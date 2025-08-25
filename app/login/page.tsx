@@ -1,17 +1,25 @@
+"use client";
+
 import { LoginCard } from "@/components/ui/login-card"
 import { Navbar } from "@/components/ui/navbar";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { FlickeringGrid } from "@/components/ui/flickering-grid";
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
-export default async function Page() {
-    const store = await cookies();
-    const token = store.get('jwt')?.value;
+export default function Page() {
+    const router = useRouter();
 
-    if (token) {
-        redirect('/dashboard');
-    }
+    useEffect(() => {
+        const token = document.cookie
+            .split('; ')
+            .find(row => row.startsWith('jwt='))
+            ?.split('=')[1];
+
+        if (token) {
+            router.push('/dashboard');
+        }
+    }, [router]);
 
     const buttons = (
         <>
