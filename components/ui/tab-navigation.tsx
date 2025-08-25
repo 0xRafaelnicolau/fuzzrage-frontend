@@ -1,0 +1,45 @@
+'use client';
+
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+
+interface Tab {
+    id: string;
+    label: string;
+    href: string;
+}
+
+interface TabNavigationProps {
+    tabs: Tab[];
+}
+
+export function TabNavigation({ tabs }: TabNavigationProps) {
+    const pathname = usePathname();
+
+    return (
+        <div className="sticky top-14 z-50 w-full border-b border-border bg-background">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <nav
+                    className="flex gap-4 sm:gap-6 text-sm overflow-x-auto whitespace-nowrap scrollbar-hide"
+                    style={{ WebkitOverflowScrolling: 'touch' }}
+                >
+                    {tabs.map((tab) => {
+                        const isActive = pathname === tab.href;
+                        return (
+                            <Link
+                                key={tab.id}
+                                href={tab.href}
+                                className={`py-2 px-2 sm:px-0 transition-colors duration-200 border-b-2 ${isActive
+                                    ? 'border-primary font-normal'
+                                    : 'border-transparent font-normal text-muted-foreground hover:text-foreground hover:border-primary'
+                                    }`}
+                            >
+                                {tab.label}
+                            </Link>
+                        );
+                    })}
+                </nav>
+            </div>
+        </div>
+    );
+}
