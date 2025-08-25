@@ -2,11 +2,15 @@ import { Navbar } from '@/components/ui/navbar';
 import { TabNavigation } from '@/components/ui/tab-navigation';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { getUser } from '@/lib/data';
+import { redirect } from 'next/navigation';
 import UserMenu from '@/components/ui/user-menu';
 
 export default async function Layout({ children }: { children: React.ReactNode }) {
 
     const user = await getUser();
+    if (!user) {
+        redirect('/login');
+    }
 
     const dashboardTabs = [
         { id: 'overview', label: 'Overview', href: '/dashboard' },

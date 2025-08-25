@@ -7,10 +7,12 @@ export default async function middleware(req: NextRequest) {
     const isProtectedRoute = protectedRoutes.some(route => path.startsWith(route))
 
     if (isProtectedRoute) {
-        // Allow access if auth_success=true query parameter is present
-        const authSuccess = req.nextUrl.searchParams.get('auth_success')
-        if (authSuccess === 'true') {
-            return NextResponse.next()
+        if (path.startsWith('/dashboard')) {
+            const auth = req.nextUrl.searchParams.get('auth_success')
+
+            if (auth === 'true') {
+                return NextResponse.redirect(new URL('/dashboard', req.nextUrl))
+            }
         }
 
         const token = req.cookies.get('jwt')?.value
