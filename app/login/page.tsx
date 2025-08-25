@@ -2,8 +2,15 @@ import { LoginCard } from "@/components/ui/login-card"
 import { Navbar } from "@/components/ui/navbar";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { FlickeringGrid } from "@/components/ui/flickering-grid";
+import { getUser } from "@/lib/data";
+import { redirect } from "next/navigation";
 
-export default function Page() {
+export default async function Page() {
+    const user = await getUser();
+    if (user) {
+        redirect('/dashboard');
+    }
+
     const buttons = (
         <>
             <ThemeToggle />
