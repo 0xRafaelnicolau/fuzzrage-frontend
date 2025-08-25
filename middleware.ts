@@ -6,10 +6,13 @@ const protectedRoutes = ['/dashboard']
 export default async function middleware(req: NextRequest) {
     const path = req.nextUrl.pathname
     const isProtectedRoute = protectedRoutes.includes(path)
-    const user = await getUser()
 
-    if (isProtectedRoute && !user) {
-        return NextResponse.redirect(new URL('/login', req.nextUrl))
+    if (isProtectedRoute) {
+        const user = await getUser()
+
+        if (!user) {
+            return NextResponse.redirect(new URL('/login', req.nextUrl))
+        }
     }
 
     return NextResponse.next()
