@@ -33,17 +33,6 @@ export default function Page() {
             <main>
                 <Navbar buttons={buttons} />
                 <div className="h-screen overflow-hidden h-full flex items-center justify-center relative">
-                    <div className="absolute inset-0 w-full overflow-hidden rounded-lg bg-background">
-                        <FlickeringGrid
-                            className="relative inset-0 z-0 [mask-image:radial-gradient(450px_circle_at_center,white,transparent)]"
-                            squareSize={4}
-                            gridGap={6}
-                            color="#0B54C7"
-                            maxOpacity={0.5}
-                            flickerChance={1}
-                        />
-                    </div>
-
                     <div className="relative z-10 -mt-32 flex flex-col items-center space-y-6">
                         <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary"></div>
                         <div className="text-center space-y-2">

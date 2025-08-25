@@ -45,7 +45,7 @@ export function ChartRadialShape() {
     }
 
     return (
-        <Card className="flex flex-col">
+        <Card className="flex flex-col border-[border-color:var(--border-light)] dark:border-input">
             <CardHeader className="items-center pb-0">
                 <CardTitle className="text-xl">Storage Usage</CardTitle>
                 <CardDescription className="text-sm">

@@ -5,6 +5,7 @@ import { cookies } from "next/headers"
 export type User = {
     name: string
     email: string
+    provider: string
     avatar_url: string
 }
 
@@ -28,6 +29,7 @@ export async function getUser(): Promise<User | null> {
                 return {
                     name: data.data.attributes.name,
                     email: data.data.attributes.email,
+                    provider: data.data.attributes.provider,
                     avatar_url: data.data.attributes.avatar_url
                 }
             }

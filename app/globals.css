@@ -124,6 +124,7 @@
   --sidebar-border: oklch(0.9132 0.0401 268.5273);
   --sidebar-ring: oklch(0.4811 0.1913 260.4498);
   --destructive-foreground: oklch(1.0000 0 0);
+  --border-light: rgba(0, 0, 0, 0.03);
   --font-sans: Montserrat, ui-sans-serif, sans-serif, system-ui;
   --font-serif: Merriweather, ui-serif, serif;
   --font-mono: JetBrains Mono;
@@ -179,6 +180,7 @@
   --sidebar-border: oklch(0.2690 0.0446 261.9433);
   --sidebar-ring: oklch(0.6738 0.1748 256.0028);
   --destructive-foreground: oklch(1.0000 0 0);
+  --border-light: rgba(0, 0, 0, 0.03);
   --radius: 0.5rem;
   --font-sans: Montserrat, ui-sans-serif, sans-serif, system-ui;
   --font-serif: Merriweather, ui-serif, serif;
