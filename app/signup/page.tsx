@@ -4,10 +4,10 @@ import { SignupCard } from "@/components/ui/signup-card";
 import { Navbar } from "@/components/ui/navbar";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { FlickeringGrid } from "@/components/ui/flickering-grid";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function Page() {
+function SignupContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const [isAuthenticating, setIsAuthenticating] = useState(false);
@@ -65,4 +65,24 @@ export default function Page() {
             </div>
         </main>
     );
+}
+
+export default function Page() {
+    return (
+        <Suspense fallback={
+            <main>
+                <Navbar buttons={<ThemeToggle />} />
+                <div className="h-screen overflow-hidden h-full flex items-center justify-center relative">
+                    <div className="relative z-10 -mt-32 flex flex-col items-center space-y-6">
+                        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary"></div>
+                        <div className="text-center space-y-2">
+                            <h2 className="text-2xl font-bold text-foreground">Loading...</h2>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        }>
+            <SignupContent />
+        </Suspense>
+    )
 }

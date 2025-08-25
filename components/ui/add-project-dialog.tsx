@@ -18,6 +18,7 @@ import { ChevronDown, Search } from "lucide-react"
 import { GitHubIcon } from "@/components/ui/icons/github-icon"
 import { GitLabIcon } from "@/components/ui/icons/gitlab-icons"
 import { BitbucketIcon } from "@/components/ui/icons/bitbucket-icon"
+import { User } from "@/lib/data"
 
 const getProviderIcon = (provider?: string) => {
     switch (provider?.toLowerCase()) {
@@ -45,7 +46,7 @@ const getProviderName = (provider?: string) => {
     }
 };
 
-export function AddProjectDialog({ user }: { user?: any }) {
+export function AddProjectDialog({ user }: { user?: User | null }) {
     return (
         <Dialog>
             <DialogTrigger asChild>
