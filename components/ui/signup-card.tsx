@@ -15,7 +15,7 @@ export function SignupCard() {
     return (
         <Card className="relative w-[350px] overflow-hidden">
             <CardHeader className="text-center px-10 py-4 pb-2">
-                <CardTitle className="text-xl">Let's create your account!</CardTitle>
+                <CardTitle className="text-xl">Let&apos;s create your account!</CardTitle>
                 <CardDescription>
                     Sign up with your Git provider
                 </CardDescription>
