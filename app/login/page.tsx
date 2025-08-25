@@ -5,21 +5,19 @@ import { Navbar } from "@/components/ui/navbar";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { FlickeringGrid } from "@/components/ui/flickering-grid";
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function Page() {
     const router = useRouter();
+    const searchParams = useSearchParams();
 
     useEffect(() => {
-        const token = document.cookie
-            .split('; ')
-            .find(row => row.startsWith('jwt='))
-            ?.split('=')[1];
+        const authSuccess = searchParams.get("auth_success");
 
-        if (token) {
-            router.push('/dashboard');
+        if (authSuccess === "true") {
+            router.push("/dashboard");
         }
-    }, [router]);
+    }, [router, searchParams]);
 
     const buttons = (
         <>
