@@ -19,7 +19,7 @@ export default function Page() {
                 <div className="w-full space-y-6 text-center">
                     <div className="space-y-3">
                         <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl animate-bounce">404</h1>
-                        <p className="text-muted-foreground">Looks like you've ventured into the unknown digital realm.</p>
+                        <p className="text-muted-foreground">Looks like you&apos;ve ventured into the unknown digital realm.</p>
                     </div>
                     <Link href="/" >
                         <Button variant="outline" size="lg">
