@@ -8,9 +8,8 @@ export default async function middleware(req: NextRequest) {
 
     if (isProtectedRoute) {
         const token = req.cookies.get('jwt')?.value
-        const header = req.headers.get('Set-Cookie')
 
-        if (!token && !header) {
+        if (!token) {
             return NextResponse.redirect(new URL('/login', req.nextUrl))
         }
     }

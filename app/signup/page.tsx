@@ -2,8 +2,17 @@ import { SignupCard } from "@/components/ui/signup-card";
 import { Navbar } from "@/components/ui/navbar";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { FlickeringGrid } from "@/components/ui/flickering-grid";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
 export default async function Page() {
+    const store = await cookies();
+    const token = store.get('jwt')?.value;
+
+    if (token) {
+        redirect('/dashboard');
+    }
+
     const buttons = (
         <>
             <ThemeToggle />

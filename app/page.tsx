@@ -12,15 +12,16 @@ import { Navbar } from "@/components/ui/navbar";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { BentoCard, BentoGrid } from "@/components/ui/bento-grid";
-import { getUser } from "@/lib/data";
+import { cookies } from "next/headers";
 
 export default async function Page() {
-  const user = await getUser()
+  const store = await cookies();
+  const token = store.get('jwt')?.value;
 
   const buttons = (
     <>
       <ThemeToggle />
-      {user ? <Link href="/dashboard">
+      {token ? <Link href="/dashboard">
         <Button variant="outline" size="icon" className="w-26">Dashboard</Button>
       </Link> : (
         <Link href="/login">
