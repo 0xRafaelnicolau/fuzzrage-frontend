@@ -7,12 +7,10 @@ export default async function middleware(req: NextRequest) {
     const isProtectedRoute = protectedRoutes.some(route => path.startsWith(route))
 
     if (isProtectedRoute) {
-        if (path.startsWith('/dashboard')) {
-            const auth = req.nextUrl.searchParams.get('auth_success')
+        const auth = req.nextUrl.searchParams.get('auth_success')
 
-            if (auth === 'true') {
-                return NextResponse.redirect(new URL('/dashboard', req.nextUrl))
-            }
+        if (auth === 'true') {
+            return NextResponse.redirect(new URL('/dashboard', req.nextUrl))
         }
 
         const token = req.cookies.get('jwt')?.value
