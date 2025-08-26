@@ -38,3 +38,38 @@ export async function getUser(): Promise<User | null> {
 
     return null;
 }
+
+export type Installation = {
+    id: string
+    target: string
+    provider: string
+}
+
+export async function getUserInstallations(): Promise<Installation[] | null> {
+    const store = await cookies()
+    const token = store.get('jwt')?.value
+
+    if (token) {
+        const response = await fetch(`${process.env.BACKEND_URL}/v1/user/installations`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        })
+
+        if (response.ok) {
+            const data = await response.json()
+
+            if (data?.data) {
+                return data.data.map((installation: any) => ({
+                    id: installation.id,
+                    target: installation.attributes.target,
+                    provider: installation.attributes.provider
+                }))
+            }
+        }
+    }
+
+    return null;
+}
