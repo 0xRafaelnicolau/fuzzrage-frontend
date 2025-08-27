@@ -2,12 +2,12 @@
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Search, ArrowLeft } from "lucide-react"
+import { Search } from "lucide-react"
 import { getRepositories, Installation, Repository } from "@/lib/data"
 import { InstallAppLink } from "./install-app-link"
 import InstallationDropdown from "./installation-dropdown"
-import Link from "next/link"
 import { useState, useEffect, useMemo } from "react"
+import { createProject } from "@/lib/actions"
 
 export default function NewProjectForm({ installations }: { installations: Installation[] | null }) {
     const [selectedInstallation, setSelectedInstallation] = useState<Installation | null>(null)
@@ -96,57 +96,19 @@ export default function NewProjectForm({ installations }: { installations: Insta
 
     return (
         <main>
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 space-y-6">
-                <div className="flex items-center gap-4">
-                    <Link href="/dashboard/projects">
-                        <Button variant="outline" size="sm" className="p-2 h-8 w-8">
-                            <ArrowLeft className="h-4 w-4" />
-                        </Button>
-                    </Link>
-                    <div>
-                        <h1 className="text-2xl font-semibold">Add Project</h1>
-                        <p className="text-muted-foreground text-sm">
-                            Create a new project and start fuzzing
-                        </p>
+            <div className="space-y-4">
+                <div className="flex flex-col gap-4">
+                    <div className="space-y-2 md:hidden">
+                        <InstallationDropdown
+                            installations={installations}
+                            variant="mobile"
+                            selectedInstallation={selectedInstallation}
+                            onInstallationChange={handleInstallationChange}
+                        />
                     </div>
-                </div>
 
-                <div className="space-y-4">
-                    <div className="flex flex-col gap-4">
-                        <div className="space-y-2 md:hidden">
-                            <InstallationDropdown
-                                installations={installations}
-                                variant="mobile"
-                                selectedInstallation={selectedInstallation}
-                                onInstallationChange={handleInstallationChange}
-                            />
-                        </div>
-
-                        <div className="hidden md:flex md:flex-row gap-4 w-full">
-                            <div className="space-y-2 flex-1">
-                                <div className="relative">
-                                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                                    <Input
-                                        id="repository"
-                                        placeholder="Search repositories..."
-                                        className="pl-9 w-full h-10"
-                                        value={searchQuery}
-                                        onChange={handleSearchChange}
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="space-y-2 flex-shrink-0">
-                                <InstallationDropdown
-                                    installations={installations}
-                                    variant="desktop"
-                                    selectedInstallation={selectedInstallation}
-                                    onInstallationChange={handleInstallationChange}
-                                />
-                            </div>
-                        </div>
-
-                        <div className="space-y-2 md:hidden">
+                    <div className="hidden md:flex md:flex-row gap-4 w-full">
+                        <div className="space-y-2 flex-1">
                             <div className="relative">
                                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                                 <Input
@@ -158,41 +120,67 @@ export default function NewProjectForm({ installations }: { installations: Insta
                                 />
                             </div>
                         </div>
-                    </div>
 
-                    <div className="space-y-2">
-                        <div className="border rounded-lg p-3 bg-background">
-                            {message ? (
-                                <div className="flex items-center justify-center p-6 text-muted-foreground">
-                                    <span className="text-sm">{message}</span>
-                                </div>
-                            ) : (
-                                <div className="space-y-2 max-h-[calc(6*3.5rem+5*0.5rem)] overflow-y-auto">
-                                    {filteredRepositories.map((repo) => (
-                                        <div key={repo.id} className="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors h-[3.5rem]">
-                                            <div className="flex items-center gap-2">
-                                                <span className="text-sm font-medium truncate">{repo.name}</span>
-                                            </div>
-                                            <Button size="sm" variant="default" className="h-8 px-4 text-sm">
-                                                Import
-                                            </Button>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
+                        <div className="space-y-2 flex-shrink-0">
+                            <InstallationDropdown
+                                installations={installations}
+                                variant="desktop"
+                                selectedInstallation={selectedInstallation}
+                                onInstallationChange={handleInstallationChange}
+                            />
                         </div>
                     </div>
 
-                    <div className="text-center pt-2 pb-8">
-                        <p className="text-sm text-muted-foreground">
-                            Missing Git repository? Adjust{" "}
-                            <InstallAppLink
-                                installations={installations}
-                                className="underline underline-offset-4 hover:text-foreground transition-colors"
+                    <div className="space-y-2 md:hidden">
+                        <div className="relative">
+                            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                            <Input
+                                id="repository"
+                                placeholder="Search repositories..."
+                                className="pl-9 w-full h-10"
+                                value={searchQuery}
+                                onChange={handleSearchChange}
                             />
-                            .
-                        </p>
+                        </div>
                     </div>
+                </div>
+
+                <div className="space-y-2">
+                    <div className="border rounded-lg p-3 bg-background">
+                        {message ? (
+                            <div className="flex items-center justify-center p-6 text-muted-foreground">
+                                <span className="text-sm">{message}</span>
+                            </div>
+                        ) : (
+                            <div className="space-y-2 max-h-[calc(6*3.5rem+5*0.5rem)] overflow-y-auto">
+                                {filteredRepositories.map((repo) => (
+                                    <div key={repo.id} className="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors h-[3.5rem]">
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-sm font-medium truncate">{repo.name}</span>
+                                        </div>
+                                        <Button size="sm" variant="default" className="h-8 px-4 text-sm" onClick={() => {
+                                            if (selectedInstallation) {
+                                                createProject(selectedInstallation.id, repo.name, repo.id)
+                                            }
+                                        }}>
+                                            Import
+                                        </Button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                <div className="text-center pt-2 pb-8">
+                    <p className="text-sm text-muted-foreground">
+                        Missing Git repository? Adjust{" "}
+                        <InstallAppLink
+                            installations={installations}
+                            className="underline underline-offset-4 hover:text-foreground transition-colors"
+                        />
+                        .
+                    </p>
                 </div>
             </div>
         </main>

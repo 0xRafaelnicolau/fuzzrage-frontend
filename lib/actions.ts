@@ -50,3 +50,30 @@ export async function installApp() {
         return response.url
     }
 }
+
+export async function createProject(installationId: string, repoName: string, repositoryId: string) {
+    const store = await cookies()
+    const token = store.get('jwt')?.value
+
+    const response = await fetch(`${process.env.BACKEND_URL}/v1/projects`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+            data: {
+                attributes: {
+                    installation_id: parseInt(installationId),
+                    name: repoName,
+                    repository_id: parseInt(repositoryId)
+                }
+            }
+        })
+    })
+
+    if (response.ok) {
+        const data = await response.json()
+        redirect(`/project/${data.data.id}`)
+    }
+}
