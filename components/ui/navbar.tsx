@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { ReactNode } from "react";
-import { Logo } from "./logo";
+import { Logo } from "./icons/logo";
 
 interface NavbarProps {
     buttons?: ReactNode;

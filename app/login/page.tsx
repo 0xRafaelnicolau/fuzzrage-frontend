@@ -1,6 +1,6 @@
 "use client";
 
-import { LoginCard } from "@/components/ui/login-card"
+import { LoginCard } from "@/components/ui/cards/login-card"
 import { Navbar } from "@/components/ui/navbar";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { FlickeringGrid } from "@/components/ui/flickering-grid";
@@ -23,7 +23,7 @@ function LoginContent() {
 
     const buttons = (
         <>
-            <ThemeToggle />
+            {/* <ThemeToggle /> */}
         </>
     );
 
@@ -32,8 +32,8 @@ function LoginContent() {
         return (
             <main>
                 <Navbar buttons={buttons} />
-                <div className="h-screen overflow-hidden h-full flex items-center justify-center relative">
-                    <div className="relative z-10 -mt-32 flex flex-col items-center space-y-6">
+                <div className="h-[calc(100vh-4rem)] overflow-hidden flex items-center justify-center relative">
+                    <div className="relative z-10 flex flex-col items-center space-y-6">
                         <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary"></div>
                         <div className="text-center space-y-2">
                             <h2 className="text-2xl font-bold text-foreground">Authenticating...</h2>
@@ -48,7 +48,7 @@ function LoginContent() {
     return (
         <main>
             <Navbar buttons={buttons} />
-            <div className="h-screen overflow-hidden h-full flex items-center justify-center relative">
+            <div className="h-[calc(100vh-4rem)] overflow-hidden flex items-center justify-center relative">
                 <div className="absolute inset-0 w-full overflow-hidden rounded-lg bg-background">
                     <FlickeringGrid
                         className="relative inset-0 z-0 [mask-image:radial-gradient(450px_circle_at_center,white,transparent)]"
@@ -59,7 +59,7 @@ function LoginContent() {
                         flickerChance={1}
                     />
                 </div>
-                <div className="relative z-10 -mt-32">
+                <div className="relative z-10">
                     <LoginCard />
                 </div>
             </div>
@@ -72,8 +72,8 @@ export default function Page() {
         <Suspense fallback={
             <main>
                 <Navbar buttons={<ThemeToggle />} />
-                <div className="h-screen overflow-hidden h-full flex items-center justify-center relative">
-                    <div className="relative z-10 -mt-32 flex flex-col items-center space-y-6">
+                <div className="h-[calc(100vh-4rem)] overflow-hidden flex items-center justify-center relative">
+                    <div className="relative z-10 flex flex-col items-center space-y-6">
                         <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary"></div>
                         <div className="text-center space-y-2">
                             <h2 className="text-2xl font-bold text-foreground">Loading...</h2>

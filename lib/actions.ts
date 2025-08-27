@@ -33,3 +33,20 @@ export async function logout() {
         redirect('/')
     }
 }
+
+export async function installApp() {
+    const store = await cookies()
+    const token = store.get('jwt')?.value
+
+    const response = await fetch(`${process.env.BACKEND_URL}/v1/user/installations/new`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        }
+    })
+
+    if (response.ok) {
+        return response.url
+    }
+}

@@ -10,8 +10,7 @@ import {
 import { FlickeringGrid } from "@/components/ui/flickering-grid";
 import { Navbar } from "@/components/ui/navbar";
 import { Button } from "@/components/ui/button";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { BentoCard, BentoGrid } from "@/components/ui/bento-grid";
+import { BentoCard, BentoGrid } from "@/components/ui/cards/bento-grid";
 import { cookies } from "next/headers";
 
 export default async function Page() {
@@ -20,7 +19,7 @@ export default async function Page() {
 
   const buttons = (
     <>
-      <ThemeToggle />
+      {/* <ThemeToggle /> */}
       {token ? <Link href="/dashboard">
         <Button variant="outline" size="icon" className="w-26">Dashboard</Button>
       </Link> : (
