@@ -1,53 +1,12 @@
-"use client";
 
-import { SignupCard } from "@/components/ui/cards/signup-card";
+import { SignupCard } from "@/components/signup/signup-card";
 import { Navbar } from "@/components/ui/navbar";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { FlickeringGrid } from "@/components/ui/flickering-grid";
-import { useEffect, useState, Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
 
-function SignupContent() {
-    const router = useRouter();
-    const searchParams = useSearchParams();
-    const [isAuthenticating, setIsAuthenticating] = useState(false);
-
-    useEffect(() => {
-        const auth = searchParams.get("auth_success");
-
-        if (auth === "true") {
-            setIsAuthenticating(true);
-            router.push("/dashboard");
-        }
-    }, [router, searchParams]);
-
-    const buttons = (
-        <>
-            {/* <ThemeToggle /> */}
-        </>
-    );
-
-    const auth = searchParams.get("auth_success");
-    if (auth === "true" || isAuthenticating) {
-        return (
-            <main>
-                <Navbar buttons={buttons} />
-                <div className="h-[calc(100vh-4rem)] overflow-hidden flex items-center justify-center relative">
-                    <div className="relative z-10 flex flex-col items-center space-y-6">
-                        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary"></div>
-                        <div className="text-center space-y-2">
-                            <h2 className="text-2xl font-bold text-foreground">Authenticating...</h2>
-                            <p className="text-muted-foreground">Please wait while we set up your account</p>
-                        </div>
-                    </div>
-                </div>
-            </main>
-        );
-    }
-
+export default function Page() {
     return (
         <main>
-            <Navbar buttons={buttons} />
+            <Navbar />
             <div className="h-[calc(100vh-4rem)] overflow-hidden flex items-center justify-center relative">
                 <div className="absolute inset-0 w-full overflow-hidden rounded-lg bg-background">
                     <FlickeringGrid
@@ -65,24 +24,4 @@ function SignupContent() {
             </div>
         </main>
     );
-}
-
-export default function Page() {
-    return (
-        <Suspense fallback={
-            <main>
-                <Navbar buttons={<ThemeToggle />} />
-                <div className="h-[calc(100vh-4rem)] overflow-hidden flex items-center justify-center relative">
-                    <div className="relative z-10 flex flex-col items-center space-y-6">
-                        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary"></div>
-                        <div className="text-center space-y-2">
-                            <h2 className="text-2xl font-bold text-foreground">Loading...</h2>
-                        </div>
-                    </div>
-                </div>
-            </main>
-        }>
-            <SignupContent />
-        </Suspense>
-    )
 }

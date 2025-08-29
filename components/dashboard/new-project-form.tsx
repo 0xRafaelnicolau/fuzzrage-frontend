@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Search } from "lucide-react"
 import { getRepositories, Installation, Repository } from "@/lib/data"
-import { InstallAppLink } from "./install-app-link"
+import { InstallationLink } from "./installation-link"
 import InstallationDropdown from "./installation-dropdown"
 import { useState, useEffect, useMemo } from "react"
 import { createProject } from "@/lib/actions"
@@ -175,7 +175,7 @@ export default function NewProjectForm({ installations }: { installations: Insta
                 <div className="text-center pt-2 pb-8">
                     <p className="text-sm text-muted-foreground">
                         Missing Git repository? Adjust{" "}
-                        <InstallAppLink
+                        <InstallationLink
                             installations={installations}
                             className="underline underline-offset-4 hover:text-foreground transition-colors"
                         />

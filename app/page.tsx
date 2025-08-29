@@ -34,7 +34,7 @@ export default async function Page() {
     {
       Icon: Cloud,
       name: "Cloud Fuzzing",
-      description: "Run continuous fuzz testing in the cloud with your Foundry powered codebase.",
+      description: "Run continuous fuzz testing in the cloud with your Echidna powered codebase.",
       href: "#cloud-fuzzing",
       cta: "Learn more",
       background: <div className="absolute inset-0 bg-gradient-to-br from-primary/3 via-transparent to-primary/3" />,

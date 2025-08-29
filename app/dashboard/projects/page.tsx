@@ -1,5 +1,5 @@
 import { Input } from "@/components/ui/input"
-import { Search } from "lucide-react"
+import { Search, CirclePlus } from "lucide-react"
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { getProjects } from "@/lib/data";
@@ -17,8 +17,9 @@ export default async function Page() {
                         <Input type="text" placeholder="Search projects..." className="pl-10" />
                     </div>
                     <Link href="/dashboard/projects/new">
-                        <Button variant="default" >
-                            Add Project
+                        <Button variant="default" className="gap-1.25">
+                            <CirclePlus className="h-4 w-4" />
+                            <span className="hidden md:inline">Add Project</span>
                         </Button>
                     </Link>
                 </div>
