@@ -5,40 +5,76 @@ import ProjectCard from "@/components/dashboard/project-card";
 import { Input } from "@/components/ui/input"
 import { Search, CirclePlus, Calendar as CalendarIcon } from "lucide-react"
 import { Button } from "@/components/ui/button";
-import { getProjects, Project, GetProjectsParams } from "@/lib/data";
-import { useEffect, useState } from "react";
 import { DateRange } from "react-day-picker";
 import { Calendar } from "@/components/ui/calendar";
+import { getProjects, Project, GetProjectsParams } from "@/lib/data";
+import { useEffect, useState } from "react";
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
+import { useDebouncedCallback } from 'use-debounce';
 
 export default function Page() {
     const [open, setOpen] = useState(false)
     const [projects, setProjects] = useState<Project[]>([])
-    const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined)
+
+    const searchParams = useSearchParams();
+    const pathname = usePathname();
+    const { replace } = useRouter();
+
+    const handleSearch = useDebouncedCallback((term: string) => {
+        const params = new URLSearchParams(searchParams);
+
+        if (term) {
+            params.set('search', term);
+        } else {
+            params.delete('search');
+        }
+
+        replace(`${pathname}?${params.toString()}`);
+    }, 300);
+
+    const handleDataPicker = (range: DateRange | undefined) => {
+        const params = new URLSearchParams(searchParams);
+
+        if (range?.from && range?.to) {
+            params.set('from', range.from.toISOString());
+            params.set('to', range.to.toISOString());
+        } else {
+            params.delete('from');
+            params.delete('to');
+        }
+
+        replace(`${pathname}?${params.toString()}`);
+    }
 
     useEffect(() => {
         const fetchProjects = async () => {
             const params: GetProjectsParams = {};
 
-            if (dateRange?.from) {
-                const fromDate = new Date(dateRange.from);
-                fromDate.setHours(0, 0, 0, 0);
-                params.created_at_gte = fromDate.toISOString();
+            const searchTerm = searchParams.get('search');
+            if (searchTerm) {
+                params.name_like = searchTerm;
             }
 
-            if (dateRange?.to) {
-                const toDate = new Date(dateRange.to);
-                toDate.setHours(23, 59, 59, 999);
-                params.created_at_lte = toDate.toISOString();
+            const toDate = searchParams.get('to');
+            const fromDate = searchParams.get('from');
+            if (fromDate && toDate) {
+                const from = new Date(fromDate);
+                const to = new Date(toDate);
+
+                from.setHours(0, 0, 0, 0);
+                to.setHours(23, 59, 59, 999);
+
+                params.created_at_gte = from.toISOString();
+                params.created_at_lte = to.toISOString();
             }
 
             const projects = await getProjects(params);
-
             if (projects) {
                 setProjects(projects);
             }
         };
         fetchProjects();
-    }, [dateRange]);
+    }, [searchParams]);
 
     return (
         <main>
@@ -46,7 +82,10 @@ export default function Page() {
                 <div className="flex w-full items-center gap-2">
                     <div className="relative flex-1">
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                        <Input type="text" placeholder="Search projects..." className="pl-10" />
+                        <Input type="text" placeholder="Search projects..." className="pl-10"
+                            onChange={(e) => {
+                                handleSearch(e.target.value);
+                            }} />
                     </div>
                     <div className="relative">
                         <Button variant="outline" size="icon" onClick={() => setOpen(!open)}>
@@ -56,9 +95,12 @@ export default function Page() {
                             <div className="absolute top-full right-0 mt-2 z-50">
                                 <Calendar
                                     mode="range"
-                                    defaultMonth={dateRange?.from}
-                                    selected={dateRange}
-                                    onSelect={setDateRange}
+                                    defaultMonth={new Date()}
+                                    selected={searchParams.get('from') && searchParams.get('to') ? {
+                                        from: new Date(searchParams.get('from')!),
+                                        to: new Date(searchParams.get('to')!)
+                                    } : undefined}
+                                    onSelect={handleDataPicker}
                                     className="rounded-lg border shadow-sm"
                                 />
                             </div>
