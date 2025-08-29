@@ -114,7 +114,7 @@ export default async function Page() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link href="/signup">
-              <Button variant="outline" size="lg" className="text-base px-8 py-3">
+              <Button variant="default" size="lg" className="text-base px-8 py-3">
                 Get Started
               </Button>
             </Link>

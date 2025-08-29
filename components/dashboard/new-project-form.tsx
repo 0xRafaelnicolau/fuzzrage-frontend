@@ -160,7 +160,7 @@ export default function NewProjectForm({ installations }: { installations: Insta
                                         </div>
                                         <Button size="sm" variant="default" className="h-8 px-4 text-sm" onClick={() => {
                                             if (selectedInstallation) {
-                                                createProject(selectedInstallation.id, repo.name, repo.id)
+                                                createProject(selectedInstallation.id, repo.name, repo.id, selectedInstallation.target)
                                             }
                                         }}>
                                             Import

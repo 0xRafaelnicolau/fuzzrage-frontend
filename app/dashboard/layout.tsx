@@ -11,7 +11,6 @@ export default async function Layout({ children }: { children: React.ReactNode }
         { id: 'projects', label: 'Projects', href: '/dashboard/projects' },
         { id: 'activity', label: 'Activity', href: '/dashboard/activity' },
         { id: 'usage', label: 'Usage', href: '/dashboard/usage' },
-        { id: 'settings', label: 'Settings', href: '/dashboard/settings' },
     ];
 
     const buttons = (

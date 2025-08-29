@@ -51,7 +51,7 @@ export async function installApp() {
     }
 }
 
-export async function createProject(installationId: string, repoName: string, repositoryId: string) {
+export async function createProject(installationId: string, repoName: string, repositoryId: string, repoOwner: string) {
     const store = await cookies()
     const token = store.get('jwt')?.value
 
@@ -64,9 +64,10 @@ export async function createProject(installationId: string, repoName: string, re
         body: JSON.stringify({
             data: {
                 attributes: {
-                    installation_id: parseInt(installationId),
                     name: repoName,
-                    repository_id: parseInt(repositoryId)
+                    installation_id: parseInt(installationId),
+                    repository_id: parseInt(repositoryId),
+                    repository_owner: repoOwner
                 }
             }
         })
