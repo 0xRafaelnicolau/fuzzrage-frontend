@@ -15,7 +15,7 @@ import { useDebouncedCallback } from 'use-debounce';
 
 export default function Page() {
     const [open, setOpen] = useState(false)
-    const [projects, setProjects] = useState<Project[]>([])
+    const [projects, setProjects] = useState<Project[] | null>(null)
 
     const searchParams = useSearchParams();
     const pathname = usePathname();
@@ -136,7 +136,7 @@ export default function Page() {
                     </Link>
                 </div>
 
-                {!projects || projects.length === 0 ? (
+                {projects === null ? null : projects.length === 0 ? (
                     <div className="text-center py-12">
                         <p className="text-muted-foreground">No projects found.</p>
                     </div>

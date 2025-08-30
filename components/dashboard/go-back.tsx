@@ -22,7 +22,7 @@ export default function GoBack({
                     </Button>
                 </Link>
                 <div>
-                    <h1 className="text-xl font-semibold">{title}</h1>
+                    <h1 className="text-lg font-semibold">{title}</h1>
                     <p className="text-muted-foreground text-sm">
                         {description}
                     </p>

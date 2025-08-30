@@ -40,12 +40,12 @@ export default async function Layout({ children, params }: { children: React.Rea
                         description={""} href="/dashboard/projects"
                         buttons={[
                             <Link key="repository-link" href={`https://github.com/${project?.attributes.repository_owner}/${project?.attributes.repository_name}`} target="_blank">
-                                <Button variant="outline">
+                                <Button variant="outline" size="icon" className="md:size-auto md:h-9 md:px-4 md:py-2 md:has-[>svg]:px-3">
                                     {getProviderIcon(user?.provider)}
                                     <span className="hidden md:inline">Repository</span>
                                 </Button>
                             </Link>,
-                            <Button key="start-campaign" variant="default" className="gap-1.25">
+                            <Button key="start-campaign" variant="default" size="icon" className="gap-1.25 md:size-auto md:h-9 md:px-4 md:py-2 md:has-[>svg]:px-3">
                                 <CirclePlus className="h-4 w-4" />
                                 <span className="hidden md:inline">Start Campaign</span>
                             </Button>
