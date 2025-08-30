@@ -17,7 +17,7 @@ export function TabNavigation({ tabs }: TabNavigationProps) {
     const pathname = usePathname();
 
     return (
-        <div className="sticky top-14 z-50 w-full border-b border-border bg-background">
+        <div className="sticky top-14 z-50 w-full border-b [border-color:var(--border-light)] dark:border-input bg-background">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <nav
                     className="flex gap-4 sm:gap-6 text-sm overflow-x-auto whitespace-nowrap scrollbar-hide"
@@ -29,9 +29,9 @@ export function TabNavigation({ tabs }: TabNavigationProps) {
                             <Link
                                 key={tab.id}
                                 href={tab.href}
-                                className={`py-2 px-2 sm:px-0 transition-colors duration-200 border-b-2 ${isActive
-                                    ? 'border-primary font-normal'
-                                    : 'border-transparent font-normal text-muted-foreground hover:text-foreground hover:border-primary'
+                                className={`py-2 px-2 sm:px-0 transition-colors border-b-2 ${isActive
+                                    ? 'border-foreground dark:border-primary font-normal'
+                                    : 'border-transparent font-normal text-muted-foreground hover:text-foreground hover:border-foreground dark:hover:border-primary'
                                     }`}
                             >
                                 {tab.label}

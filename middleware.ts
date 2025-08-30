@@ -1,16 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getUser } from '@/lib/data'
 
-const protectedRoutes = ['/dashboard']
+const protectedRoutes = ['/dashboard', '/project']
 
 export default async function middleware(req: NextRequest) {
     const path = req.nextUrl.pathname
-    const isProtectedRoute = protectedRoutes.includes(path)
+    const isProtectedRoute = protectedRoutes.some(route => path.startsWith(route))
 
     if (isProtectedRoute) {
-        const user = await getUser()
+        const token = req.cookies.get('jwt')?.value
 
-        if (!user) {
+        if (!token) {
             return NextResponse.redirect(new URL('/login', req.nextUrl))
         }
     }

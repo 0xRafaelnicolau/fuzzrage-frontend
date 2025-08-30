@@ -10,17 +10,17 @@ import {
 import { FlickeringGrid } from "@/components/ui/flickering-grid";
 import { Navbar } from "@/components/ui/navbar";
 import { Button } from "@/components/ui/button";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { BentoCard, BentoGrid } from "@/components/ui/bento-grid";
-import { getUser } from "@/lib/data";
+import { BentoCard, BentoGrid } from "@/components/ui/cards/bento-grid";
+import { cookies } from "next/headers";
 
 export default async function Page() {
-  const user = await getUser()
+  const store = await cookies();
+  const token = store.get('jwt')?.value;
 
   const buttons = (
     <>
-      <ThemeToggle />
-      {user ? <Link href="/dashboard">
+      {/* <ThemeToggle /> */}
+      {token ? <Link href="/dashboard">
         <Button variant="outline" size="icon" className="w-26">Dashboard</Button>
       </Link> : (
         <Link href="/login">
@@ -34,7 +34,7 @@ export default async function Page() {
     {
       Icon: Cloud,
       name: "Cloud Fuzzing",
-      description: "Run continuous fuzz testing in the cloud with your Foundry powered codebase.",
+      description: "Run continuous fuzz testing in the cloud with your Echidna powered codebase.",
       href: "#cloud-fuzzing",
       cta: "Learn more",
       background: <div className="absolute inset-0 bg-gradient-to-br from-primary/3 via-transparent to-primary/3" />,
@@ -114,7 +114,7 @@ export default async function Page() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link href="/signup">
-              <Button variant="outline" size="lg" className="text-base px-8 py-3">
+              <Button variant="default" size="lg" className="text-base px-8 py-3">
                 Get Started
               </Button>
             </Link>

@@ -7,10 +7,8 @@ import {
     CreditCardIcon,
     LogOutIcon,
     SparklesIcon,
-    UserIcon
 } from "lucide-react";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -20,7 +18,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { logout } from "@/lib/actions";
 import { User } from "@/lib/data";
 
@@ -30,10 +28,10 @@ export default function UserMenu({ user }: { user: User }) {
     return (
         <DropdownMenu open={open} onOpenChange={setOpen}>
             <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="icon">
-                    <UserIcon className="h-[1.2rem] w-[1.2rem]" />
-                    <span className="sr-only">User menu</span>
-                </Button>
+                <Avatar className="border border-border size-8">
+                    <AvatarImage src={user.avatar_url} alt={user.name} />
+                    <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                </Avatar>
             </DropdownMenuTrigger>
             <DropdownMenuContent
                 className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"

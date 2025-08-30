@@ -1,8 +1,8 @@
-export default function Page() {
+export default async function Page() {
     return (
         <main>
             <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
-                <h1 className="text-2xl font-bold text-center justify-center mt-32">Activity</h1>
+                <h1 className="text-2xl font-bold text-center justify-center mt-32">Overview</h1>
             </div>
         </main>
     )

@@ -1,11 +1,9 @@
 import { Navbar } from '@/components/ui/navbar';
 import { TabNavigation } from '@/components/ui/tab-navigation';
-import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { getUser } from '@/lib/data';
 import UserMenu from '@/components/ui/user-menu';
 
 export default async function Layout({ children }: { children: React.ReactNode }) {
-
     const user = await getUser();
 
     const dashboardTabs = [
@@ -18,7 +16,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
 
     const buttons = (
         <>
-            <ThemeToggle />
+            {/* <ThemeToggle /> */}
             {user && <UserMenu user={user} />}
         </>
     );
