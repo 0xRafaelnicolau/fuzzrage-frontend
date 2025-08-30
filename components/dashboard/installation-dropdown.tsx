@@ -75,7 +75,7 @@ export default function InstallationDropdown({
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                     <Button variant="outline" size="lg" className={`${buttonClassName} ${className}`}>
-                        <div className="flex items-center">
+                        <div className="flex items-center gap-2">
                             {getProviderIcon(provider)}
                             Select {getProviderName(provider)} App
                         </div>

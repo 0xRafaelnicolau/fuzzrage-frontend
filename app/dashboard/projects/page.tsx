@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import ProjectCard from "@/components/dashboard/project-card";
+import ProjectList from "@/components/dashboard/project-list";
 import { Input } from "@/components/ui/input"
-import { Search, CirclePlus, Calendar as CalendarIcon } from "lucide-react"
+import { Search, CirclePlus, LayoutGrid, List, Calendar as CalendarIcon } from "lucide-react"
 import { Button } from "@/components/ui/button";
 import { DateRange } from "react-day-picker";
 import { Calendar } from "@/components/ui/calendar";
@@ -19,6 +20,8 @@ export default function Page() {
     const searchParams = useSearchParams();
     const pathname = usePathname();
     const { replace } = useRouter();
+
+    const isGridView = searchParams.get('layout') !== 'list';
 
     const handleSearch = useDebouncedCallback((term: string) => {
         const params = new URLSearchParams(searchParams);
@@ -45,6 +48,18 @@ export default function Page() {
 
         replace(`${pathname}?${params.toString()}`);
     }
+
+    const handleLayoutToggle = () => {
+        const params = new URLSearchParams(searchParams);
+
+        if (isGridView) {
+            params.set('layout', 'list');
+        } else {
+            params.delete('layout');
+        }
+
+        replace(`${pathname}?${params.toString()}`);
+    };
 
     useEffect(() => {
         const fetchProjects = async () => {
@@ -87,7 +102,14 @@ export default function Page() {
                                 handleSearch(e.target.value);
                             }} />
                     </div>
-                    <div className="relative">
+                    <div className="relative flex gap-2">
+                        <Button variant="outline" size="icon" onClick={handleLayoutToggle}>
+                            {isGridView ? (
+                                <LayoutGrid className="h-4 w-4" />
+                            ) : (
+                                <List className="h-4 w-4" />
+                            )}
+                        </Button>
                         <Button variant="outline" size="icon" onClick={() => setOpen(!open)}>
                             <CalendarIcon className="h-4 w-4" />
                         </Button>
@@ -119,13 +141,21 @@ export default function Page() {
                         <p className="text-muted-foreground">No projects found.</p>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {projects.map((project) => (
-                            <ProjectCard key={project.id} project={project} />
-                        ))}
-                    </div>
+                    isGridView ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {projects.map((project) => (
+                                <ProjectCard key={project.id} project={project} />
+                            ))}
+                        </div>
+                    ) : (
+                        <>
+                            {projects.map((project) => (
+                                <ProjectList key={project.id} project={project} />
+                            ))}
+                        </>
+                    )
                 )}
             </div>
-        </main>
+        </main >
     )
 }
