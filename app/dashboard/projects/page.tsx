@@ -8,10 +8,12 @@ import { Search, CirclePlus, LayoutGrid, List, Calendar as CalendarIcon } from "
 import { Button } from "@/components/ui/button";
 import { DateRange } from "react-day-picker";
 import { Calendar } from "@/components/ui/calendar";
-import { getProjects, Project, GetProjectsParams } from "@/lib/data";
+import { getProjects } from "@/lib/actions/projects";
+import { Project, GetProjectsRequest } from "@/lib/actions/types";
 import { useEffect, useState } from "react";
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { useDebouncedCallback } from 'use-debounce';
+import { toast } from "sonner";
 
 export default function Page() {
     const [open, setOpen] = useState(false)
@@ -63,7 +65,7 @@ export default function Page() {
 
     useEffect(() => {
         const fetchProjects = async () => {
-            const params: GetProjectsParams = {};
+            const params: GetProjectsRequest = {};
 
             const searchTerm = searchParams.get('search');
             if (searchTerm) {
@@ -83,9 +85,13 @@ export default function Page() {
                 params.created_at_lte = to.toISOString();
             }
 
-            const projects = await getProjects(params);
-            if (projects) {
-                setProjects(projects);
+            const response = await getProjects(params);
+
+            if (response.success) {
+                setProjects(response.projects || []);
+            } else {
+                toast.error(response.error?.message || 'Failed to fetch projects');
+                console.error(response.error);
             }
         };
         fetchProjects();

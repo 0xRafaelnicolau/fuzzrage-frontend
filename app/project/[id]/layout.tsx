@@ -1,17 +1,32 @@
-import { Navbar } from '@/components/ui/navbar';
-import { TabNavigation } from '@/components/ui/tab-navigation';
-import { getProject, getUser } from '@/lib/data';
+import { Navbar } from '@/components/ui/navigation/navbar';
+import { TabNavigation } from '@/components/ui/navigation/tab-navigation';
+import { getProject } from '@/lib/actions/projects';
+import { getUser } from '@/lib/actions/user';
+import { Project, User } from '@/lib/actions/types';
 import { Button } from '@/components/ui/button';
 import { getProviderIcon } from '@/components/providers/icon-provider';
 import { CirclePlus } from 'lucide-react';
-import UserMenu from '@/components/ui/user-menu';
+import UserMenu from '@/components/ui/navigation/user-menu';
 import GoBack from '@/components/dashboard/go-back';
 import Link from 'next/link';
 
 export default async function Layout({ children, params }: { children: React.ReactNode; params: Promise<{ id: string }> }) {
     const { id } = await params;
-    const project = await getProject(id);
-    const user = await getUser();
+
+    const [projectResponse, userResponse] = await Promise.all([
+        getProject({ projectId: id }),
+        getUser()
+    ]);
+
+    let user: User | undefined;
+    if (userResponse.success) {
+        user = userResponse.user;
+    }
+
+    let project: Project | undefined;
+    if (projectResponse.success) {
+        project = projectResponse.project;
+    }
 
     const dashboardTabs = [
         { id: 'overview', label: 'Overview', href: `/project/${id}` },

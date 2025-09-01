@@ -9,18 +9,18 @@ import {
     CardTitle,
 } from "@/components/ui/cards/card";
 import { BorderBeam } from "@/components/ui/border-beam";
-import { login } from "@/lib/actions";
+import { login } from "@/lib/actions/auth";
 import { GitHubIcon } from "@/components/ui/icons/github-icon";
 import { GitLabIcon } from "@/components/ui/icons/gitlab-icon";
 import { BitbucketIcon } from "@/components/ui/icons/bitbucket-icon";
 
-export function SignupCard() {
+export function LoginCard() {
     return (
         <Card className="relative w-full max-w-[350px] min-w-[320px] overflow-hidden">
             <CardHeader className="text-center px-10 py-4 pb-2">
-                <CardTitle className="text-xl">Let&apos;s create your account!</CardTitle>
+                <CardTitle className="text-xl">Welcome back!</CardTitle>
                 <CardDescription>
-                    Sign up with your Git provider
+                    Log in with your Git provider
                 </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3 px-10 pb-4 pt-0">
@@ -37,13 +37,13 @@ export function SignupCard() {
                     Continue with Bitbucket
                 </Button>
                 <div className="text-center text-sm pt-2">
-                    Already have an account?{" "}
-                    <a href="/login" className="underline underline-offset-4">
-                        Log in
+                    Don&apos;t have an account?{" "}
+                    <a href="/signup" className="underline underline-offset-4">
+                        Sign up
                     </a>
                 </div>
             </CardContent>
             <BorderBeam duration={8} size={100} colorFrom="#0B54C7" colorTo="#4496FF" />
-        </Card >
+        </Card>
     );
 }

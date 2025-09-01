@@ -3,70 +3,76 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Search } from "lucide-react"
-import { getRepositories, Installation, Repository } from "@/lib/data"
+import { getRepositories } from "@/lib/actions/repositories"
+import { Installation, Repository } from "@/lib/actions/types"
 import { InstallationLink } from "./installation-link"
-import InstallationDropdown from "./installation-dropdown"
 import { useState, useEffect, useMemo } from "react"
-import { createProject } from "@/lib/actions"
+import { createProject } from "@/lib/actions/projects"
+import InstallationDropdown from "./installation-dropdown"
+import { toast } from "sonner"
+import { redirect } from "next/navigation"
 
-export default function NewProjectForm({ installations }: { installations: Installation[] | null }) {
-    const [selectedInstallation, setSelectedInstallation] = useState<Installation | null>(null)
+export default function NewProjectForm({ installations }: { installations: Installation[] }) {
+    const [selectedInstallation, setSelectedInstallation] = useState<Installation | undefined>(undefined)
     const [repositories, setRepositories] = useState<Repository[]>([])
     const [searchQuery, setSearchQuery] = useState("")
 
     useEffect(() => {
-        const fetchRepositories = async () => {
-            if (installations && installations.length > 0) {
-                setSelectedInstallation(installations[0])
-
-                try {
-                    const repos = await getRepositories(installations[0].id)
-                    setRepositories(repos || [])
-                } catch (error) {
-                    console.error('Failed to fetch repositories:', error)
-                    setRepositories([])
-                }
-            } else {
-                setRepositories([])
-            }
+        if (installations && installations.length > 0) {
+            const initialInstallation = installations[0]
+            setSelectedInstallation(initialInstallation)
+            fetchRepositories(initialInstallation.id)
         }
-
-        fetchRepositories()
     }, [installations])
 
     useEffect(() => {
-        const fetchRepositories = async () => {
-            if (!selectedInstallation) {
-                setRepositories([])
-                return
-            }
-
-            try {
-                const repos = await getRepositories(selectedInstallation.id)
-                setRepositories(repos || [])
-            } catch (error) {
-                console.error('Failed to fetch repositories:', error)
-                setRepositories([])
-            }
+        if (selectedInstallation) {
+            fetchRepositories(selectedInstallation.id)
         }
-
-        fetchRepositories()
     }, [selectedInstallation])
+
+    const fetchRepositories = async (installationId: string) => {
+        try {
+            const result = await getRepositories({ installation_id: installationId })
+            if (result.success && result.repositories) {
+                setRepositories(result.repositories)
+            } else {
+                setRepositories([])
+                if (result.error) {
+                    toast.error(result.error.message || 'Failed to fetch repositories')
+                }
+            }
+        } catch (error) {
+            setRepositories([])
+            toast.error('Failed to fetch repositories')
+            console.error('Failed to fetch repositories:', error)
+        }
+    }
 
     const handleInstallationChange = (installation: Installation) => {
         setSelectedInstallation(installation)
     }
 
-    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setSearchQuery(e.target.value)
+    const handleImport = async (repo: Repository) => {
+        if (selectedInstallation) {
+            const result = await createProject({
+                installation_id: parseInt(selectedInstallation.id),
+                name: repo.name,
+                repository_id: parseInt(repo.id),
+                repository_owner: selectedInstallation.target
+            })
+
+            if (result.success && result.project) {
+                toast.success(`Project ${result.project.attributes.name} successfully created`)
+                redirect(`/project/${result.project.id}`)
+            } else {
+                toast.error(result.error?.message || 'Failed to create project')
+            }
+        }
     }
 
-    // Filter repositories based on search query
     const filteredRepositories = useMemo(() => {
-        if (!searchQuery.trim()) {
-            return repositories
-        }
-
+        if (!searchQuery.trim()) return repositories
         return repositories.filter(repo =>
             repo.name.toLowerCase().includes(searchQuery.toLowerCase())
         )
@@ -76,19 +82,15 @@ export default function NewProjectForm({ installations }: { installations: Insta
         if (!installations || installations.length === 0) {
             return "Install the GitHub App to add repositories"
         }
-
         if (!selectedInstallation) {
             return "Select an installation to view repositories"
         }
-
         if (repositories.length === 0) {
             return "No repositories found"
         }
-
         if (searchQuery && filteredRepositories.length === 0) {
             return `No repositories found matching "${searchQuery}"`
         }
-
         return null
     }
 
@@ -97,81 +99,77 @@ export default function NewProjectForm({ installations }: { installations: Insta
     return (
         <main>
             <div className="space-y-4">
+                {/* Installation Selection */}
                 <div className="flex flex-col gap-4">
-                    <div className="space-y-2 md:hidden">
+                    <div className="md:hidden">
                         <InstallationDropdown
                             installations={installations}
-                            variant="mobile"
                             selectedInstallation={selectedInstallation}
                             onInstallationChange={handleInstallationChange}
                         />
                     </div>
 
-                    <div className="hidden md:flex md:flex-row gap-4 w-full">
-                        <div className="space-y-2 flex-1">
+                    <div className="hidden md:flex gap-4">
+                        <div className="flex-1">
                             <div className="relative">
                                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                                 <Input
-                                    id="repository"
                                     placeholder="Search repositories..."
                                     className="pl-9 w-full h-10"
                                     value={searchQuery}
-                                    onChange={handleSearchChange}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
                                 />
                             </div>
                         </div>
 
-                        <div className="space-y-2 flex-shrink-0">
+                        <div className="flex-shrink-0">
                             <InstallationDropdown
                                 installations={installations}
-                                variant="desktop"
                                 selectedInstallation={selectedInstallation}
                                 onInstallationChange={handleInstallationChange}
                             />
                         </div>
                     </div>
 
-                    <div className="space-y-2 md:hidden">
+                    <div className="md:hidden">
                         <div className="relative">
                             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                             <Input
-                                id="repository"
                                 placeholder="Search repositories..."
                                 className="pl-9 w-full h-10"
                                 value={searchQuery}
-                                onChange={handleSearchChange}
+                                onChange={(e) => setSearchQuery(e.target.value)}
                             />
                         </div>
                     </div>
                 </div>
 
-                <div className="space-y-2">
-                    <div className="border rounded-lg p-3 bg-background">
-                        {message ? (
-                            <div className="flex items-center justify-center p-6 text-muted-foreground">
-                                <span className="text-sm">{message}</span>
-                            </div>
-                        ) : (
-                            <div className="space-y-2 max-h-[calc(6*3.5rem+5*0.5rem)] overflow-y-auto">
-                                {filteredRepositories.map((repo) => (
-                                    <div key={repo.id} className="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors h-[3.5rem]">
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-sm font-medium truncate">{repo.name}</span>
-                                        </div>
-                                        <Button size="sm" variant="default" className="h-8 px-4 text-sm" onClick={() => {
-                                            if (selectedInstallation) {
-                                                createProject(selectedInstallation.id, repo.name, repo.id, selectedInstallation.target)
-                                            }
-                                        }}>
-                                            Import
-                                        </Button>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </div>
+                {/* Repository List */}
+                <div className="border rounded-lg p-3 bg-background">
+                    {message ? (
+                        <div className="flex items-center justify-center p-6 text-muted-foreground">
+                            <span className="text-sm">{message}</span>
+                        </div>
+                    ) : (
+                        <div className="space-y-2 max-h-[calc(6*3.5rem+5*0.5rem)] overflow-y-auto">
+                            {filteredRepositories.map((repo) => (
+                                <div key={repo.id} className="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors h-[3.5rem]">
+                                    <span className="text-sm font-medium truncate">{repo.name}</span>
+                                    <Button
+                                        size="sm"
+                                        variant="default"
+                                        className="h-8 px-4 text-sm"
+                                        onClick={() => handleImport(repo)}
+                                    >
+                                        Import
+                                    </Button>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
+                {/* Footer */}
                 <div className="text-center pt-2 pb-8">
                     <p className="text-sm text-muted-foreground">
                         Missing Git repository? Adjust{" "}

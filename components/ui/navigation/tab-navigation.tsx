@@ -16,6 +16,10 @@ interface TabNavigationProps {
 export function TabNavigation({ tabs }: TabNavigationProps) {
     const pathname = usePathname();
 
+    const activeTab = tabs
+        .filter(t => pathname.startsWith(t.href + '/') || pathname === t.href)
+        .sort((a, b) => b.href.length - a.href.length)[0];
+
     return (
         <div className="sticky top-14 z-50 w-full border-b [border-color:var(--border-light)] dark:border-input bg-background">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -24,7 +28,8 @@ export function TabNavigation({ tabs }: TabNavigationProps) {
                     style={{ WebkitOverflowScrolling: 'touch' }}
                 >
                     {tabs.map((tab) => {
-                        const isActive = pathname === tab.href;
+                        const isActive = tab === activeTab;
+
                         return (
                             <Link
                                 key={tab.id}

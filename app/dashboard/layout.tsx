@@ -1,10 +1,16 @@
-import { Navbar } from '@/components/ui/navbar';
-import { TabNavigation } from '@/components/ui/tab-navigation';
-import { getUser } from '@/lib/data';
-import UserMenu from '@/components/ui/user-menu';
+import { Navbar } from '@/components/ui/navigation/navbar';
+import { TabNavigation } from '@/components/ui/navigation/tab-navigation';
+import { User } from '@/lib/actions/types';
+import { getUser } from '@/lib/actions/user';
+import UserMenu from '@/components/ui/navigation/user-menu';
 
 export default async function Layout({ children }: { children: React.ReactNode }) {
-    const user = await getUser();
+    const response = await getUser();
+
+    let user: User | undefined;
+    if (response.success) {
+        user = response.user;
+    }
 
     const dashboardTabs = [
         { id: 'overview', label: 'Overview', href: '/dashboard' },

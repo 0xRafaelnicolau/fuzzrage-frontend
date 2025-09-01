@@ -8,61 +8,43 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { ChevronDown } from "lucide-react"
-import { installApp } from "@/lib/actions"
+import { createInstallation } from "@/lib/actions/installations"
+import { Installation } from "@/lib/actions/types"
 import { getProviderIcon } from "../providers/icon-provider"
-import { getProviderName } from "../providers/name-provider"
-
-interface Installation {
-    id: string
-    provider: string
-    target: string
-}
+import { toast } from "sonner"
 
 interface InstallationDropdownProps {
-    installations: Installation[] | null
+    installations: Installation[]
+    selectedInstallation?: Installation
+    onInstallationChange: (installation: Installation) => void
     className?: string
-    variant?: "mobile" | "desktop"
-    provider?: "github" | "gitlab" | "bitbucket"
-    selectedInstallation?: Installation | null
-    onInstallationChange?: (installation: Installation) => void
 }
 
 export default function InstallationDropdown({
     installations,
-    className = "",
-    variant = "desktop",
-    provider,
     selectedInstallation,
-    onInstallationChange
+    onInstallationChange,
+    className = ""
 }: InstallationDropdownProps) {
-    const handleInstallApp = async () => {
-        const url = await installApp();
-        if (url) {
-            window.open(url, 'Install App', 'width=800,height=700,scrollbars=yes,resizable=yes');
+    const handleInstallation = async () => {
+        const response = await createInstallation()
+        if (response.success && response.url) {
+            window.open(response.url, 'Install App', 'width=800,height=700,scrollbars=yes,resizable=yes');
+        } else {
+            toast.error(response.error?.message)
+            console.error(response.error)
         }
     }
 
-    const handleInstallationSelect = (installation: Installation) => {
-        if (onInstallationChange) {
-            onInstallationChange(installation)
-        }
-    }
-
-    const isMobile = variant === "mobile"
-    const buttonClassName = isMobile
-        ? "justify-between w-full"
-        : "justify-between w-auto min-w-fit"
-
-    // If no installations, show install button
     if (!installations || installations.length === 0) {
         return (
             <Button
                 variant="outline"
                 size="lg"
-                className={`${buttonClassName} ${className}`}
-                onClick={handleInstallApp}
+                className={`justify-between w-full ${className}`}
+                onClick={handleInstallation}
             >
-                <div className="flex items-center">
+                <div className="flex items-center gap-2">
                     {getProviderIcon("github")}
                     Install GitHub App
                 </div>
@@ -70,42 +52,16 @@ export default function InstallationDropdown({
         )
     }
 
-    if (!selectedInstallation) {
-        return (
-            <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="lg" className={`${buttonClassName} ${className}`}>
-                        <div className="flex items-center gap-2">
-                            {getProviderIcon(provider)}
-                            Select {getProviderName(provider)} App
-                        </div>
-                        <ChevronDown className="h-4 w-4" />
-                    </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-[var(--radix-dropdown-menu-trigger-width)]">
-                    {installations.map((installation) => (
-                        <DropdownMenuItem
-                            key={installation.id}
-                            onClick={() => handleInstallationSelect(installation)}
-                        >
-                            <div className="flex items-center">
-                                {getProviderIcon(installation.provider)}
-                                {installation.target}
-                            </div>
-                        </DropdownMenuItem>
-                    ))}
-                </DropdownMenuContent>
-            </DropdownMenu>
-        )
-    }
+    const currentInstallation = selectedInstallation || installations[0]
+    const displayText = currentInstallation?.target || "Select App"
 
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="lg" className={`${buttonClassName} ${className}`}>
+                <Button variant="outline" size="lg" className={`justify-between w-full ${className}`}>
                     <div className="flex items-center gap-2">
-                        {getProviderIcon(selectedInstallation.provider)}
-                        {selectedInstallation.target}
+                        {getProviderIcon(currentInstallation?.provider || "github")}
+                        {displayText}
                     </div>
                     <ChevronDown className="h-4 w-4" />
                 </Button>
@@ -114,7 +70,7 @@ export default function InstallationDropdown({
                 {installations.map((installation) => (
                     <DropdownMenuItem
                         key={installation.id}
-                        onClick={() => handleInstallationSelect(installation)}
+                        onClick={() => onInstallationChange(installation)}
                     >
                         <div className="flex items-center gap-2">
                             {getProviderIcon(installation.provider)}
