@@ -37,7 +37,6 @@ export type Installation = {
     provider: string
 }
 
-
 export type GetInstallationsResponse = {
     data: Array<{
         id: string
@@ -161,4 +160,34 @@ export type GetProjectsResponse = {
             updated_at: string
         }
     }>
+}
+
+/*//////////////////////////////////////////////////////////////
+                        CONFIGS
+//////////////////////////////////////////////////////////////*/
+
+export type Config = {
+    id: string
+    name: string
+    config: string
+}
+
+export type CreateConfigRequest = {
+    project_id: string
+    name: string
+    config: string
+}
+
+export type CreateConfigResponse = {
+    data: {
+        attributes: {
+            content: string,
+            created_at: string
+            name: string
+            project_id: number
+            updated_at: string
+        },
+        id: string
+        type: string
+    }
 }

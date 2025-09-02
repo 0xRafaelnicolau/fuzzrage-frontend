@@ -30,7 +30,7 @@ export default function Error({
             <div className="relative z-10 flex items-center min-h-screen px-4 py-12 sm:px-6 md:px-8 lg:px-12 xl:px-16">
                 <div className="w-full space-y-6 text-center">
                     <div className="space-y-3">
-                        <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl animate-bounce">ERROR</h1>
+                        <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl animate-bounce">Error</h1>
                         <p className="text-muted-foreground">
                             {error.message || 'An unexpected error occurred. Please try again or contact support if the problem persists.'}
                         </p>

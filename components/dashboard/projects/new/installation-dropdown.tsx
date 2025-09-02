@@ -10,7 +10,7 @@ import {
 import { ChevronDown } from "lucide-react"
 import { createInstallation } from "@/lib/actions/installations"
 import { Installation } from "@/lib/actions/types"
-import { getProviderIcon } from "../providers/icon-provider"
+import { getProviderIcon } from "@/components/providers/icon-provider"
 import { toast } from "sonner"
 
 interface InstallationDropdownProps {

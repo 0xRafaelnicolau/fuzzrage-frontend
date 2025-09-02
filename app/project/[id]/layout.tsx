@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { getProviderIcon } from '@/components/providers/icon-provider';
 import { CirclePlus } from 'lucide-react';
 import UserMenu from '@/components/ui/navigation/user-menu';
-import GoBack from '@/components/dashboard/go-back';
+import GoBack from '@/components/ui/go-back';
 import Link from 'next/link';
 
 export default async function Layout({ children, params }: { children: React.ReactNode; params: Promise<{ id: string }> }) {

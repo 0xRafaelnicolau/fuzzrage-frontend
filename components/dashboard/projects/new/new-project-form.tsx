@@ -6,7 +6,7 @@ import { Search } from "lucide-react"
 import { getRepositories } from "@/lib/actions/repositories"
 import { Installation, Repository } from "@/lib/actions/types"
 import { InstallationLink } from "./installation-link"
-import { useState, useEffect, useMemo } from "react"
+import { useState, useEffect, useMemo, useTransition } from "react"
 import { createProject } from "@/lib/actions/projects"
 import InstallationDropdown from "./installation-dropdown"
 import { toast } from "sonner"
@@ -16,6 +16,8 @@ export default function NewProjectForm({ installations }: { installations: Insta
     const [selectedInstallation, setSelectedInstallation] = useState<Installation | undefined>(undefined)
     const [repositories, setRepositories] = useState<Repository[]>([])
     const [searchQuery, setSearchQuery] = useState("")
+    const [isPending, startTransition] = useTransition()
+    const [importingRepo, setImportingRepo] = useState<string | null>(null)
 
     useEffect(() => {
         if (installations && installations.length > 0) {
@@ -55,19 +57,23 @@ export default function NewProjectForm({ installations }: { installations: Insta
 
     const handleImport = async (repo: Repository) => {
         if (selectedInstallation) {
-            const result = await createProject({
-                installation_id: parseInt(selectedInstallation.id),
-                name: repo.name,
-                repository_id: parseInt(repo.id),
-                repository_owner: selectedInstallation.target
-            })
+            setImportingRepo(repo.id)
+            startTransition(async () => {
+                const result = await createProject({
+                    installation_id: parseInt(selectedInstallation.id),
+                    name: repo.name,
+                    repository_id: parseInt(repo.id),
+                    repository_owner: selectedInstallation.target
+                })
 
-            if (result.success && result.project) {
-                toast.success(`Project ${result.project.attributes.name} successfully created`)
-                redirect(`/project/${result.project.id}`)
-            } else {
-                toast.error(result.error?.message || 'Failed to create project')
-            }
+                if (result.success && result.project) {
+                    toast.success(`Project ${result.project.attributes.name} successfully created`)
+                    redirect(`/project/${result.project.id}`)
+                } else {
+                    toast.error(result.error?.message || 'Failed to create project')
+                }
+                setImportingRepo(null)
+            })
         }
     }
 
@@ -160,8 +166,9 @@ export default function NewProjectForm({ installations }: { installations: Insta
                                         variant="default"
                                         className="h-8 px-4 text-sm"
                                         onClick={() => handleImport(repo)}
+                                        disabled={isPending}
                                     >
-                                        Import
+                                        {importingRepo === repo.id ? "Importing..." : "Import"}
                                     </Button>
                                 </div>
                             ))}
