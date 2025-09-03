@@ -3,38 +3,24 @@
 import { LoginCard } from "@/components/auth/login-card"
 import { Navbar } from "@/components/ui/navigation/navbar";
 import { FlickeringGrid } from "@/components/ui/flickering-grid";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
-import Load from "@/components/ui/load/load";
 
 export default function Page() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const [isAuthenticating, setIsAuthenticating] = useState(false);
 
     useEffect(() => {
         const auth = searchParams.get("auth_success");
         if (auth) {
             if (auth === "true") {
-                setIsAuthenticating(true);
-                setTimeout(() => {
-                    router.push("/dashboard");
-                }, 5000);
+                router.push("/dashboard");
             } else {
                 toast.error("Failed to authenticate");
             }
         }
     }, [router, searchParams]);
-
-    const auth = searchParams.get("auth_success");
-    if (auth === "true" || isAuthenticating) {
-        return (
-            <main>
-                <Load header="Authenticating..." paragraph="" />
-            </main>
-        );
-    }
 
     return (
         <main>
