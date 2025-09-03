@@ -1,16 +1,15 @@
+'use server'
+
 import { cookies } from "next/headers";
 import type { Error } from "./types";
-
-export const BACKEND_URL = process.env.BACKEND_URL;
+import { BACKEND_URL } from "@/lib/constants";
 
 export async function getToken() {
-    'use server'
     const store = await cookies()
     return store.get('jwt')?.value
 }
 
 export async function deleteToken() {
-    'use server'
     const store = await cookies()
     store.delete('jwt')
 }
@@ -27,8 +26,6 @@ export async function parseErrorResponse(response: Response): Promise<Error> {
 }
 
 export async function request(url: string, options: RequestInit = {}) {
-    'use server'
-
     const token = await getToken()
     if (!token) {
         return { success: false, error: { message: 'No token available' } }

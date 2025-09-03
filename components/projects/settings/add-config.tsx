@@ -57,7 +57,9 @@ export function AddConfig({ projectId }: { projectId: string }) {
                         disabled={!name.trim() || !config.trim() || isPending}
                     >
                         <Save className="h-4 w-4" />
-                        {isPending ? "Saving..." : "Save"}
+                        <span className="hidden sm:inline">
+                            {isPending ? "Saving..." : "Save"}
+                        </span>
                     </Button>
                 </div>
             </CardHeader>

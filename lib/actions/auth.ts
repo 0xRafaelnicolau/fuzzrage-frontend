@@ -1,6 +1,7 @@
 'use server'
 
-import { BACKEND_URL, deleteToken, request } from "./helpers";
+import { BACKEND_URL } from "@/lib/constants";
+import { deleteToken, request } from "./helpers";
 import { redirect } from "next/navigation";
 import { Error } from "./types";
 

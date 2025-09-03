@@ -10,6 +10,9 @@ import {
     GetProjectsRequest,
     GetProjectsResponse,
     Error,
+    ProjectOwner,
+    GetProjectOwnerRequest,
+    GetProjectOwnerResponse,
 } from "./types";
 
 export async function createProject(req: CreateProjectRequest): Promise<{ success: boolean; project?: Project; error?: Error }> {
@@ -136,6 +139,35 @@ export async function getProjects(params?: GetProjectsRequest): Promise<{ succes
             return { success: true, projects }
         } catch {
             return { success: false, error: { message: 'Failed to parse get projects data' } }
+        }
+    }
+
+    return { success: false, error: result.error }
+}
+
+export async function getProjectOwner(req: GetProjectOwnerRequest): Promise<{ success: boolean; owner?: ProjectOwner; error?: Error }> {
+    const result = await request(`/v1/projects/${req.projectId}/owner`, {
+        method: 'GET'
+    })
+
+    if (result.success && result.response) {
+        try {
+            const data: GetProjectOwnerResponse = await result.response.json()
+
+            const owner = {
+                name: data.data.attributes.name,
+                email: data.data.attributes.email,
+                provider: data.data.attributes.provider,
+                avatar_url: data.data.attributes.avatar_url,
+                created_at: data.data.attributes.created_at,
+                updated_at: data.data.attributes.updated_at
+            }
+
+            return { success: true, owner: owner }
+        } catch {
+            return {
+                success: false, error: { message: 'Failed to parse project owner data' }
+            }
         }
     }
 

@@ -44,7 +44,7 @@ export default function NewProjectForm({ installations }: { installations: Insta
                     toast.error(result.error.message || 'Failed to fetch repositories')
                 }
             }
-        } catch (error) {
+        } catch {
             setRepositories([])
             toast.error('Failed to fetch repositories')
         }
