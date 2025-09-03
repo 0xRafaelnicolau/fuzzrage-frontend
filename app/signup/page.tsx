@@ -1,6 +1,6 @@
 
-import { SignupCard } from "@/components/signup/signup-card";
-import { Navbar } from "@/components/ui/navbar";
+import { SignupCard } from "@/components/auth/signup-card";
+import { Navbar } from "@/components/ui/navigation/navbar";
 import { FlickeringGrid } from "@/components/ui/flickering-grid";
 
 export default function Page() {

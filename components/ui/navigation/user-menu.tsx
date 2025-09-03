@@ -18,12 +18,20 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { logout } from "@/lib/actions";
-import { User } from "@/lib/data";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/navigation/avatar";
+import { logout } from "@/lib/actions/auth";
+import { User } from "@/lib/actions/types";
+import { toast } from "sonner";
 
 export default function UserMenu({ user }: { user: User }) {
     const [open, setOpen] = React.useState(false);
+
+    const handleLogout = async () => {
+        const response = await logout();
+        if (!response.success) {
+            toast.error(response.error?.message || "Failed to logout");
+        }
+    };
 
     return (
         <DropdownMenu open={open} onOpenChange={setOpen}>
@@ -71,7 +79,7 @@ export default function UserMenu({ user }: { user: User }) {
                     </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="text-destructive" onClick={() => { logout() }}>
+                <DropdownMenuItem className="text-destructive" onClick={handleLogout}>
                     <LogOutIcon className="text-destructive" />
                     Log out
                 </DropdownMenuItem>

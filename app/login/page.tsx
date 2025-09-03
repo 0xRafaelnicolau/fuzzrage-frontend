@@ -1,11 +1,12 @@
 "use client";
 
-import { LoginCard } from "@/components/login/login-card"
-import { Navbar } from "@/components/ui/navbar";
+import { LoginCard } from "@/components/auth/login-card"
+import { Navbar } from "@/components/ui/navigation/navbar";
 import { FlickeringGrid } from "@/components/ui/flickering-grid";
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import Load from "@/components/ui/load";
+import { toast } from "sonner";
+import Load from "@/components/ui/load/load";
 
 export default function Page() {
     const router = useRouter();
@@ -14,10 +15,13 @@ export default function Page() {
 
     useEffect(() => {
         const auth = searchParams.get("auth_success");
-
-        if (auth === "true") {
-            setIsAuthenticating(true);
-            router.push("/dashboard");
+        if (auth) {
+            if (auth === "true") {
+                setIsAuthenticating(true);
+                router.push("/dashboard");
+            } else {
+                toast.error("Failed to authenticate");
+            }
         }
     }, [router, searchParams]);
 

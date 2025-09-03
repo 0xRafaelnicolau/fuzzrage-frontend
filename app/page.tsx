@@ -8,14 +8,13 @@ import {
   Database
 } from "lucide-react";
 import { FlickeringGrid } from "@/components/ui/flickering-grid";
-import { Navbar } from "@/components/ui/navbar";
+import { Navbar } from "@/components/ui/navigation/navbar";
 import { Button } from "@/components/ui/button";
 import { BentoCard, BentoGrid } from "@/components/ui/cards/bento-grid";
-import { cookies } from "next/headers";
+import { getToken } from "@/lib/actions/helpers";
 
 export default async function Page() {
-  const store = await cookies();
-  const token = store.get('jwt')?.value;
+  const token = await getToken();
 
   const buttons = (
     <>
