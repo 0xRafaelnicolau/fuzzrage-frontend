@@ -16,6 +16,7 @@ export default function Page() {
         if (auth) {
             if (auth === "true") {
                 router.push("/dashboard");
+                toast.success("Authenticated successfully");
             } else {
                 toast.error("Failed to authenticate");
             }
