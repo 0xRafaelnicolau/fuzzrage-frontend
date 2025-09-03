@@ -18,7 +18,9 @@ export default function Page() {
         if (auth) {
             if (auth === "true") {
                 setIsAuthenticating(true);
-                router.push("/dashboard");
+                setTimeout(() => {
+                    router.push("/dashboard");
+                }, 5000);
             } else {
                 toast.error("Failed to authenticate");
             }
