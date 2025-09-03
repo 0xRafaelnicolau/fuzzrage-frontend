@@ -19,7 +19,8 @@ export async function parseErrorResponse(response: Response): Promise<Error> {
     try {
         const data = await response.json()
         const firstError = data.errors?.[0]
-        return firstError ? { message: firstError.detail } : { message: 'Unknown error occurred' }
+        const message = firstError?.detail || 'Unknown error occurred'
+        return { message: message.charAt(0).toUpperCase() + message.slice(1) }
     } catch {
         return { message: 'Failed to parse error response' }
     }

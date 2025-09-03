@@ -37,7 +37,6 @@ export function AddConfig({ projectId }: { projectId: string }) {
                 toast.success("Config created successfully");
             } else {
                 toast.error(result.error?.message || "Failed to create config");
-                console.error(result.error);
             }
         });
     };
@@ -63,14 +62,14 @@ export function AddConfig({ projectId }: { projectId: string }) {
                 </div>
             </CardHeader>
             <CardContent>
-                <form id="config-form" action={handleSubmit} className="space-y-6">
+                <form id="config-form" action={handleSubmit} className="space-y-4">
                     <div className="space-y-2">
                         <Label htmlFor="config-name">Name</Label>
                         <Input
                             id="config-name"
                             name="name"
                             type="text"
-                            placeholder="Enter config name"
+                            placeholder="Enter config name..."
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                             required
@@ -83,15 +82,14 @@ export function AddConfig({ projectId }: { projectId: string }) {
                         <CodeEditor
                             value={config}
                             language="yaml"
-                            placeholder="Please paste your Echidna config here."
-                            onChange={(evn) => setConfig(evn.target.value)}
-                            padding={15}
+                            placeholder="Please paste your Echidna config here..."
+                            onChange={(e) => setConfig(e.target.value)}
+                            padding={13}
+                            className="rounded-md border border-input shadow-xs focus-within:ring-ring/50 focus-within:ring-[3px]"
                             style={{
                                 backgroundColor: "var(--background)",
                                 fontFamily: "var(--font-mono)",
-                                border: "solid var(--border)",
-                                borderRadius: "var(--radius)",
-                                minHeight: "200px"
+                                minHeight: "100px",
                             }}
                         />
                         <input type="hidden" name="config" value={config} />

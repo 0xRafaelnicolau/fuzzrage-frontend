@@ -18,7 +18,6 @@ export function InstallationLink({
             window.open(response.url, 'Install App', 'width=800,height=700,scrollbars=yes,resizable=yes');
         } else {
             toast.error(response.error?.message)
-            console.error(response.error)
         }
     }
 

@@ -9,6 +9,7 @@ import { CirclePlus } from 'lucide-react';
 import UserMenu from '@/components/ui/navigation/user-menu';
 import GoBack from '@/components/ui/go-back';
 import Link from 'next/link';
+import { notFound } from 'next/navigation';
 
 export default async function Layout({ children, params }: { children: React.ReactNode; params: Promise<{ id: string }> }) {
     const { id } = await params;
@@ -21,18 +22,22 @@ export default async function Layout({ children, params }: { children: React.Rea
     let user: User | undefined;
     if (userResponse.success) {
         user = userResponse.user;
+    } else {
+        notFound();
     }
 
     let project: Project | undefined;
     if (projectResponse.success) {
         project = projectResponse.project;
+    } else {
+        notFound();
     }
 
     const dashboardTabs = [
         { id: 'overview', label: 'Overview', href: `/project/${id}` },
         { id: 'campaigns', label: 'Campaigns', href: `/project/${id}/campaigns` },
-        { id: 'statistics', label: 'Statistics', href: `/project/${id}/statistics` },
         { id: 'activity', label: 'Activity', href: `/project/${id}/activity` },
+        { id: 'statistics', label: 'Statistics', href: `/project/${id}/statistics` },
         { id: 'corpus', label: 'Corpus', href: `/project/${id}/corpus` },
         { id: 'settings', label: 'Settings', href: `/project/${id}/settings` },
     ];

@@ -30,7 +30,6 @@ export default function UserMenu({ user }: { user: User }) {
         const response = await logout();
         if (!response.success) {
             toast.error(response.error?.message || "Failed to logout");
-            console.error(response.error);
         }
     };
 

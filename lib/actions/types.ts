@@ -170,6 +170,7 @@ export type Config = {
     id: string
     name: string
     config: string
+    created_at: string
 }
 
 export type CreateConfigRequest = {
@@ -190,4 +191,48 @@ export type CreateConfigResponse = {
         id: string
         type: string
     }
+}
+
+export type GetConfigsRequest = {
+    project_id: string
+}
+
+export type GetConfigsResponse = {
+    data: Array<{
+        attributes: {
+            content: string
+            created_at: string
+            name: string
+            project_id: number
+            updated_at: string
+        },
+        id: string
+        type: string
+    }>
+}
+
+export type UpdateConfigRequest = {
+    project_id: string
+    config_id: string
+    name: string
+    content: string
+}
+
+export type UpdateConfigResponse = {
+    data: {
+        attributes: {
+            content: string
+            created_at: string
+            name: string
+            project_id: number
+            updated_at: string
+        }
+        id: string
+        type: string
+    }
+}
+
+export type DeleteConfigRequest = {
+    project_id: string
+    config_id: string
 }
