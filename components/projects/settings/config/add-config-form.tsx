@@ -47,15 +47,6 @@ export function AddConfigForm({ projectId }: { projectId: string }) {
                         required
                     />
                 </div>
-                <Button
-                    type="submit"
-                    disabled={!name.trim() || !config.trim() || isPending}
-                >
-                    <Save className="h-4 w-4" />
-                    <span className="hidden sm:inline">
-                        {isPending ? "Saving..." : "Save"}
-                    </span>
-                </Button>
             </div>
 
             <div className="space-y-2">
@@ -74,6 +65,22 @@ export function AddConfigForm({ projectId }: { projectId: string }) {
                     }}
                 />
                 <input type="hidden" name="config" value={config} />
+            </div>
+
+            <div className="-mx-6 border-t border-border"></div>
+            <div className="flex items-center justify-between -mb-2">
+                <p className="text-xs text-muted-foreground">
+                    Visit the official Echidna <a href="https://secure-contracts.com/program-analysis/echidna/configuration.html" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">documentation</a> for more information.
+                </p>
+                <Button
+                    type="submit"
+                    disabled={!name.trim() || !config.trim() || isPending}
+                >
+                    <Save className="h-4 w-4" />
+                    <span className="hidden sm:inline">
+                        {isPending ? "Saving..." : "Save"}
+                    </span>
+                </Button>
             </div>
         </form>
     );
