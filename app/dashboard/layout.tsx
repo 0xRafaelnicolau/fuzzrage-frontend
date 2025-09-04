@@ -3,6 +3,7 @@ import { TabNavigation } from '@/components/ui/navigation/tab-navigation';
 import { User } from '@/lib/actions/types';
 import { getUser } from '@/lib/actions/user';
 import UserMenu from '@/components/ui/navigation/user-menu';
+import { notFound } from 'next/navigation';
 
 export default async function Layout({ children }: { children: React.ReactNode }) {
     const response = await getUser();
@@ -10,6 +11,8 @@ export default async function Layout({ children }: { children: React.ReactNode }
     let user: User | undefined;
     if (response.success) {
         user = response.user;
+    } else {
+        notFound();
     }
 
     const dashboardTabs = [
