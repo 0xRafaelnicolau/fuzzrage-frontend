@@ -1,5 +1,5 @@
-import { AddConfig } from "@/components/projects/settings/add-config";
-import { ConfigList } from "@/components/projects/settings/config-list";
+import { AddConfig } from "@/components/projects/settings/config/add-config";
+import { ConfigList } from "@/components/projects/settings/config/config-list";
 import { getConfigs } from "@/lib/actions/configs";
 import { Config } from "@/lib/actions/types";
 
