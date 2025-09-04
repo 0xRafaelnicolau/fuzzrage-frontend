@@ -9,6 +9,15 @@ export async function getToken() {
     return store.get('jwt')?.value
 }
 
+export async function setToken(token: string) {
+    const store = await cookies()
+    store.set('jwt', token, {
+        httpOnly: true,
+        secure: process.env.ENV === 'production',
+        maxAge: 60 * 60 * 24 * 7
+    })
+}
+
 export async function deleteToken() {
     const store = await cookies()
     store.delete('jwt')

@@ -6,21 +6,30 @@ import { FlickeringGrid } from "@/components/ui/flickering-grid";
 import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
+import { setToken } from "@/lib/actions/helpers";
 
 export default function Page() {
     const router = useRouter();
     const searchParams = useSearchParams();
 
     useEffect(() => {
-        const auth = searchParams.get("auth_success");
-        if (auth) {
-            if (auth === "true") {
-                router.push("/dashboard");
-                toast.success("Authenticated successfully");
-            } else {
-                toast.error("Failed to authenticate");
+        const handleAuth = async () => {
+            const auth = searchParams.get("auth_success");
+            const token = window.location.hash.substring(1).replace('jwt=', '');
+
+            if (auth) {
+                if (auth === "true" && token) {
+                    await setToken(token);
+                    router.push("/dashboard");
+                    toast.success("Authenticated successfully");
+                } else {
+                    history.replaceState(null, "", "/login");
+                    toast.error("Failed to authenticate");
+                }
             }
         }
+
+        handleAuth();
     }, [router, searchParams]);
 
     return (
