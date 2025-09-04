@@ -3,14 +3,16 @@
 import { LoginCard } from "@/components/auth/login-card"
 import { Navbar } from "@/components/ui/navigation/navbar";
 import { FlickeringGrid } from "@/components/ui/flickering-grid";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { setToken } from "@/lib/actions/helpers";
+import Load from "@/components/ui/load/load";
 
 export default function Page() {
     const router = useRouter();
     const searchParams = useSearchParams();
+    const [isAuthenticating, setIsAuthenticating] = useState(false);
 
     useEffect(() => {
         const handleAuth = async () => {
@@ -19,6 +21,7 @@ export default function Page() {
 
             if (auth) {
                 if (auth === "true" && token) {
+                    setIsAuthenticating(true);
                     await setToken(token);
                     router.push("/dashboard");
                     toast.success("Authenticated successfully");
@@ -31,6 +34,15 @@ export default function Page() {
 
         handleAuth();
     }, [router, searchParams]);
+
+    const auth = searchParams.get("auth_success");
+    if (auth === "true" || isAuthenticating) {
+        return (
+            <main>
+                <Load header="Authenticating..." paragraph="" />
+            </main>
+        );
+    }
 
     return (
         <main>
