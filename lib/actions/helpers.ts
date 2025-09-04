@@ -3,7 +3,7 @@
 import crypto from 'crypto';
 import { cookies } from "next/headers";
 import type { Error } from "./types";
-import { BACKEND_URL, AUTH_API_SECRET } from "@/lib/constants";
+import { BACKEND_URL, AUTH_API_SECRET, ENV } from "@/lib/constants";
 
 export async function getToken() {
     const store = await cookies()
@@ -14,7 +14,7 @@ export async function setToken(token: string) {
     const store = await cookies()
     store.set('jwt', token, {
         httpOnly: true,
-        secure: process.env.ENV === 'production',
+        secure: ENV === 'production',
         maxAge: 60 * 60 * 24 * 7
     })
 }

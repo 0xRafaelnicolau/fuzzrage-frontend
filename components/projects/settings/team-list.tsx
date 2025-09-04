@@ -2,11 +2,12 @@
 
 import React, { useTransition, useCallback, useMemo } from "react";
 import { ProjectOwner, TeamMember, User } from "@/lib/actions/types";
-import { Trash2 } from "lucide-react";
+import { Trash2, AlertTriangle } from "lucide-react";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/cards/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/navigation/avatar";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { deleteTeamMember } from "@/lib/actions/team";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -44,8 +45,7 @@ export function TeamList({ user, projectId, owner, members = [] }: TeamListProps
     const [isPending, startTransition] = useTransition();
     const router = useRouter();
 
-    const handleRemoveMember = useCallback((collaboratorId: string, memberUsername: string, event: React.MouseEvent) => {
-        event.stopPropagation();
+    const handleRemoveMember = useCallback((collaboratorId: string, memberUsername: string) => {
         const isCurrentUser = user.name === memberUsername;
 
         startTransition(async () => {
@@ -112,6 +112,7 @@ export function TeamList({ user, projectId, owner, members = [] }: TeamListProps
                         {allMembers.map((member, index) => {
                             const isLast = index === allMembers.length - 1;
                             const isOwner = member.user_id === 'owner' || member.role_level === 3;
+                            const isCurrentUser = user.name === member.username;
                             const borderClass = `border-t ${isLast ? '' : 'border-b'}`;
 
                             return (
@@ -140,16 +141,42 @@ export function TeamList({ user, projectId, owner, members = [] }: TeamListProps
                                     </TableCell>
                                     <TableCell className={`w-24 text-right ${borderClass}`}>
                                         {!isOwner && (
-                                            <Button
-                                                variant="outline"
-                                                size="icon"
-                                                onClick={(e) => handleRemoveMember(member.collaborator_id, member.username, e)}
-                                                className="h-8 w-8"
-                                                disabled={isPending}
-                                                title="Remove team member"
-                                            >
-                                                <Trash2 className="h-4 w-4" />
-                                            </Button>
+                                            <AlertDialog>
+                                                <AlertDialogTrigger asChild>
+                                                    <Button
+                                                        variant="outline"
+                                                        size="icon"
+                                                        className="h-8 w-8"
+                                                        title="Remove Team Member"
+                                                    >
+                                                        <Trash2 className="h-4 w-4" />
+                                                    </Button>
+                                                </AlertDialogTrigger>
+                                                <AlertDialogContent>
+                                                    <AlertDialogHeader>
+                                                        <AlertDialogTitle className="flex items-center gap-2">
+                                                            <AlertTriangle className="h-4 w-4" />
+                                                            {isCurrentUser ? "Leave Project" : "Remove Member"}
+                                                        </AlertDialogTitle>
+                                                        <AlertDialogDescription>
+                                                            {isCurrentUser ? (
+                                                                <>You are about to remove <strong>yourself</strong> from this project. This action cannot be undone.</>
+                                                            ) : (
+                                                                <>This will remove <strong>{member.username}</strong> from the project. This action cannot be undone.</>
+                                                            )}
+                                                        </AlertDialogDescription>
+                                                    </AlertDialogHeader>
+                                                    <AlertDialogFooter>
+                                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                        <AlertDialogAction
+                                                            onClick={() => handleRemoveMember(member.collaborator_id, member.username)}
+                                                            disabled={isPending}
+                                                        >
+                                                            {isCurrentUser ? "Leave" : "Remove"}
+                                                        </AlertDialogAction>
+                                                    </AlertDialogFooter>
+                                                </AlertDialogContent>
+                                            </AlertDialog>
                                         )}
                                     </TableCell>
                                 </TableRow>

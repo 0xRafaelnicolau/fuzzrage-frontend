@@ -72,6 +72,7 @@ export default async function Layout({ children, params }: { children: React.Rea
                         ]} />
                 </div>
             </>
+            <div className="border-b [border-color:var(--border-light)] dark:border-input pb-6"></div>
             {children}
         </div>
     );
