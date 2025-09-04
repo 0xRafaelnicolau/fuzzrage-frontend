@@ -1,5 +1,6 @@
 'use server'
 
+import { revalidatePath } from "next/cache";
 import { request } from "./helpers";
 import {
     Project,
@@ -13,6 +14,8 @@ import {
     ProjectOwner,
     GetProjectOwnerRequest,
     GetProjectOwnerResponse,
+    UpdateProjectRequest,
+    UpdateProjectResponse,
 } from "./types";
 
 export async function createProject(req: CreateProjectRequest): Promise<{ success: boolean; project?: Project; error?: Error }> {
@@ -167,6 +170,50 @@ export async function getProjectOwner(req: GetProjectOwnerRequest): Promise<{ su
         } catch {
             return {
                 success: false, error: { message: 'Failed to parse project owner data' }
+            }
+        }
+    }
+
+    return { success: false, error: result.error }
+}
+
+export async function updateProject(req: UpdateProjectRequest): Promise<{ success: boolean; project?: Project; error?: Error }> {
+    const result = await request(`/v1/projects/${req.projectId}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+            data: {
+                attributes: {
+                    name: req.name
+                }
+            }
+        })
+    })
+
+    if (result.success && result.response) {
+        try {
+            const data: UpdateProjectResponse = await result.response.json()
+
+            const project: Project = {
+                id: data.data.id,
+                type: data.data.type,
+                attributes: {
+                    created_at: data.data.attributes.created_at,
+                    installation_id: data.data.attributes.installation_id,
+                    name: data.data.attributes.name,
+                    owner: data.data.attributes.owner,
+                    repository_name: data.data.attributes.repository_name,
+                    repository_owner: data.data.attributes.repository_owner,
+                    repository_id: data.data.attributes.repository_id,
+                    updated_at: data.data.attributes.updated_at
+                }
+            }
+
+            revalidatePath(`/project/${req.projectId}/settings`)
+
+            return { success: true, project }
+        } catch {
+            return {
+                success: false, error: { message: 'Failed to parse project data' }
             }
         }
     }

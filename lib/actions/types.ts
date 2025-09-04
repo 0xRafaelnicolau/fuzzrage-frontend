@@ -183,6 +183,28 @@ export type GetProjectOwnerResponse = {
     }
 }
 
+export type UpdateProjectRequest = {
+    projectId: string
+    name: string
+}
+
+export type UpdateProjectResponse = {
+    data: {
+        id: string
+        type: string
+        attributes: {
+            created_at: string
+            installation_id: number
+            name: string
+            owner: number
+            repository_id: number
+            repository_name: string
+            repository_owner: string
+            updated_at: string
+        }
+    }
+}
+
 
 /*//////////////////////////////////////////////////////////////
                         CONFIGS

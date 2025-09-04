@@ -1,8 +1,9 @@
 'use server'
 
+import crypto from 'crypto';
 import { cookies } from "next/headers";
 import type { Error } from "./types";
-import { BACKEND_URL } from "@/lib/constants";
+import { BACKEND_URL, AUTH_API_SECRET, ENV } from "@/lib/constants";
 
 export async function getToken() {
     const store = await cookies()
@@ -13,7 +14,7 @@ export async function setToken(token: string) {
     const store = await cookies()
     store.set('jwt', token, {
         httpOnly: true,
-        secure: process.env.ENV === 'production',
+        secure: ENV === 'production',
         maxAge: 60 * 60 * 24 * 7
     })
 }
@@ -43,11 +44,25 @@ export async function request(url: string, options: RequestInit = {}) {
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), 5000)
 
+    const now = new Date();
+    const rounded = new Date(Date.UTC(
+        now.getUTCFullYear(),
+        now.getUTCMonth(),
+        now.getUTCDate(),
+        now.getUTCHours(),
+        now.getUTCMinutes(),
+        0, 0
+    )).toISOString().replace(/\.\d{3}Z$/, 'Z');
+
+    const secret = AUTH_API_SECRET || 'secret';
+    const hmac = crypto.createHmac('sha256', secret).update(rounded).digest('hex');
+
     try {
         const response = await fetch(`${BACKEND_URL}${url}`, {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`,
+                'X-FUZZRAGE-TOKEN': hmac,
                 ...options.headers
             },
             signal: controller.signal,

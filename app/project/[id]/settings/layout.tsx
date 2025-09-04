@@ -11,7 +11,6 @@ export default async function Layout({ children, params }: { children: React.Rea
 
     return (
         <main>
-            <div className="border-b [border-color:var(--border-light)] dark:border-input pb-6"></div>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
                     <div className="lg:col-span-1">
