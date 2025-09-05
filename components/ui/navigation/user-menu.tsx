@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/navigation/avatar";
 import { logout } from "@/lib/actions/auth";
-import { User } from "@/lib/actions/types";
+import { User } from "@/lib/actions/user";
 import { toast } from "sonner";
 
 export default function UserMenu({ user }: { user: User }) {

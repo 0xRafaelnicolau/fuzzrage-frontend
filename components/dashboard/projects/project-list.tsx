@@ -1,4 +1,4 @@
-import { Project } from "@/lib/actions/types";
+import { Project } from "@/lib/actions/projects";
 import { Card } from "@/components/ui/cards/card";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";

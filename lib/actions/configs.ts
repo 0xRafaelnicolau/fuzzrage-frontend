@@ -2,17 +2,34 @@
 
 import { revalidatePath } from "next/cache";
 import { request } from "./helpers";
-import {
-    Error,
-    Config,
-    CreateConfigRequest,
-    CreateConfigResponse,
-    GetConfigsRequest,
-    GetConfigsResponse,
-    UpdateConfigRequest,
-    UpdateConfigResponse,
-    DeleteConfigRequest,
-} from "./types";
+import { Error } from "./types";
+
+export type Config = {
+    id: string
+    name: string
+    config: string
+    created_at: string
+}
+
+export type CreateConfigRequest = {
+    project_id: string
+    name: string
+    config: string
+}
+
+export type CreateConfigResponse = {
+    data: {
+        attributes: {
+            content: string,
+            created_at: string
+            name: string
+            project_id: number
+            updated_at: string
+        },
+        id: string
+        type: string
+    }
+}
 
 export async function createConfig(req: CreateConfigRequest) {
     const result = await request(`/v1/projects/${req.project_id}/configs`, {
@@ -49,6 +66,24 @@ export async function createConfig(req: CreateConfigRequest) {
     return { success: false, error: result.error }
 }
 
+export type GetConfigsRequest = {
+    project_id: string
+}
+
+export type GetConfigsResponse = {
+    data: Array<{
+        attributes: {
+            content: string
+            created_at: string
+            name: string
+            project_id: number
+            updated_at: string
+        },
+        id: string
+        type: string
+    }>
+}
+
 export async function getConfigs(req: GetConfigsRequest): Promise<{ success: boolean; configs?: Config[]; error?: Error }> {
     const result = await request(`/v1/projects/${req.project_id}/configs`, {
         method: 'GET'
@@ -72,6 +107,27 @@ export async function getConfigs(req: GetConfigsRequest): Promise<{ success: boo
     }
 
     return { success: false, error: result.error }
+}
+
+export type UpdateConfigRequest = {
+    project_id: string
+    config_id: string
+    name: string
+    content: string
+}
+
+export type UpdateConfigResponse = {
+    data: {
+        attributes: {
+            content: string
+            created_at: string
+            name: string
+            project_id: number
+            updated_at: string
+        }
+        id: string
+        type: string
+    }
 }
 
 export async function updateConfig(req: UpdateConfigRequest): Promise<{ success: boolean; config?: Config; error?: Error }> {
@@ -109,6 +165,10 @@ export async function updateConfig(req: UpdateConfigRequest): Promise<{ success:
     return { success: false, error: result.error }
 }
 
+export type DeleteConfigRequest = {
+    project_id: string
+    config_id: string
+}
 
 export async function deleteConfig(req: DeleteConfigRequest): Promise<{ success: boolean; error?: Error }> {
     const result = await request(`/v1/projects/${req.project_id}/configs/${req.config_id}`, {

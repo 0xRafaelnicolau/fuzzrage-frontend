@@ -1,7 +1,26 @@
 'use server'
 
 import { request } from "./helpers";
-import { Repository, GetRepositoriesRequest, GetRepositoriesResponse, Error } from "./types";
+import { Error } from "./types";
+
+export type Repository = {
+    id: string
+    name: string
+}
+
+export type GetRepositoriesRequest = {
+    installation_id: string
+}
+
+export type GetRepositoriesResponse = {
+    data: Array<{
+        id: string
+        type: string
+        attributes: {
+            name: string
+        }
+    }>
+}
 
 export async function getRepositories(req: GetRepositoriesRequest): Promise<{ success: boolean; repositories?: Repository[]; error?: Error }> {
     const result = await request(`/v1/user/installations/${req.installation_id}/repos`, {

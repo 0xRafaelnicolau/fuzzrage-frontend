@@ -1,7 +1,14 @@
 'use server'
 
 import { request } from "./helpers";
-import { Installation, GetInstallationsResponse, Error } from "./types";
+import { Error } from "./types";
+
+export type Installation = {
+    id: string
+    target: string
+    provider: string
+}
+
 
 export async function createInstallation() {
     const result = await request(`/v1/user/installations/new`, {
@@ -13,6 +20,17 @@ export async function createInstallation() {
     }
 
     return { success: false, error: result.error }
+}
+
+export type GetInstallationsResponse = {
+    data: Array<{
+        id: string
+        type: string
+        attributes: {
+            provider: string
+            target: string
+        }
+    }>
 }
 
 export async function getInstallations(): Promise<{ success: boolean; installations?: Installation[]; error?: Error }> {

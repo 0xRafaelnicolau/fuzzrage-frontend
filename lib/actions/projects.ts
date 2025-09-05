@@ -2,21 +2,46 @@
 
 import { revalidatePath } from "next/cache";
 import { request } from "./helpers";
-import {
-    Project,
-    CreateProjectRequest,
-    CreateProjectResponse,
-    GetProjectRequest,
-    GetProjectResponse,
-    GetProjectsRequest,
-    GetProjectsResponse,
-    Error,
-    ProjectOwner,
-    GetProjectOwnerRequest,
-    GetProjectOwnerResponse,
-    UpdateProjectRequest,
-    UpdateProjectResponse,
-} from "./types";
+import { Error } from "./types";
+
+export type Project = {
+    id: string
+    type: string
+    attributes: {
+        created_at: string
+        installation_id: number
+        name: string
+        owner: number
+        repository_id: number
+        repository_name: string
+        repository_owner: string
+        updated_at: string
+    }
+}
+
+export type CreateProjectRequest = {
+    installation_id: number
+    name: string
+    repository_id: number
+    repository_owner: string
+}
+
+export type CreateProjectResponse = {
+    data: {
+        id: string
+        type: string
+        attributes: {
+            created_at: string
+            installation_id: number
+            name: string
+            owner: number
+            repository_id: number
+            repository_name: string
+            repository_owner: string
+            updated_at: string
+        }
+    }
+}
 
 export async function createProject(req: CreateProjectRequest): Promise<{ success: boolean; project?: Project; error?: Error }> {
     const result = await request(`/v1/projects`, {
@@ -61,6 +86,27 @@ export async function createProject(req: CreateProjectRequest): Promise<{ succes
     return { success: false, error: result.error }
 }
 
+export type GetProjectRequest = {
+    projectId: string
+}
+
+export type GetProjectResponse = {
+    data: {
+        id: string
+        type: string
+        attributes: {
+            created_at: string
+            installation_id: number
+            name: string
+            owner: number
+            repository_id: number
+            repository_name: string
+            repository_owner: string
+            updated_at: string
+        }
+    }
+}
+
 export async function getProject(req: GetProjectRequest): Promise<{ success: boolean; project?: Project; error?: Error }> {
     const result = await request(`/v1/projects/${req.projectId}`, {
         method: 'GET'
@@ -92,6 +138,32 @@ export async function getProject(req: GetProjectRequest): Promise<{ success: boo
     }
 
     return { success: false, error: result.error }
+}
+
+export type GetProjectsRequest = {
+    page?: number;
+    size?: number;
+    sort?: string;
+    name_like?: string;
+    created_at_gte?: string;
+    created_at_lte?: string;
+}
+
+export type GetProjectsResponse = {
+    data: Array<{
+        id: string
+        type: string
+        attributes: {
+            created_at: string
+            installation_id: number
+            name: string
+            owner: number
+            repository_id: number
+            repository_name: string
+            repository_owner: string
+            updated_at: string
+        }
+    }>
 }
 
 export async function getProjects(params?: GetProjectsRequest): Promise<{ success: boolean; projects?: Project[]; error?: Error }> {
@@ -148,6 +220,27 @@ export async function getProjects(params?: GetProjectsRequest): Promise<{ succes
     return { success: false, error: result.error }
 }
 
+export type ProjectOwner = {
+    name: string
+    email: string
+    provider: string
+    avatar_url: string
+    created_at: string
+    updated_at: string
+}
+
+export type GetProjectOwnerRequest = {
+    projectId: string
+}
+
+export type GetProjectOwnerResponse = {
+    data: {
+        id: string
+        type: string
+        attributes: ProjectOwner
+    }
+}
+
 export async function getProjectOwner(req: GetProjectOwnerRequest): Promise<{ success: boolean; owner?: ProjectOwner; error?: Error }> {
     const result = await request(`/v1/projects/${req.projectId}/owner`, {
         method: 'GET'
@@ -175,6 +268,28 @@ export async function getProjectOwner(req: GetProjectOwnerRequest): Promise<{ su
     }
 
     return { success: false, error: result.error }
+}
+
+export type UpdateProjectRequest = {
+    projectId: string
+    name: string
+}
+
+export type UpdateProjectResponse = {
+    data: {
+        id: string
+        type: string
+        attributes: {
+            created_at: string
+            installation_id: number
+            name: string
+            owner: number
+            repository_id: number
+            repository_name: string
+            repository_owner: string
+            updated_at: string
+        }
+    }
 }
 
 export async function updateProject(req: UpdateProjectRequest): Promise<{ success: boolean; project?: Project; error?: Error }> {

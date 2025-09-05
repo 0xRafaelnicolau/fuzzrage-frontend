@@ -1,24 +1,40 @@
-import { TeamInvite } from "@/components/projects/settings/team-invite";
-import { TeamList } from "@/components/projects/settings/team-list";
-import { getProjectOwner } from "@/lib/actions/projects";
-import { getCollabRoles, getTeamMembers } from "@/lib/actions/team";
-import { CollabRole, ProjectOwner, TeamMember } from "@/lib/actions/types";
-import { getUser } from "@/lib/actions/user";
+import { Suspense } from "react";
+import { TeamInvite } from "@/components/projects/settings/team/team-invite";
+import { TeamInviteSkeleton } from "@/components/projects/settings/team/team-invite-skeleton";
+import { TeamList } from "@/components/projects/settings/team/team-list";
+import { TeamListSkeleton } from "@/components/projects/settings/team/team-list-skeleton";
+import { ProjectOwner, getProjectOwner } from "@/lib/actions/projects";
+import { TeamMember, getTeamMembers } from "@/lib/actions/team";
+import { CollabRole, getCollabRoles } from "@/lib/actions/roles";
+import { getUser, User } from "@/lib/actions/user";
 
-export default async function Page({ params }: { params: { id: string } }) {
-    const { id } = await params;
+async function TeamInviteContent({ id }: { id: string }) {
+    const response = await getCollabRoles();
 
-    const [userResponse, collabRolesResponse, projectOwnerResponse, teamMembersResponse] = await Promise.all([
+    let roles: CollabRole[] | undefined;
+    if (response.success) {
+        roles = response.roles;
+    }
+
+    return <TeamInvite projectId={id} roles={roles} />;
+}
+
+async function TeamListContent({ id }: { id: string }) {
+    const [userResponse, projectOwnerResponse, teamMembersResponse] = await Promise.all([
         getUser(),
-        getCollabRoles(),
         getProjectOwner({ projectId: id }),
         getTeamMembers({ project_id: id })
     ]);
 
     const user = userResponse.success && userResponse.user ? userResponse.user : (() => { throw new Error("User not found"); })();
-    const roles: CollabRole[] = collabRolesResponse.success && collabRolesResponse.roles ? collabRolesResponse.roles : [];
     const owner: ProjectOwner | undefined = projectOwnerResponse.success && projectOwnerResponse.owner ? projectOwnerResponse.owner : undefined;
     const members: TeamMember[] = teamMembersResponse.success && teamMembersResponse.members ? teamMembersResponse.members : [];
+
+    return <TeamList user={user} projectId={id} owner={owner} members={members || []} />
+}
+
+export default async function Page({ params }: { params: { id: string } }) {
+    const { id } = await params;
 
     return (
         <main>
@@ -26,8 +42,13 @@ export default async function Page({ params }: { params: { id: string } }) {
                 <h2 className="text-lg font-semibold">Team</h2>
             </div>
 
-            <TeamInvite projectId={id} roles={roles} />
-            <TeamList user={user} projectId={id} owner={owner} members={members} />
+            <Suspense fallback={<TeamInviteSkeleton />}>
+                <TeamInviteContent id={id} />
+            </Suspense>
+
+            <Suspense fallback={<TeamListSkeleton />}>
+                <TeamListContent id={id} />
+            </Suspense>
         </main>
     );
-}   
+}

@@ -1,7 +1,24 @@
 'use server'
 
 import { request } from "./helpers";
-import { User, GetUserResponse, Error } from "./types";
+import { Error } from "./types";
+
+export type User = {
+    name: string
+    email: string
+    provider: string
+    avatar_url: string
+    created_at: string
+    updated_at: string
+}
+
+export type GetUserResponse = {
+    data: {
+        id: string
+        type: string
+        attributes: User
+    }
+}
 
 export async function getUser(): Promise<{ success: boolean; user?: User; error?: Error }> {
     const result = await request(`/v1/user`, {

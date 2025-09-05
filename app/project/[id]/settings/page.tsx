@@ -1,16 +1,20 @@
-import { UpdateProject } from "@/components/projects/settings/update-project";
+import { Suspense } from "react";
+import { UpdateProject } from "@/components/projects/settings/general/update-project";
+import { UpdateProjectSkeleton } from "@/components/projects/settings/general/update-project-skeleton";
 import { getProject } from "@/lib/actions/projects";
 import { notFound } from "next/navigation";
 
-export default async function Page({ params }: { params: { id: string } }) {
-    const { id } = await params;
-
+async function UpdateProjectContent({ id }: { id: string }) {
     const response = await getProject({ projectId: id });
     if (!response.success || !response.project) {
         notFound();
     }
 
-    const project = response.project;
+    return <UpdateProject project={response.project} />;
+}
+
+export default async function Page({ params }: { params: { id: string } }) {
+    const { id } = await params;
 
     return (
         <main>
@@ -18,7 +22,9 @@ export default async function Page({ params }: { params: { id: string } }) {
                 <h2 className="text-lg font-semibold">General</h2>
             </div>
 
-            <UpdateProject project={project} />
+            <Suspense fallback={<UpdateProjectSkeleton />}>
+                <UpdateProjectContent id={id} />
+            </Suspense>
         </main>
     );
-}   
+}

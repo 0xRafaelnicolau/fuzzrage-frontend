@@ -1,4 +1,4 @@
-import { Config } from "@/lib/actions/types";
+import { Config } from "@/lib/actions/configs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/cards/card";
 import { Table, TableBody } from "@/components/ui/table";
 import { ConfigListTable } from "@/components/projects/settings/config/config-list-table";
@@ -24,7 +24,7 @@ export function ConfigList({ projectId, configs }: ConfigListProps) {
                         </CardDescription>
                     </div>
                 </CardHeader>
-                <CardContent className="flex items-center justify-center py-8">
+                <CardContent className="flex items-center justify-center py-4">
                     <p className="text-muted-foreground text-sm">No configs found. Add your first config above.</p>
                 </CardContent>
             </Card>

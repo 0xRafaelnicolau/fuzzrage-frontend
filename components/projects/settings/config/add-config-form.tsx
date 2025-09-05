@@ -70,7 +70,7 @@ export function AddConfigForm({ projectId }: { projectId: string }) {
             <div className="-mx-6 border-t border-border"></div>
             <div className="flex items-center justify-between -mb-2">
                 <p className="text-xs text-muted-foreground">
-                    Visit the official Echidna <a href="https://secure-contracts.com/program-analysis/echidna/configuration.html" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">documentation</a> for more information.
+                    Visit Echidna official <a href="https://secure-contracts.com/program-analysis/echidna/configuration.html" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">documentation</a> for more information.
                 </p>
                 <Button
                     type="submit"

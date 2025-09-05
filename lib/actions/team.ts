@@ -2,38 +2,23 @@
 
 import { revalidatePath } from "next/cache";
 import { request } from "./helpers";
-import {
-    Error,
-    InviteRequest,
-    AcceptInviteRequest,
-    CollabRole,
-    CollabRoleResponse,
-    TeamMember,
-    GetTeamMembersRequest,
-    GetTeamMembersResponse,
-    DeleteTeamMemberRequest
-} from "./types";
+import { Error } from "./types";
 
-export async function getCollabRoles(): Promise<{ success: boolean; roles?: CollabRole[]; error?: Error }> {
-    const result = await request(`/v1/projects/collab-roles`, {
-        method: 'GET',
-    })
-
-    if (result.success && result.response) {
-        const data: CollabRoleResponse = await result.response.json()
-
-        const roles: CollabRole[] = data.data.map((role) => ({
-            role_id: role.id,
-            level: role.attributes.level,
-        }))
-
-        return { success: true, roles }
-    }
-
-    return { success: false, error: result.error }
+export type TeamMember = {
+    collaborator_id: string
+    user_id: string
+    username: string
+    avatar_url: string
+    role_level: number
 }
 
-export async function createInvite(req: InviteRequest): Promise<{ success: boolean; error?: Error }> {
+export type CreateInviteRequest = {
+    project_id: string
+    email: string
+    role: number
+}
+
+export async function createInvite(req: CreateInviteRequest): Promise<{ success: boolean; error?: Error }> {
     const result = await request(`/v1/projects/${req.project_id}/collabs/invite`, {
         method: 'POST',
         body: JSON.stringify({
@@ -53,6 +38,11 @@ export async function createInvite(req: InviteRequest): Promise<{ success: boole
     return { success: false, error: result.error }
 }
 
+export type AcceptInviteRequest = {
+    project_id: string
+    invite_code: string
+}
+
 export async function acceptInvite(req: AcceptInviteRequest): Promise<{ success: boolean; error?: Error }> {
     const result = await request(`/v1/projects/${req.project_id}/collabs`, {
         method: 'POST',
@@ -70,6 +60,28 @@ export async function acceptInvite(req: AcceptInviteRequest): Promise<{ success:
     }
 
     return { success: false, error: result.error }
+}
+
+export type GetTeamMembersRequest = {
+    project_id: string
+}
+
+export type GetTeamMembersResponse = {
+    data: Array<{
+        attributes: {
+            avatar_url: string,
+            created_at: string,
+            project_id: number,
+            role: string,
+            role_level: number,
+            updated_at: string,
+            user_id: number,
+            username: string
+        },
+        id: string,
+        type: string
+    }
+    >
 }
 
 export async function getTeamMembers(req: GetTeamMembersRequest): Promise<{ success: boolean; members?: TeamMember[]; error?: Error }> {
@@ -96,6 +108,11 @@ export async function getTeamMembers(req: GetTeamMembersRequest): Promise<{ succ
     }
 
     return { success: false, error: result.error }
+}
+
+export type DeleteTeamMemberRequest = {
+    project_id: string
+    collaborator_id: string
 }
 
 export async function deleteTeamMember(req: DeleteTeamMemberRequest): Promise<{ success: boolean; error?: Error }> {

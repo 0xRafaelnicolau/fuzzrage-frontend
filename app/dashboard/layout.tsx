@@ -1,7 +1,6 @@
 import { Navbar } from '@/components/ui/navigation/navbar';
 import { TabNavigation } from '@/components/ui/navigation/tab-navigation';
-import { User } from '@/lib/actions/types';
-import { getUser } from '@/lib/actions/user';
+import { User, getUser } from '@/lib/actions/user';;
 import UserMenu from '@/components/ui/navigation/user-menu';
 import { notFound } from 'next/navigation';
 

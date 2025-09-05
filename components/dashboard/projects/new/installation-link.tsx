@@ -1,8 +1,7 @@
 "use client"
 
-import { createInstallation } from "@/lib/actions/installations"
+import { Installation, createInstallation } from "@/lib/actions/installations"
 import { getProviderName } from "@/components/providers/name-provider"
-import { Installation } from "@/lib/actions/types"
 import { toast } from "sonner"
 
 export function InstallationLink({

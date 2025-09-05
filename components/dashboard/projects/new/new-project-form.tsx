@@ -1,14 +1,14 @@
 "use client"
 
+import InstallationDropdown from "@/components/dashboard/projects/new/installation-dropdown"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Search } from "lucide-react"
-import { getRepositories } from "@/lib/actions/repositories"
-import { Installation, Repository } from "@/lib/actions/types"
-import { InstallationLink } from "./installation-link"
+import { Repository, getRepositories } from "@/lib/actions/repositories"
+import { Installation } from "@/lib/actions/installations"
+import { InstallationLink } from "@/components/dashboard/projects/new/installation-link"
 import { useState, useEffect, useMemo, useTransition } from "react"
 import { createProject } from "@/lib/actions/projects"
-import InstallationDropdown from "./installation-dropdown"
 import { toast } from "sonner"
 import { redirect } from "next/navigation"
 

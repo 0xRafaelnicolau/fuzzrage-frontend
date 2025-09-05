@@ -20,7 +20,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { createInvite } from "@/lib/actions/team";
-import { CollabRole } from "@/lib/actions/types";
+import { CollabRole } from "@/lib/actions/roles";
 import { toast } from "sonner";
 
 function getRoleName(role: CollabRole) {

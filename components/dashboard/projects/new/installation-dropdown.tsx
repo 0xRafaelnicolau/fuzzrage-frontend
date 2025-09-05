@@ -8,8 +8,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { ChevronDown } from "lucide-react"
-import { createInstallation } from "@/lib/actions/installations"
-import { Installation } from "@/lib/actions/types"
+import { Installation, createInstallation } from "@/lib/actions/installations"
 import { getProviderIcon } from "@/components/providers/icon-provider"
 import { toast } from "sonner"
 

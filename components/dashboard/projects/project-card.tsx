@@ -1,5 +1,5 @@
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/cards/card";
-import { Project } from "@/lib/actions/types";
+import { Project } from "@/lib/actions/projects";
 import { MoreHorizontal, BarChart3, Activity, FileText, Settings, Bug } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";

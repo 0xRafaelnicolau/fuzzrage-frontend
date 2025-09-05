@@ -8,7 +8,7 @@ import { Search, CirclePlus, LayoutGrid, List, Calendar as CalendarIcon } from "
 import { Button } from "@/components/ui/button";
 import { DateRange } from "react-day-picker";
 import { Calendar } from "@/components/ui/calendar";
-import { Project } from "@/lib/actions/types";
+import { Project } from "@/lib/actions/projects";
 import { useState } from "react";
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { useDebouncedCallback } from 'use-debounce';

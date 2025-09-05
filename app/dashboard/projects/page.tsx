@@ -1,5 +1,4 @@
-import { getProjects } from "@/lib/actions/projects";
-import { GetProjectsRequest } from "@/lib/actions/types";
+import { GetProjectsRequest, getProjects } from "@/lib/actions/projects";
 import ProjectsClient from "@/components/dashboard/projects/project-view";
 
 interface PageProps {

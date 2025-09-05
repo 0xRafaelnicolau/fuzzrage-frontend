@@ -1,15 +1,23 @@
 "use client";
 
 import React, { useState, useTransition } from "react";
-import { Config } from "@/lib/actions/types";
+import CodeEditor from "@uiw/react-textarea-code-editor";
+import { Config, deleteConfig, updateConfig } from "@/lib/actions/configs";
 import { ChevronDown, ChevronRight, Edit, Trash2, Check, X, AlertTriangle } from "lucide-react";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import CodeEditor from "@uiw/react-textarea-code-editor";
-import { deleteConfig, updateConfig } from "@/lib/actions/configs";
 import { toast } from "sonner";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle
+} from "@/components/ui/alert-dialog";
 
 interface ConfigListTableProps {
     projectId: string;

@@ -1,16 +1,27 @@
 "use client";
 
 import React, { useTransition, useCallback, useMemo } from "react";
-import { ProjectOwner, TeamMember, User } from "@/lib/actions/types";
+import { User } from "@/lib/actions/user";
+import { ProjectOwner } from "@/lib/actions/projects";
+import { TeamMember, deleteTeamMember } from "@/lib/actions/team";
 import { Trash2, AlertTriangle } from "lucide-react";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/cards/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/navigation/avatar";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { deleteTeamMember } from "@/lib/actions/team";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger
+} from "@/components/ui/alert-dialog";
 
 interface TeamListProps {
     user: User;

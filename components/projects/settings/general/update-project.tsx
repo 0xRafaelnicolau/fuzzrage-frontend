@@ -11,8 +11,7 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/cards/card";
-import { Project } from "@/lib/actions/types";
-import { updateProject } from "@/lib/actions/projects";
+import { Project, updateProject } from "@/lib/actions/projects";
 import { toast } from "sonner";
 
 export function UpdateProject({ project }: { project: Project }) {
