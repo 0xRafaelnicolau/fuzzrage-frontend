@@ -20,7 +20,6 @@ export function SideNavigation({ tabs }: SideNavigationProps) {
     const searchParams = useSearchParams();
     const searchQuery = searchParams.get('search') || '';
 
-
     const filteredTabs = tabs.filter(tab =>
         tab.label.toLowerCase().includes(searchQuery.toLowerCase())
     );

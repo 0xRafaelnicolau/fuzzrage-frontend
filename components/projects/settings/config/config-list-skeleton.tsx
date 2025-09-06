@@ -21,7 +21,7 @@ export function ConfigListSkeleton() {
                 </div>
             </CardHeader>
             <CardContent className="flex items-center justify-center py-4">
-
+                <Skeleton className="h-5 w-64" />
             </CardContent>
         </Card>
     );
