@@ -1,8 +1,9 @@
 import { Navbar } from '@/components/ui/navigation/navbar';
 import { TabNavigation } from '@/components/ui/navigation/tab-navigation';
-import { User, getUser } from '@/lib/actions/user';;
-import UserMenu from '@/components/ui/navigation/user-menu';
+import { User, getUser } from '@/lib/actions/user';
+import { DashboardFooter } from '@/components/dashboard/dashboard-footer';
 import { notFound } from 'next/navigation';
+import UserMenu from '@/components/ui/navigation/user-menu';
 
 export default async function Layout({ children }: { children: React.ReactNode }) {
     const response = await getUser();
@@ -30,10 +31,13 @@ export default async function Layout({ children }: { children: React.ReactNode }
     );
 
     return (
-        <div>
+        <main className="min-h-screen flex flex-col">
             <Navbar buttons={buttons} />
             <TabNavigation tabs={dashboardTabs} />
-            {children}
-        </div>
+            <div className="flex-1" style={{ minHeight: 'calc(100vh)' }}>
+                {children}
+            </div>
+            <DashboardFooter />
+        </main>
     );
 }

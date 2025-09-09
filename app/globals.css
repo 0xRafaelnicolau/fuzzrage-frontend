@@ -92,6 +92,12 @@
 
 :root {
   --radius: 0.5rem;
+  --header-height: 3.5rem;
+  /* 56px - navbar height */
+  --tab-nav-height: 2.5rem;
+  /* 40px - tab navigation height */
+  --footer-height: 3rem;
+  /* 48px - footer content height */
   --background: oklch(1.0000 0 0);
   --foreground: oklch(0.2134 0.0345 261.4295);
   --card: oklch(1.0000 0 0);
@@ -148,6 +154,12 @@
 }
 
 .dark {
+  --header-height: 3.5rem;
+  /* 56px - navbar height */
+  --tab-nav-height: 2.5rem;
+  /* 40px - tab navigation height */
+  --footer-height: 3rem;
+  /* 48px - footer content height */
   --background: oklch(0.2134 0.0345 261.4295);
   --foreground: oklch(1.0000 0 0);
   --card: oklch(0.2134 0.0345 261.4295);

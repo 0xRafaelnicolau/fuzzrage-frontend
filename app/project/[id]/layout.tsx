@@ -6,6 +6,7 @@ import { Project } from '@/lib/actions/projects';
 import { Button } from '@/components/ui/button';
 import { getProviderIcon } from '@/components/providers/icon-provider';
 import { CirclePlus } from 'lucide-react';
+import { DashboardFooter } from '@/components/dashboard/dashboard-footer';
 import { notFound } from 'next/navigation';
 import UserMenu from '@/components/ui/navigation/user-menu';
 import GoBack from '@/components/ui/go-back';
@@ -50,7 +51,7 @@ export default async function Layout({ children, params }: { children: React.Rea
     );
 
     return (
-        <div>
+        <main>
             <Navbar buttons={buttons} />
             <TabNavigation tabs={dashboardTabs} />
             <>
@@ -73,7 +74,10 @@ export default async function Layout({ children, params }: { children: React.Rea
                 </div>
             </>
             <div className="border-b [border-color:var(--border-light)] dark:border-input pb-6"></div>
-            {children}
-        </div >
+            <div className="flex-1" style={{ minHeight: 'calc(100vh)' }}>
+                {children}
+            </div>
+            <DashboardFooter />
+        </main >
     );
 }

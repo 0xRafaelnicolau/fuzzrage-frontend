@@ -15,7 +15,7 @@ interface SideNavigationProps {
     tabs: SideTabs[];
 }
 
-export function SideNavigation({ tabs }: SideNavigationProps) {
+export function SettingsSideNavigation({ tabs }: SideNavigationProps) {
     const pathname = usePathname();
     const searchParams = useSearchParams();
     const searchQuery = searchParams.get('search') || '';
