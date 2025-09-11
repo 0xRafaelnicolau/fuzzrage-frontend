@@ -18,7 +18,7 @@ export type GetProjectActivityRequest = {
     page?: number;
     size?: number;
     sort?: string;
-    name_like?: string;
+    target_type?: string;
     created_at_gte?: string;
     created_at_lte?: string;
 }
@@ -42,20 +42,27 @@ export type GetProjectActivityResponse = {
     }>
 }
 
-export async function getProjectActivity(req: GetProjectActivityRequest): Promise<{ success: boolean; activity?: Activity[]; error?: Error }> {
-    const queryParams = new URLSearchParams();
+export type ActivityPaginationResult = {
+    activity: Activity[];
+    hasMore: boolean;
+    currentPage: number;
+    pageSize: number;
+}
 
-    if (req?.page !== undefined) {
-        queryParams.append('page', req.page.toString());
-    }
-    if (req?.size !== undefined) {
-        queryParams.append('size', req.size.toString());
-    }
+export async function getProjectActivity(req: GetProjectActivityRequest): Promise<{ success: boolean; result?: ActivityPaginationResult; error?: Error }> {
+    const pageSize = req.size || 20;
+    const currentPage = req.page || 1;
+    const fetchSize = pageSize + 1;
+
+    const queryParams = new URLSearchParams();
+    queryParams.append('page', currentPage.toString());
+    queryParams.append('size', fetchSize.toString());
+
     if (req?.sort) {
         queryParams.append('sort', req.sort);
     }
-    if (req?.name_like) {
-        queryParams.append('name_like', req.name_like);
+    if (req?.target_type) {
+        queryParams.append('target_type', req.target_type);
     }
     if (req?.created_at_gte) {
         queryParams.append('created_at_gte', req.created_at_gte);
@@ -64,7 +71,7 @@ export async function getProjectActivity(req: GetProjectActivityRequest): Promis
         queryParams.append('created_at_lte', req.created_at_lte);
     }
 
-    const result = await request(`/v1/projects/${req.project_id}/activity${queryParams.toString() ? `?${queryParams.toString()}` : ''}`, {
+    const result = await request(`/v1/projects/${req.project_id}/activity?${queryParams.toString()}`, {
         method: 'GET',
     })
 
@@ -82,7 +89,18 @@ export async function getProjectActivity(req: GetProjectActivityRequest): Promis
                 user_avatar: item.attributes.avatar_url,
             }))
 
-            return { success: true, activity }
+            const hasMore = activity.length > pageSize;
+            const displayActivity = hasMore ? activity.slice(0, pageSize) : activity;
+
+            return {
+                success: true,
+                result: {
+                    activity: displayActivity,
+                    hasMore,
+                    currentPage,
+                    pageSize
+                }
+            }
         } catch {
             return { success: false, error: { message: 'Failed to parse get project activity data' } }
         }

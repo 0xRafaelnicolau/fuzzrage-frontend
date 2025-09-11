@@ -1,6 +1,6 @@
 "use client";
 
-import { LoginCard } from "@/components/auth/login-card"
+import { LoginCard } from "@/components/login/login-card"
 import { Navbar } from "@/components/ui/navigation/navbar";
 import { FlickeringGrid } from "@/components/ui/flickering-grid";
 import { useEffect, useState } from "react";

@@ -1,8 +1,20 @@
 "use client"
 
 import { Installation, createInstallation } from "@/lib/actions/installations"
-import { getProviderName } from "@/components/providers/name-provider"
 import { toast } from "sonner"
+
+export const getProviderName = (provider?: string) => {
+    switch (provider?.toLowerCase()) {
+        case 'github':
+            return 'GitHub';
+        case 'gitlab':
+            return 'GitLab';
+        case 'bitbucket':
+            return 'Bitbucket';
+        default:
+            return 'GitHub';
+    }
+};
 
 export function InstallationLink({
     installations,

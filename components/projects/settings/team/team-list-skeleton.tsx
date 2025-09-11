@@ -3,7 +3,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import {
     Card,
-    CardContent,
     CardDescription,
     CardHeader,
     CardTitle,

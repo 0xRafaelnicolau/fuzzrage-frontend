@@ -6,7 +6,7 @@ import { TeamListSkeleton } from "@/components/projects/settings/team/team-list-
 import { ProjectOwner, getProjectOwner } from "@/lib/actions/projects";
 import { TeamMember, getTeamMembers } from "@/lib/actions/team";
 import { CollabRole, getCollabRoles } from "@/lib/actions/roles";
-import { getUser, User } from "@/lib/actions/user";
+import { getUser } from "@/lib/actions/user";
 
 async function TeamInviteContent({ id }: { id: string }) {
     const response = await getCollabRoles();

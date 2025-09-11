@@ -14,7 +14,7 @@ const DashboardFooter = ({
     ],
 }: DashboardFooterProps) => {
     return (
-        <div className="w-full">
+        <div className="w-full bg-background">
             <section>
                 <div className="w-full border-t">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-6">

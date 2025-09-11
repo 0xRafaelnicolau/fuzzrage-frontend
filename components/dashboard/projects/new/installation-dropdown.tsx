@@ -9,8 +9,23 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { ChevronDown } from "lucide-react"
 import { Installation, createInstallation } from "@/lib/actions/installations"
-import { getProviderIcon } from "@/components/providers/icon-provider"
 import { toast } from "sonner"
+import { GitHubIcon } from "@/components/ui/icons/github-icon"
+import { BitbucketIcon } from "@/components/ui/icons/bitbucket-icon"
+import { GitLabIcon } from "@/components/ui/icons/gitlab-icon"
+
+export const getProviderIcon = (provider?: string) => {
+    switch (provider?.toLowerCase()) {
+        case 'github':
+            return <GitHubIcon />;
+        case 'gitlab':
+            return <GitLabIcon />;
+        case 'bitbucket':
+            return <BitbucketIcon />;
+        default:
+            return <GitHubIcon />;
+    }
+};
 
 interface InstallationDropdownProps {
     installations: Installation[]

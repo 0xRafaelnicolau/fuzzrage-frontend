@@ -41,7 +41,7 @@ export function TabNavigation({ tabs }: TabNavigationProps) {
     }, [activeTab]);
 
     return (
-        <div className="sticky top-14 z-50 w-full border-b [border-color:var(--border-light)] dark:border-input bg-background">
+        <div className="sticky top-14.5 z-50 w-full border-b [border-color:var(--border-light)] dark:border-input bg-background">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <nav
                     className="flex gap-4 sm:gap-6 text-sm overflow-x-auto whitespace-nowrap scrollbar-hide"
