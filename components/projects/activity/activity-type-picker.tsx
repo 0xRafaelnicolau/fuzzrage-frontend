@@ -103,7 +103,7 @@ export function ActivityTypePicker({ projectId }: ActivityTypePickerProps) {
 
                         {filteredTypes.length === 0 && (
                             <div className="text-sm text-muted-foreground text-center py-4">
-                                No types found matching "{searchQuery}"
+                                No types found matching &quot;{searchQuery}&quot;
                             </div>
                         )}
                     </div>
