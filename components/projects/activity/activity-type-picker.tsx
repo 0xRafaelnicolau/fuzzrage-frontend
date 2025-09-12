@@ -1,9 +1,9 @@
 'use client'
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ChevronDown, ChevronRight, Search, Check, Filter } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 interface ActivityTypePickerProps {
     projectId: string;
@@ -17,9 +17,15 @@ const TYPES = [
 
 export function ActivityTypePicker({ projectId }: ActivityTypePickerProps) {
     const router = useRouter();
+    const searchParams = useSearchParams();
     const [isExpanded, setIsExpanded] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedType, setSelectedType] = useState<string | null>(null);
+
+    useEffect(() => {
+        const targetType = searchParams.get('target_type');
+        setSelectedType(targetType);
+    }, [searchParams]);
 
     const filteredTypes = TYPES.filter(type =>
         type.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -28,13 +34,15 @@ export function ActivityTypePicker({ projectId }: ActivityTypePickerProps) {
 
     const handleTypeSelect = (target: string) => {
         const params = new URLSearchParams(window.location.search);
-        if (target) {
+
+        if (selectedType === target) {
+            setSelectedType(null);
+            params.delete('target_type');
+        } else {
             setSelectedType(target);
             params.set('target_type', target);
-            params.delete('page');
-        } else {
-            params.delete('target_type');
         }
+        params.delete('page');
 
         router.push(`/project/${projectId}/activity?${params.toString()}`);
     };

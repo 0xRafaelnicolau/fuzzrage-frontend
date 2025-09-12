@@ -4,7 +4,6 @@ import { getProject } from '@/lib/actions/projects';
 import { User, getUser } from '@/lib/actions/user';
 import { Project } from '@/lib/actions/projects';
 import { Button } from '@/components/ui/button';
-import { CirclePlus } from 'lucide-react';
 import { GitHubIcon } from "@/components/ui/icons/github-icon";
 import { GitLabIcon } from "@/components/ui/icons/gitlab-icon";
 import { BitbucketIcon } from "@/components/ui/icons/bitbucket-icon";
@@ -14,6 +13,7 @@ import { notFound } from 'next/navigation';
 import UserMenu from '@/components/ui/navigation/user-menu';
 import GoBack from '@/components/ui/go-back';
 import Link from 'next/link';
+import { StartCampaignModal } from '@/components/projects/start/start-campaign-modal';
 
 export const getProviderIcon = (provider?: string) => {
     switch (provider?.toLowerCase()) {
@@ -81,10 +81,7 @@ export default async function Layout({ children, params }: { children: React.Rea
                                     <span className="hidden md:inline">Repository</span>
                                 </Button>
                             </Link>,
-                            <Button key="start-campaign" variant="default" size="icon" className="gap-1.25 md:size-auto md:h-9 md:px-4 md:py-2 md:has-[>svg]:px-3">
-                                <CirclePlus className="h-4 w-4" />
-                                <span className="hidden md:inline">Start Campaign</span>
-                            </Button>
+                            <StartCampaignModal projectId={id} key="start-campaign" />
                         ]} />
                 </div>
                 <div className="border-b [border-color:var(--border-light)] dark:border-input"></div>
