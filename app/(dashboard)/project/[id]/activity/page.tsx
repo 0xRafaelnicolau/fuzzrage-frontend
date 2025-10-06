@@ -16,8 +16,8 @@ import { DateRange } from "react-day-picker";
 import { Calendar } from "@/components/ui/calendar";
 
 const TYPES = [
-    { value: 'project', label: 'Projects', description: 'A project was created, updated or deleted.' },
     { value: 'campaign', label: 'Campaigns', description: 'A campaign started, stopped or finished.' },
+    { value: 'corpus', label: 'Corpus', description: 'A corpus was created, updated or deleted.' },
     { value: 'config', label: 'Configs', description: 'A config was added, updated or deleted.' },
 ];
 
@@ -25,7 +25,7 @@ const getActionLabel = (action: string, target_id: string) => {
     switch (action) {
         case "CONFIG_ADDED":
             return `config ${target_id} was added to `;
-        case "CONFIG_UPDATE":
+        case "CONFIG_UPDATED":
             return `config ${target_id} was updated in `;
         case "CONFIG_DELETED":
             return `config ${target_id} was deleted from `;
@@ -49,7 +49,7 @@ export default function Page() {
     const id = params.id as string;
 
     // Activity
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(false);
@@ -86,7 +86,7 @@ export default function Page() {
         const request: GetProjectActivityRequest = {
             project_id: id,
             page: page + 1,
-            size: 10,
+            size: 20,
             sort: "-created_at",
             target_type_in: selectedTypes.join(","),
             created_at_gte: from?.toISOString(),
@@ -135,7 +135,7 @@ export default function Page() {
             const request: GetProjectActivityRequest = {
                 project_id: id,
                 page: 1,
-                size: 10,
+                size: 20,
                 sort: "-created_at",
                 target_type_in: selectedTypes.join(","),
                 created_at_gte: from?.toISOString(),
@@ -168,106 +168,206 @@ export default function Page() {
                         <div className="">
                             <h2 className="text-lg font-semibold">Filters</h2>
                         </div>
-                        <div className="space-y-3 mt-4">
-                            {/* Calendar Picker */}
-                            <Collapsible className="border border-border rounded-md">
-                                <CollapsibleTrigger
-                                    onClick={() => setIsDateExpanded(!isDateExpanded)}
-                                    className="w-full flex items-center justify-between p-2.5 text-left hover:bg-muted/50 transition-colors"
-                                >
-                                    <div className="flex items-center gap-2">
-                                        <CalendarIcon className="h-4 w-4 text-muted-foreground" />
-                                        <span className="text-sm font-medium">Date</span>
-                                    </div>
-                                    {isDateExpanded ? (
-                                        <ChevronDown className="h-4 w-4" />
-                                    ) : (
-                                        <ChevronRight className="h-4 w-4" />
-                                    )}
-                                </CollapsibleTrigger>
-                                <CollapsibleContent>
-                                    <div className="border-t bg-background">
-                                        <div className="flex justify-center text-sm text-muted-foreground">
-                                            <Calendar
-                                                mode="range"
-                                                defaultMonth={new Date()}
-                                                selected={date}
-                                                onSelect={setDate}
-                                                className="rounded-lg w-full h-full"
-                                            />
-                                        </div>
-                                    </div>
-                                </CollapsibleContent>
-                            </Collapsible>
+                        <div className="mt-4">
+                            {/* Mobile version - no scroll */}
+                            <div className="lg:hidden">
+                                <div className="space-y-3">
+                                    <Collapsible className="border border-border rounded-md">
+                                        <CollapsibleTrigger
+                                            onClick={() => setIsDateExpanded(!isDateExpanded)}
+                                            className="w-full flex items-center justify-between p-2.5 text-left hover:bg-muted/50 transition-colors"
+                                        >
+                                            <div className="flex items-center gap-2">
+                                                <CalendarIcon className="h-4 w-4 text-muted-foreground" />
+                                                <span className="text-sm font-medium">Date</span>
+                                            </div>
+                                            {isDateExpanded ? (
+                                                <ChevronDown className="h-4 w-4" />
+                                            ) : (
+                                                <ChevronRight className="h-4 w-4" />
+                                            )}
+                                        </CollapsibleTrigger>
+                                        <CollapsibleContent>
+                                            <div className="border-t bg-background">
+                                                <div className="flex justify-center text-sm text-muted-foreground">
+                                                    <Calendar
+                                                        mode="range"
+                                                        defaultMonth={new Date()}
+                                                        selected={date}
+                                                        onSelect={setDate}
+                                                        className="rounded-lg w-full h-full"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </CollapsibleContent>
+                                    </Collapsible>
 
-                            {/* Type Picker */}
-                            <Collapsible className="border border-border rounded-md">
-                                <CollapsibleTrigger
-                                    onClick={() => setTypeExpanded(!isTypeExpanded)}
-                                    className="w-full flex items-center justify-between p-2.5 text-left hover:bg-muted/50 transition-colors"
-                                >
-                                    <div className="flex items-center gap-2">
-                                        <Filter className="h-4 w-4 text-muted-foreground" />
-                                        <span className="text-sm font-medium">Type</span>
-                                    </div>
-                                    {isTypeExpanded ? (
-                                        <ChevronDown className="h-4 w-4" />
-                                    ) : (
-                                        <ChevronRight className="h-4 w-4" />
-                                    )}
-                                </CollapsibleTrigger>
-                                <CollapsibleContent>
-                                    <div className="p-3 border-t bg-background">
-                                        <div className="relative">
-                                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                                            <Input
-                                                placeholder="Search types..."
-                                                value={searchType}
-                                                onChange={(e) => setSearchType(e.target.value)}
-                                                className="pl-9 h-9 text-sm"
-                                            />
-                                        </div>
-                                        <div className="space-y-1 mt-2">
-                                            {filteredTypes.map((type) => {
-                                                const isSelected = selectedTypes.includes(type.value);
-                                                return (
-                                                    <div
-                                                        key={type.value}
-                                                        className="flex items-start gap-3 p-1.5 rounded-md hover:bg-muted/50 cursor-pointer transition-colors"
-                                                        onClick={() => handleTypeSelect(type.value)}
-                                                    >
-                                                        <div className="flex-shrink-0 mt-1">
-                                                            {isSelected ? (
-                                                                <div className="h-4 w-4 rounded border border-primary bg-primary flex items-center justify-center">
-                                                                    <Check className="h-3 w-3 text-primary-foreground" />
+                                    {/* Type Picker */}
+                                    <Collapsible className="border border-border rounded-md">
+                                        <CollapsibleTrigger
+                                            onClick={() => setTypeExpanded(!isTypeExpanded)}
+                                            className="w-full flex items-center justify-between p-2.5 text-left hover:bg-muted/50 transition-colors"
+                                        >
+                                            <div className="flex items-center gap-2">
+                                                <Filter className="h-4 w-4 text-muted-foreground" />
+                                                <span className="text-sm font-medium">Type</span>
+                                            </div>
+                                            {isTypeExpanded ? (
+                                                <ChevronDown className="h-4 w-4" />
+                                            ) : (
+                                                <ChevronRight className="h-4 w-4" />
+                                            )}
+                                        </CollapsibleTrigger>
+                                        <CollapsibleContent>
+                                            <div className="p-3 border-t bg-background">
+                                                <div className="relative">
+                                                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                                    <Input
+                                                        placeholder="Search types..."
+                                                        value={searchType}
+                                                        onChange={(e) => setSearchType(e.target.value)}
+                                                        className="pl-9 h-9 text-sm"
+                                                    />
+                                                </div>
+                                                <div className="space-y-1 mt-2">
+                                                    {filteredTypes.map((type) => {
+                                                        const isSelected = selectedTypes.includes(type.value);
+                                                        return (
+                                                            <div
+                                                                key={type.value}
+                                                                className="flex items-start gap-3 p-1.5 rounded-md hover:bg-muted/50 cursor-pointer transition-colors"
+                                                                onClick={() => handleTypeSelect(type.value)}
+                                                            >
+                                                                <div className="flex-shrink-0 mt-1">
+                                                                    {isSelected ? (
+                                                                        <div className="h-4 w-4 rounded border border-primary bg-primary flex items-center justify-center">
+                                                                            <Check className="h-3 w-3 text-primary-foreground" />
+                                                                        </div>
+                                                                    ) : (
+                                                                        <div className="h-4 w-4 rounded border border-muted-foreground/30" />
+                                                                    )}
                                                                 </div>
-                                                            ) : (
-                                                                <div className="h-4 w-4 rounded border border-muted-foreground/30" />
-                                                            )}
-                                                        </div>
-                                                        <div className="min-w-0 flex-1">
-                                                            <div className="text-sm font-medium text-foreground">
-                                                                {type.label}
+                                                                <div className="min-w-0 flex-1">
+                                                                    <div className="text-sm font-medium text-foreground">
+                                                                        {type.label}
+                                                                    </div>
+                                                                    <div className="text-xs text-muted-foreground">
+                                                                        {type.description}
+                                                                    </div>
+                                                                </div>
                                                             </div>
-                                                            <div className="text-xs text-muted-foreground">
-                                                                {type.description}
+                                                        );
+                                                    })}
+                                                </div>
+                                            </div>
+                                        </CollapsibleContent>
+                                    </Collapsible>
+                                </div>
+                            </div>
+
+                            {/* Desktop version - scrollable */}
+                            <ScrollArea className="hidden lg:block h-[calc(100vh-16rem)]">
+                                <div className="space-y-3">
+                                    <Collapsible className="border border-border rounded-md">
+                                        <CollapsibleTrigger
+                                            onClick={() => setIsDateExpanded(!isDateExpanded)}
+                                            className="w-full flex items-center justify-between p-2.5 text-left hover:bg-muted/50 transition-colors"
+                                        >
+                                            <div className="flex items-center gap-2">
+                                                <CalendarIcon className="h-4 w-4 text-muted-foreground" />
+                                                <span className="text-sm font-medium">Date</span>
+                                            </div>
+                                            {isDateExpanded ? (
+                                                <ChevronDown className="h-4 w-4" />
+                                            ) : (
+                                                <ChevronRight className="h-4 w-4" />
+                                            )}
+                                        </CollapsibleTrigger>
+                                        <CollapsibleContent>
+                                            <div className="border-t bg-background">
+                                                <div className="flex justify-center text-sm text-muted-foreground">
+                                                    <Calendar
+                                                        mode="range"
+                                                        defaultMonth={new Date()}
+                                                        selected={date}
+                                                        onSelect={setDate}
+                                                        className="rounded-lg w-full h-full"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </CollapsibleContent>
+                                    </Collapsible>
+
+                                    {/* Type Picker */}
+                                    <Collapsible className="border border-border rounded-md">
+                                        <CollapsibleTrigger
+                                            onClick={() => setTypeExpanded(!isTypeExpanded)}
+                                            className="w-full flex items-center justify-between p-2.5 text-left hover:bg-muted/50 transition-colors"
+                                        >
+                                            <div className="flex items-center gap-2">
+                                                <Filter className="h-4 w-4 text-muted-foreground" />
+                                                <span className="text-sm font-medium">Type</span>
+                                            </div>
+                                            {isTypeExpanded ? (
+                                                <ChevronDown className="h-4 w-4" />
+                                            ) : (
+                                                <ChevronRight className="h-4 w-4" />
+                                            )}
+                                        </CollapsibleTrigger>
+                                        <CollapsibleContent>
+                                            <div className="p-3 border-t bg-background">
+                                                <div className="relative">
+                                                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                                    <Input
+                                                        placeholder="Search types..."
+                                                        value={searchType}
+                                                        onChange={(e) => setSearchType(e.target.value)}
+                                                        className="pl-9 h-9 text-sm"
+                                                    />
+                                                </div>
+                                                <div className="space-y-1 mt-2">
+                                                    {filteredTypes.map((type) => {
+                                                        const isSelected = selectedTypes.includes(type.value);
+                                                        return (
+                                                            <div
+                                                                key={type.value}
+                                                                className="flex items-start gap-3 p-1.5 rounded-md hover:bg-muted/50 cursor-pointer transition-colors"
+                                                                onClick={() => handleTypeSelect(type.value)}
+                                                            >
+                                                                <div className="flex-shrink-0 mt-1">
+                                                                    {isSelected ? (
+                                                                        <div className="h-4 w-4 rounded border border-primary bg-primary flex items-center justify-center">
+                                                                            <Check className="h-3 w-3 text-primary-foreground" />
+                                                                        </div>
+                                                                    ) : (
+                                                                        <div className="h-4 w-4 rounded border border-muted-foreground/30" />
+                                                                    )}
+                                                                </div>
+                                                                <div className="min-w-0 flex-1">
+                                                                    <div className="text-sm font-medium text-foreground">
+                                                                        {type.label}
+                                                                    </div>
+                                                                    <div className="text-xs text-muted-foreground">
+                                                                        {type.description}
+                                                                    </div>
+                                                                </div>
                                                             </div>
-                                                        </div>
-                                                    </div>
-                                                );
-                                            })}
-                                        </div>
-                                    </div>
-                                </CollapsibleContent>
-                            </Collapsible>
+                                                        );
+                                                    })}
+                                                </div>
+                                            </div>
+                                        </CollapsibleContent>
+                                    </Collapsible>
+                                </div>
+                            </ScrollArea>
                         </div>
                     </div>
                 </div>
 
                 <div className="w-full lg:w-3/4 lg:pl-4">
-                    <ScrollArea className="lg:h-[calc(100vh-14rem)]">
-                        <div className="space-y-4">
-                            <h2 className="text-lg font-semibold">Activity</h2>
+                    <div className="space-y-4">
+                        <h2 className="text-lg font-semibold">Activity</h2>
+                        <ScrollArea className="lg:h-[calc(100vh-16rem)]">
                             {loading ? (
                                 <div className="flex justify-center items-center py-16">
                                     <Spinner variant="default" className="text-muted-foreground" />
@@ -319,10 +419,10 @@ export default function Page() {
                                     )}
                                 </>
                             )}
-                        </div>
-                    </ScrollArea>
+                        </ScrollArea>
+                    </div>
                 </div>
             </div>
-        </div>
+        </div >
     );
 }       

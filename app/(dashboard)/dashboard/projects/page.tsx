@@ -22,7 +22,7 @@ export default function Page() {
     const [date, setDate] = useState<DateRange | undefined>(undefined);
 
     // Projects
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(false);
