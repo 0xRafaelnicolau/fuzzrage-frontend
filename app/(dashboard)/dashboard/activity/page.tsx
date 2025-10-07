@@ -383,7 +383,9 @@ export default function Page() {
                                                 <div className="flex items-center gap-3 min-w-0 flex-1">
                                                     <Avatar className="h-8 w-8 flex-shrink-0 border border-border">
                                                         <AvatarImage src={item.user_avatar} alt={item.user_name} />
-                                                        <AvatarFallback>{item.user_name.charAt(0).toUpperCase()}</AvatarFallback>
+                                                        <AvatarFallback className="bg-gradient-to-br from-muted to-accent backdrop-blur-sm">
+                                                            <div className="w-full h-full bg-gradient-to-br from-accent/50 to-border/50 rounded-full blur-sm"></div>
+                                                        </AvatarFallback>
                                                     </Avatar>
                                                     <div className="text-sm min-w-0">
                                                         <span className="font-medium truncate sm:inline">{item.user_name} </span>
