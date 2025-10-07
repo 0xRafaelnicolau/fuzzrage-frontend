@@ -160,7 +160,7 @@ export function ImportRepo({ user, installations }: { user: User, installations:
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem key="installation" onClick={handleInstallation}>
                                     {getProviderIcon(user?.provider)}
-                                    Adjust Permissions
+                                    Update Permissions
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
