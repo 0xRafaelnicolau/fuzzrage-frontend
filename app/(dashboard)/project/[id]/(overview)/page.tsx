@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { GitHubIcon } from "@/components/ui/github-icon";
 import { GitLabIcon } from "@/components/ui/gitlab-icon";
 import { GoBack } from "@/components/ui/go-back";
-import { StartCampaignModal } from "@/components/projects/overview/start-campaign-modal";
+import { StartCampaignModal } from "@/components/projects/start-campaign-modal";
 import { getProject, Project } from "@/lib/actions/projects";
 import { User } from "@/lib/actions/user";
 import { getUser } from "@/lib/actions/user";

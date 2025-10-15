@@ -1,3 +1,6 @@
+"use client"
+
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import {
     Dialog,
@@ -20,49 +23,103 @@ import {
 } from "@/components/ui/select"
 import { CirclePlus } from 'lucide-react'
 import { Config, getConfigs } from "@/lib/actions/configs"
+import { createCampaign } from "@/lib/actions/campaigns"
+import { toast } from "sonner"
+import { useRouter } from "next/navigation"
 
 interface StartCampaignModalProps {
     projectId: string
 }
 
-export async function StartCampaignModal({ projectId }: StartCampaignModalProps) {
-    const response = await getConfigs({ project_id: projectId })
+export function StartCampaignModal({ projectId }: StartCampaignModalProps) {
+    const [configs, setConfigs] = useState<Config[]>([])
+    const [loading, setLoading] = useState(true)
+    const [isSubmitting, setIsSubmitting] = useState(false)
+    const [open, setOpen] = useState(false)
+    const router = useRouter()
 
-    let configs: Config[] = []
-    if (response.success && response.configs) {
-        configs = response.configs
-    } else {
-        configs = []
+    useEffect(() => {
+        async function fetchConfigs() {
+            setLoading(true)
+            const response = await getConfigs({ project_id: projectId })
+
+            if (response.success && response.configs) {
+                setConfigs(response.configs)
+            } else {
+                setConfigs([])
+            }
+            setLoading(false)
+        }
+
+        if (open) {
+            fetchConfigs()
+        }
+    }, [projectId, open])
+
+    async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+        e.preventDefault()
+        setIsSubmitting(true)
+
+        const formData = new FormData(e.currentTarget)
+        const branch = formData.get("git-branch") as string
+        const duration = parseInt(formData.get("duration") as string)
+        const configId = parseInt(formData.get("config") as string)
+        const contractName = formData.get("contract") as string
+        const entryPoint = formData.get("entrypoint") as string
+
+        if (!branch || !duration || !configId || !contractName || !entryPoint) {
+            toast.error("Please fill in all fields")
+            setIsSubmitting(false)
+            return
+        }
+
+        const result = await createCampaign({
+            project_id: projectId,
+            branch,
+            config_id: configId,
+            contract_name: contractName,
+            duration,
+            entry_point: entryPoint,
+        })
+
+        if (result.success) {
+            toast.success("Campaign started successfully")
+            setOpen(false)
+            router.refresh()
+        } else {
+            toast.error(result.error?.message || "Failed to start campaign")
+        }
+
+        setIsSubmitting(false)
     }
 
     return (
-        <Dialog>
-            <form>
-                <DialogTrigger asChild>
-                    <Button variant="default" size="icon" className="gap-1.25 md:size-auto md:h-9 md:px-4 md:py-2 md:has-[>svg]:px-3">
-                        <CirclePlus className="h-4 w-4" />
-                        <span className="hidden md:inline">Start Campaign</span>
-                    </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px]">
+        <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+                <Button variant="default" size="icon" className="gap-1.25 md:size-auto md:h-9 md:px-4 md:py-2 md:has-[>svg]:px-3">
+                    <CirclePlus className="h-4 w-4" />
+                    <span className="hidden md:inline">Start Campaign</span>
+                </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+                <form onSubmit={handleSubmit}>
                     <DialogHeader>
                         <DialogTitle>Start Campaign</DialogTitle>
                         <DialogDescription>
                             Configure the campaign settings below.
                         </DialogDescription>
                     </DialogHeader>
-                    <div className="grid gap-4 mt-2 mb-2">
+                    <div className="grid gap-4 mt-4 mb-4">
                         <div className="grid grid-cols-2 gap-4">
                             <div className="grid gap-3">
                                 <Label htmlFor="git-branch">Branch</Label>
-                                <Select name="git-branch">
+                                <Select name="git-branch" required>
                                     <SelectTrigger className="w-full">
                                         <SelectValue placeholder="Select a branch" />
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectItem value="main">main</SelectItem>
                                         <SelectItem value="develop">master</SelectItem>
-                                        <SelectItem value="feature/new-feature">security-review</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
@@ -74,14 +131,15 @@ export async function StartCampaignModal({ projectId }: StartCampaignModalProps)
                                     type="number"
                                     placeholder="Enter duration"
                                     min="1"
+                                    required
                                 />
                             </div>
                         </div>
                         <div className="grid gap-3">
                             <Label htmlFor="config">Config</Label>
-                            <Select name="config">
+                            <Select name="config" required disabled={loading}>
                                 <SelectTrigger className="w-full">
-                                    <SelectValue placeholder="Select a config" />
+                                    <SelectValue placeholder={loading ? "Loading configs..." : "Select a config"} />
                                 </SelectTrigger>
                                 <SelectContent>
                                     {configs.length > 0 ? (
@@ -104,6 +162,7 @@ export async function StartCampaignModal({ projectId }: StartCampaignModalProps)
                                 id="contract"
                                 name="contract"
                                 placeholder="Enter the contract..."
+                                required
                             />
                         </div>
                         <div className="grid gap-3">
@@ -112,17 +171,20 @@ export async function StartCampaignModal({ projectId }: StartCampaignModalProps)
                                 id="entrypoint"
                                 name="entrypoint"
                                 placeholder="Enter the entrypoint..."
+                                required
                             />
                         </div>
                     </div>
                     <DialogFooter>
                         <DialogClose asChild>
-                            <Button variant="outline">Cancel</Button>
+                            <Button variant="outline" type="button" disabled={isSubmitting}>Cancel</Button>
                         </DialogClose>
-                        <Button type="submit">Start Campaign</Button>
+                        <Button type="submit" disabled={isSubmitting || loading}>
+                            {isSubmitting ? "Starting..." : "Start Campaign"}
+                        </Button>
                     </DialogFooter>
-                </DialogContent>
-            </form>
+                </form>
+            </DialogContent>
         </Dialog>
     )
 }

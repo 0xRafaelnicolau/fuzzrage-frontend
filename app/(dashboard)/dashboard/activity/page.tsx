@@ -6,8 +6,8 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Activity, getActivity, GetActivityRequest } from "@/lib/actions/activity";
-import { ChevronDown, ChevronRight, Filter, Search, Check, Calendar as CalendarIcon } from "lucide-react";
-import { useParams } from 'next/navigation';
+import { ChevronDown, ChevronRight, Filter, Search, Check, Calendar as CalendarIcon, PlayCircle, CheckCircle2, XCircle } from "lucide-react";
+import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
@@ -16,36 +16,102 @@ import { DateRange } from "react-day-picker";
 import { Calendar } from "@/components/ui/calendar";
 
 const TYPES = [
-    { value: 'campaign', label: 'Campaigns', description: 'A campaign started, stopped or finished.' },
-    { value: 'corpus', label: 'Corpus', description: 'A corpus was created, updated or deleted.' },
-    { value: 'config', label: 'Configs', description: 'A config was added, updated or deleted.' },
+    { value: 'campaign', label: 'Campaigns', description: 'Campaigns that were started, stopped, or finished.' },
+    { value: 'corpus', label: 'Corpus', description: 'Corpus items that were created, updated, or deleted.' },
+    { value: 'config', label: 'Configs', description: 'Configuration files that were added, updated, or deleted.' },
 ];
 
-const getActionLabel = (action: string, target_id: string) => {
+const getActionLabel = (action: string, targetId: string) => {
     switch (action) {
         case "CONFIG_ADDED":
-            return `config ${target_id} was added to `;
+            return {
+                prefix: 'added config ',
+                suffix: ' to ',
+                targetDisplay: targetId,
+                href: ''
+            };
         case "CONFIG_UPDATED":
-            return `config ${target_id} was updated in `;
+            return {
+                prefix: 'updated config ',
+                suffix: ' in ',
+                targetDisplay: targetId,
+                href: ''
+            };
         case "CONFIG_DELETED":
-            return `config ${target_id} was deleted from `;
+            return {
+                prefix: 'deleted config ',
+                suffix: ' from ',
+                targetDisplay: targetId,
+                href: ''
+            };
         case "CORPUS_RENAMED":
-            return `corpus ${target_id} was renamed in `;
+            return {
+                prefix: 'renamed corpus ',
+                suffix: ' in ',
+                targetDisplay: targetId,
+                href: ''
+            };
         case "CORPUS_DELETED":
-            return `corpus ${target_id} was deleted from `;
+            return {
+                prefix: 'deleted corpus ',
+                suffix: ' from ',
+                targetDisplay: targetId,
+                href: ''
+            };
         case "CAMPAIGN_CREATED":
-            return `campaign ${target_id} was created in  `;
+            return {
+                prefix: 'created campaign ',
+                suffix: ' in ',
+                targetDisplay: targetId.substring(0, 8),
+                href: `/campaign/${targetId}`
+            };
         case "CAMPAIGN_CANCELED":
-            return `campaign ${target_id} was canceled in `;
+            return {
+                prefix: 'Campaign ',
+                suffix: ' canceled executing in ',
+                targetDisplay: targetId.substring(0, 8),
+                href: `/campaign/${targetId}`
+            };
         case "CAMPAIGN_FINISHED":
-            return `campaign ${target_id} was finished in `;
+            return {
+                prefix: 'Campaign ',
+                suffix: ' finished executing in ',
+                targetDisplay: targetId.substring(0, 8),
+                href: `/campaign/${targetId}`
+            };
         case "CAMPAIGN_STARTED":
-            return `campaign ${target_id} was started in `;
+            return {
+                prefix: 'Campaign ',
+                suffix: ' started executing in ',
+                targetDisplay: targetId.substring(0, 8),
+                href: `/campaign/${targetId}`
+            };
+        default:
+            return {
+                prefix: '',
+                suffix: '',
+                targetDisplay: targetId,
+                href: ''
+            };
+    }
+}
+
+const getActionIcon = (action: string) => {
+    switch (action) {
+        case "CAMPAIGN_STARTED":
+            return PlayCircle;
+        case "CAMPAIGN_FINISHED":
+            return CheckCircle2;
+        case "CAMPAIGN_CANCELED":
+            return XCircle;
+        default:
+            return null;
     }
 }
 
 export default function Page() {
     const params = useParams();
+    const router = useRouter();
 
     // Activity
     const [loading, setLoading] = useState(true);
@@ -91,10 +157,7 @@ export default function Page() {
             created_at_lte: to?.toISOString(),
         };
 
-        const [response] = await Promise.all([
-            getActivity(request),
-            new Promise(resolve => setTimeout(resolve, 200))
-        ]);
+        const response = await getActivity(request)
 
         if (response.success && response.activity) {
             setActivities(prevActivities => [...prevActivities, ...response.activity!]);
@@ -139,12 +202,7 @@ export default function Page() {
                 created_at_lte: to?.toISOString(),
             };
 
-            const [response] = await Promise.all([
-                getActivity(request),
-                new Promise(resolve => setTimeout(resolve, 200))
-            ]);
-
-            console.log(response);
+            const response = await getActivity(request)
 
             if (response.success && response.activity) {
                 setActivities(response.activity);
@@ -170,11 +228,11 @@ export default function Page() {
                         <div className="mt-4">
                             {/* Mobile version - no scroll */}
                             <div className="lg:hidden">
-                                <div className="space-y-3">
-                                    <Collapsible className="border border-border rounded-md">
+                                <div className="border border-border rounded-md">
+                                    <Collapsible>
                                         <CollapsibleTrigger
                                             onClick={() => setIsDateExpanded(!isDateExpanded)}
-                                            className="w-full flex items-center justify-between p-2.5 text-left hover:bg-muted/50 transition-colors"
+                                            className="w-full flex items-center justify-between p-2.5 text-left hover:bg-muted/50 transition-colors rounded-t-md"
                                         >
                                             <div className="flex items-center gap-2">
                                                 <CalendarIcon className="h-4 w-4 text-muted-foreground" />
@@ -202,10 +260,10 @@ export default function Page() {
                                     </Collapsible>
 
                                     {/* Type Picker */}
-                                    <Collapsible className="border border-border rounded-md">
+                                    <Collapsible>
                                         <CollapsibleTrigger
                                             onClick={() => setTypeExpanded(!isTypeExpanded)}
-                                            className="w-full flex items-center justify-between p-2.5 text-left hover:bg-muted/50 transition-colors"
+                                            className="w-full flex items-center justify-between p-2.5 text-left hover:bg-muted/50 transition-colors border-t border-border"
                                         >
                                             <div className="flex items-center gap-2">
                                                 <Filter className="h-4 w-4 text-muted-foreground" />
@@ -266,11 +324,11 @@ export default function Page() {
 
                             {/* Desktop version - scrollable */}
                             <ScrollArea className="hidden lg:block h-[calc(100vh-16rem)]">
-                                <div className="space-y-3">
-                                    <Collapsible className="border border-border rounded-md">
+                                <div className="border border-border rounded-md">
+                                    <Collapsible>
                                         <CollapsibleTrigger
                                             onClick={() => setIsDateExpanded(!isDateExpanded)}
-                                            className="w-full flex items-center justify-between p-2.5 text-left hover:bg-muted/50 transition-colors"
+                                            className="w-full flex items-center justify-between p-2.5 text-left hover:bg-muted/50 transition-colors rounded-t-md"
                                         >
                                             <div className="flex items-center gap-2">
                                                 <CalendarIcon className="h-4 w-4 text-muted-foreground" />
@@ -290,7 +348,7 @@ export default function Page() {
                                                         defaultMonth={new Date()}
                                                         selected={date}
                                                         onSelect={setDate}
-                                                        className="rounded-lg w-full h-full"
+                                                        className="w-full h-full"
                                                     />
                                                 </div>
                                             </div>
@@ -298,10 +356,10 @@ export default function Page() {
                                     </Collapsible>
 
                                     {/* Type Picker */}
-                                    <Collapsible className="border border-border rounded-md">
+                                    <Collapsible>
                                         <CollapsibleTrigger
                                             onClick={() => setTypeExpanded(!isTypeExpanded)}
-                                            className="w-full flex items-center justify-between p-2.5 text-left hover:bg-muted/50 transition-colors"
+                                            className="w-full flex items-center justify-between p-2.5 text-left hover:bg-muted/50 transition-colors border-t border-border"
                                         >
                                             <div className="flex items-center gap-2">
                                                 <Filter className="h-4 w-4 text-muted-foreground" />
@@ -378,26 +436,57 @@ export default function Page() {
                             ) : (
                                 <>
                                     <div className="space-y-3">
-                                        {activities.map((item, index) => (
-                                            <div key={index} className="flex items-center justify-between p-3 rounded-md border bg-card">
-                                                <div className="flex items-center gap-3 min-w-0 flex-1">
-                                                    <Avatar className="h-8 w-8 flex-shrink-0 border border-border">
-                                                        <AvatarImage src={item.user_avatar} alt={item.user_name} />
-                                                        <AvatarFallback className="bg-gradient-to-br from-muted to-accent backdrop-blur-sm">
-                                                            <div className="w-full h-full bg-gradient-to-br from-accent/50 to-border/50 rounded-full blur-sm"></div>
-                                                        </AvatarFallback>
-                                                    </Avatar>
-                                                    <div className="text-sm min-w-0">
-                                                        <span className="font-medium truncate sm:inline">{item.user_name} </span>
-                                                        <span className="text-muted-foreground">{getActionLabel(item.action, item.target_id)}</span>
-                                                        <span className="font-medium truncate sm:inline">{item.project_name + "."}</span>
+                                        {activities.map((item, index) => {
+                                            const ActionIcon = getActionIcon(item.action);
+                                            return (
+                                                <div key={index} className="flex items-center justify-between p-3 rounded-md border bg-card">
+                                                    <div className="flex items-center gap-3 min-w-0 flex-1">
+                                                        {ActionIcon ? (
+                                                            <div className="h-8 w-8 flex-shrink-0 flex items-center justify-center rounded-full border border-border bg-muted">
+                                                                <ActionIcon className="h-4 w-4 text-muted-foreground" />
+                                                            </div>
+                                                        ) : (
+                                                            <Avatar className="h-8 w-8 flex-shrink-0 border border-border">
+                                                                <AvatarImage src={item.user_avatar} alt={item.user_name} />
+                                                                <AvatarFallback className="bg-gradient-to-br from-muted to-accent backdrop-blur-sm">
+                                                                    <div className="w-full h-full bg-gradient-to-br from-accent/50 to-border/50 rounded-full blur-sm"></div>
+                                                                </AvatarFallback>
+                                                            </Avatar>
+                                                        )}
+                                                        <div className="text-sm min-w-0">
+                                                            <span className="font-medium truncate sm:inline">{item.user_name} </span>
+                                                            <span className="text-muted-foreground">
+                                                                {(() => {
+                                                                    const actionLabel = getActionLabel(item.action, item.target_id);
+                                                                    return (
+                                                                        <>
+                                                                            {actionLabel.prefix}
+                                                                            {actionLabel.href ? (
+                                                                                <span
+                                                                                    className="text-white cursor-pointer hover:underline"
+                                                                                    onClick={() => router.push(actionLabel.href)}
+                                                                                >
+                                                                                    {actionLabel.targetDisplay}
+                                                                                </span>
+                                                                            ) : (
+                                                                                <span className="text-white">
+                                                                                    {actionLabel.targetDisplay}
+                                                                                </span>
+                                                                            )}
+                                                                            {actionLabel.suffix}
+                                                                        </>
+                                                                    );
+                                                                })()}
+                                                            </span>
+                                                            <span className="font-medium truncate sm:inline">{item.project_name + "."}</span>
+                                                        </div>
+                                                    </div>
+                                                    <div className="text-xs text-muted-foreground whitespace-nowrap flex-shrink-0">
+                                                        {formatDistanceToNow(new Date(item.timestamp), { addSuffix: true })}
                                                     </div>
                                                 </div>
-                                                <div className="text-xs text-muted-foreground whitespace-nowrap flex-shrink-0">
-                                                    {formatDistanceToNow(new Date(item.timestamp), { addSuffix: true })}
-                                                </div>
-                                            </div>
-                                        ))}
+                                            );
+                                        })}
                                     </div>
                                     {hasMore && (
                                         <div className="flex justify-center mt-6">

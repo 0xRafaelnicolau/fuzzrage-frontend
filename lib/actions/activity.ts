@@ -6,6 +6,7 @@ import { Error } from "@/lib/types";
 export type Activity = {
     action: string
     target_id: string
+    target_type: string
     timestamp: string
     project_id: string
     project_name: string
@@ -33,10 +34,10 @@ export type GetProjectActivityResponse = {
             created_at: string,
             project_id: number,
             project_name: string,
-            target_id: number,
+            target_id: string,
             target_type: string,
             updated_at: string,
-            user_id: number,
+            user_id: number | null,
             username: string
         },
         id: string,
@@ -86,16 +87,18 @@ export async function getProjectActivity(req: GetProjectActivityRequest): Promis
             const activity: Activity[] = data.data.map(item => ({
                 action: item.attributes.action,
                 target_id: item.attributes.target_id.toString(),
+                target_type: item.attributes.target_type,
                 timestamp: item.attributes.created_at,
                 project_id: item.attributes.project_id.toString(),
                 project_name: item.attributes.project_name,
-                user_id: item.attributes.user_id.toString(),
-                user_name: item.attributes.username,
-                user_avatar: item.attributes.avatar_url,
+                user_id: item.attributes.user_id?.toString() || '',
+                user_name: item.attributes.username || '',
+                user_avatar: item.attributes.avatar_url || '',
             }))
 
             return { success: true, activity, meta: data.meta }
-        } catch {
+        } catch (e) {
+            console.error('Parse error:', e)
             return { success: false, error: { message: 'Failed to parse get project activity data' } }
         }
     }
@@ -125,7 +128,7 @@ export type GetActivityResponse = {
             target_id: number,
             target_type: string,
             updated_at: string,
-            user_id: number,
+            user_id: number | null,
             username: string
         },
         id: string,
@@ -175,12 +178,13 @@ export async function getActivity(req: GetActivityRequest): Promise<{ success: b
             const activity: Activity[] = data.data.map(item => ({
                 action: item.attributes.action,
                 target_id: item.attributes.target_id.toString(),
+                target_type: item.attributes.target_type,
                 timestamp: item.attributes.created_at,
                 project_id: item.attributes.project_id.toString(),
                 project_name: item.attributes.project_name,
-                user_id: item.attributes.user_id.toString(),
-                user_name: item.attributes.username,
-                user_avatar: item.attributes.avatar_url,
+                user_id: item.attributes.user_id?.toString() || '',
+                user_name: item.attributes.username || '',
+                user_avatar: item.attributes.avatar_url || '',
             }))
 
             return { success: true, activity, meta: data.meta }

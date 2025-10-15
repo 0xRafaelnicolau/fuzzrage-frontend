@@ -57,23 +57,19 @@ export default function Page() {
             created_at_lte: to?.toISOString(),
         }
 
-        // Execute the request to get the projects.
-        const [result] = await Promise.all([
-            getProjects(request),
-            new Promise(resolve => setTimeout(resolve, 200))
-        ]);
+        const response = await getProjects(request)
 
-        if (result.success && result.projects) {
+        if (response.success && response.projects) {
             // If the request was successful, add the projects to the state.
-            setProjects(prevProjects => [...prevProjects, ...result.projects!]);
+            setProjects(prevProjects => [...prevProjects, ...response.projects!]);
             // If there are more pages set the has more state to true.
-            setHasMore(result.meta ? result.meta.current_page < result.meta.total_pages : false);
+            setHasMore(response.meta ? response.meta.current_page < response.meta.total_pages : false);
         } else {
             // If the request was not successful, set the page to the previous page.
             setPage(page);
 
             // If the request was not successful, show an error toast.
-            toast.error(result.error?.message || "Failed to load more projects");
+            toast.error(response.error?.message || "Failed to load more projects");
         }
 
         // Set the loading more state to false.
@@ -110,19 +106,16 @@ export default function Page() {
                 created_at_lte: to?.toISOString(),
             }
 
-            // Execute the request to get the projects.
-            const [result] = await Promise.all([
-                getProjects(request),
-                new Promise(resolve => setTimeout(resolve, 200))
-            ]);
-            if (result.success && result.projects) {
+            const response = await getProjects(request)
+
+            if (response.success && response.projects) {
                 // If the request was successful, store the projects in the state.
-                setProjects(result.projects);
+                setProjects(response.projects);
                 // If there are more pages set the has more state to true.
-                setHasMore(result.meta ? result.meta.current_page < result.meta.total_pages : false);
+                setHasMore(response.meta ? response.meta.current_page < response.meta.total_pages : false);
             } else {
                 // If the request was not successful, show an error toast.
-                toast.error(result.error?.message || "Failed to fetch projects");
+                toast.error(response.error?.message || "Failed to fetch projects");
             }
 
             // Set the loading state to false.
