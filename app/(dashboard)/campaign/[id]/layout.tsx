@@ -4,7 +4,7 @@ import { User, getUser } from '@/lib/actions/user';
 import { notFound } from 'next/navigation';
 import FlickeringGrid from '@/components/ui/flickering-grid';
 
-export default async function Layout({ children, params }: { children: React.ReactNode, params: { id: string } }) {
+export default async function Layout({ children, params }: { children: React.ReactNode, params: Promise<{ id: string }> }) {
     const { id } = await params;
 
     const response = await getUser();

@@ -59,7 +59,7 @@ export default async function Page({ params }: { params: { id: string } }) {
                                 <span className="hidden md:inline">Repository</span>
                             </Button>
                         </Link>,
-                        <StartCampaignModal projectId={id} />
+                        <StartCampaignModal key="start-campaign" projectId={id} />
                     ]} />
             </div>
         </>

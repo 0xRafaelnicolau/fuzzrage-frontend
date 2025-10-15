@@ -5,17 +5,12 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { CalendarIcon, ChevronDown, ChevronRight } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { DateRange } from "react-day-picker";
-import { useParams } from 'next/navigation';
 import { useState } from "react";
 
 export default function Page() {
-    const params = useParams();
-    const id = params.id as string;
-
     // Calendar picker
     const [isDateExpanded, setIsDateExpanded] = useState(false);
     const [date, setDate] = useState<DateRange | undefined>(undefined);
-
 
     return (
         <>

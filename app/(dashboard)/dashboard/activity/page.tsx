@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Activity, getActivity, GetActivityRequest } from "@/lib/actions/activity";
 import { ChevronDown, ChevronRight, Filter, Search, Check, Calendar as CalendarIcon, PlayCircle, CheckCircle2, XCircle } from "lucide-react";
-import { useParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
@@ -110,7 +110,6 @@ const getActionIcon = (action: string) => {
 }
 
 export default function Page() {
-    const params = useParams();
     const router = useRouter();
 
     // Activity
