@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useEffect, useTransition } from "react";
 import { Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,17 +11,32 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { Project, updateProject } from "@/lib/actions/projects";
+import { Project, getProject, updateProject } from "@/lib/actions/projects";
 import { toast } from "sonner";
 
-export function UpdateProject({ project }: { project: Project }) {
-    const [name, setName] = useState(project.attributes.name || "");
+export function UpdateProject({ projectId }: { projectId: string }) {
+    const [project, setProject] = useState<Project>();
+    const [name, setName] = useState(project?.attributes.name || "");
     const [isPending, startTransition] = useTransition();
+
+    useEffect(() => {
+        const fetchProject = async () => {
+            const response = await getProject({ projectId });
+
+            if (response.success && response.project) {
+                setProject(response.project);
+            } else {
+                toast.error(response.error?.message || "Failed to fetch project");
+            }
+        }
+
+        fetchProject();
+    }, [projectId]);
 
     const handleSubmit = async (formData: FormData) => {
         startTransition(async () => {
             const result = await updateProject({
-                projectId: project.id,
+                projectId: projectId,
                 name: formData.get('name') as string,
             });
 

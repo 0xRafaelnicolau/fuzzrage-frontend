@@ -9,7 +9,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { CalendarIcon, CirclePlus, Search } from "lucide-react";
 import { GetProjectsRequest, getProjects, Project } from "@/lib/actions/projects";
-import { ProjectCard } from "@/components/dashboard/projects/project-card";
+import { ProjectCard } from "@/app/(dashboard)/dashboard/projects/project-card";
 import { DateRange } from "react-day-picker";
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
@@ -100,7 +100,7 @@ export default function Page() {
             const request: GetProjectsRequest = {
                 page: 1,
                 name_like: debouncedSearch,
-                size: 9,
+                size: 20,
                 sort: "-created_at",
                 created_at_gte: from?.toISOString(),
                 created_at_lte: to?.toISOString(),

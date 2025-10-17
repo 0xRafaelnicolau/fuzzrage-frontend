@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import { UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,38 +20,40 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { createInvite } from "@/lib/actions/team";
-import { CollabRole } from "@/lib/actions/roles";
+import { CollabRole, getCollabRoles } from "@/lib/actions/roles";
 import { toast } from "sonner";
+import { getRoleName } from "@/lib/utils";
 
-function getRoleName(role: CollabRole) {
-    if (role.level === 1) {
-        return "Read";
-    } else if (role.level === 2) {
-        return "Write";
-    } else if (role.level === 3) {
-        return "Owner";
-    } else {
-        return "Unknown";
-    }
-}
-
-export function TeamInvite({ projectId, roles = [] }: { projectId: string, roles?: CollabRole[] }) {
+export function TeamInvite({ projectId }: { projectId: string }) {
     const [email, setEmail] = useState("");
-    const defaultRoleId = roles.find(r => r.level === 1)?.role_id || "1";
-    const [role, setRole] = useState<string>(defaultRoleId);
+    const [roles, setRoles] = useState<CollabRole[]>([]);
+    const [selectedRole, setSelectedRole] = useState<string>("1");
     const [isPending, startTransition] = useTransition();
+
+    useEffect(() => {
+        const fetchRoles = async () => {
+            const response = await getCollabRoles();
+            if (response.success && response.roles) {
+                setRoles(response.roles);
+            } else {
+                toast.error(response.error?.message || "Failed to fetch roles");
+            }
+        }
+
+        fetchRoles();
+    }, [projectId]);
 
     const handleSubmit = async (formData: FormData) => {
         startTransition(async () => {
             const result = await createInvite({
                 project_id: projectId,
                 email: formData.get('email') as string,
-                role: parseInt(role)
+                role: parseInt(selectedRole)
             });
 
             if (result.success) {
                 setEmail("");
-                setRole(defaultRoleId);
+                setSelectedRole("1");
                 toast.success("Invite sent successfully");
             } else {
                 toast.error(result.error?.message || "Failed to send invite");
@@ -72,7 +74,7 @@ export function TeamInvite({ projectId, roles = [] }: { projectId: string, roles
                     <Button
                         type="submit"
                         form="invite-form"
-                        disabled={!email.trim() || !role || isPending}
+                        disabled={!email.trim() || !selectedRole || isPending}
                     >
                         <UserPlus className="h-4 w-4" />
                         <span className="hidden sm:inline">
@@ -102,8 +104,8 @@ export function TeamInvite({ projectId, roles = [] }: { projectId: string, roles
                             <Label htmlFor="invite-role">Permissions</Label>
                             <Select
                                 name="role"
-                                value={role}
-                                onValueChange={setRole}
+                                value={selectedRole}
+                                onValueChange={setSelectedRole}
                                 required
                             >
                                 <SelectTrigger className="w-full">

@@ -1,4 +1,4 @@
-import { CampaignsHeader } from '@/components/campaigns/campaigns-header';
+import { CampaignsHeader } from '@/app/(dashboard)/campaign/[id]/campaigns-header';
 import { Footer } from '@/components/ui/footer';
 import { User, getUser } from '@/lib/actions/user';
 import { notFound } from 'next/navigation';

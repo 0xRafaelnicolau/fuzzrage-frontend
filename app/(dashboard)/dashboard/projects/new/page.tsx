@@ -1,5 +1,5 @@
 import { Installation, getInstallations } from "@/lib/actions/installations";
-import { ImportRepo } from "@/components/dashboard/projects/import-repo";
+import { ImportRepo } from "@/app/(dashboard)/dashboard/projects/new/import-repo";
 import { GoBack } from "@/components/ui/go-back";
 import { RefreshOnFocus } from "@/components/ui/refresh-on-focus";
 import { notFound } from "next/navigation";

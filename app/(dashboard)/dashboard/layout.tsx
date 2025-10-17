@@ -1,4 +1,4 @@
-import { DashboardHeader } from '@/components/dashboard/dashboard-header';
+import { DashboardHeader } from '@/app/(dashboard)/dashboard/dashboard-header';
 import { Footer } from '@/components/ui/footer';
 import { User, getUser } from '@/lib/actions/user';
 import { notFound } from 'next/navigation';

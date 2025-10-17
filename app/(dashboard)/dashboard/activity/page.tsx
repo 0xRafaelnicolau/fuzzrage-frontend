@@ -14,100 +14,13 @@ import { toast } from "sonner";
 import { Spinner } from "@/components/ui/spinner";
 import { DateRange } from "react-day-picker";
 import { Calendar } from "@/components/ui/calendar";
+import { getActionIcon, getActionLabel } from "@/lib/utils";
 
 const TYPES = [
     { value: 'campaign', label: 'Campaigns', description: 'Campaigns that were started, stopped, or finished.' },
     { value: 'corpus', label: 'Corpus', description: 'Corpus items that were created, updated, or deleted.' },
     { value: 'config', label: 'Configs', description: 'Configuration files that were added, updated, or deleted.' },
 ];
-
-const getActionLabel = (action: string, targetId: string) => {
-    switch (action) {
-        case "CONFIG_ADDED":
-            return {
-                prefix: 'added config ',
-                suffix: ' to ',
-                targetDisplay: targetId,
-                href: ''
-            };
-        case "CONFIG_UPDATED":
-            return {
-                prefix: 'updated config ',
-                suffix: ' in ',
-                targetDisplay: targetId,
-                href: ''
-            };
-        case "CONFIG_DELETED":
-            return {
-                prefix: 'deleted config ',
-                suffix: ' from ',
-                targetDisplay: targetId,
-                href: ''
-            };
-        case "CORPUS_RENAMED":
-            return {
-                prefix: 'renamed corpus ',
-                suffix: ' in ',
-                targetDisplay: targetId,
-                href: ''
-            };
-        case "CORPUS_DELETED":
-            return {
-                prefix: 'deleted corpus ',
-                suffix: ' from ',
-                targetDisplay: targetId,
-                href: ''
-            };
-        case "CAMPAIGN_CREATED":
-            return {
-                prefix: 'created campaign ',
-                suffix: ' in ',
-                targetDisplay: targetId.substring(0, 8),
-                href: `/campaign/${targetId}`
-            };
-        case "CAMPAIGN_CANCELED":
-            return {
-                prefix: 'Campaign ',
-                suffix: ' canceled executing in ',
-                targetDisplay: targetId.substring(0, 8),
-                href: `/campaign/${targetId}`
-            };
-        case "CAMPAIGN_FINISHED":
-            return {
-                prefix: 'Campaign ',
-                suffix: ' finished executing in ',
-                targetDisplay: targetId.substring(0, 8),
-                href: `/campaign/${targetId}`
-            };
-        case "CAMPAIGN_STARTED":
-            return {
-                prefix: 'Campaign ',
-                suffix: ' started executing in ',
-                targetDisplay: targetId.substring(0, 8),
-                href: `/campaign/${targetId}`
-            };
-        default:
-            return {
-                prefix: '',
-                suffix: '',
-                targetDisplay: targetId,
-                href: ''
-            };
-    }
-}
-
-const getActionIcon = (action: string) => {
-    switch (action) {
-        case "CAMPAIGN_STARTED":
-            return PlayCircle;
-        case "CAMPAIGN_FINISHED":
-            return CheckCircle2;
-        case "CAMPAIGN_CANCELED":
-            return XCircle;
-        default:
-            return null;
-    }
-}
 
 export default function Page() {
     const router = useRouter();

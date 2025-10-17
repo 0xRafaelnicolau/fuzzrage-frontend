@@ -1,6 +1,6 @@
-import { AuthHandler } from "@/components/home/auth/auth-handler";
-import { LoginCard } from "@/components/home/auth/login/login-card";
-import { LoginHeader } from "@/components/home/auth/login/login-header"
+import { AuthHandler } from "@/app/(home)/(auth)/login/auth-handler";
+import { LoginCard } from "@/app/(home)/(auth)/login/login-card";
+import { LoginHeader } from "@/app/(home)/(auth)/login/login-header"
 import { Footer } from "@/components/ui/footer";
 import FlickeringGrid from "@/components/ui/flickering-grid";
 

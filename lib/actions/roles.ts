@@ -1,3 +1,5 @@
+'use server'
+
 import { request } from "@/lib/helpers";
 import { Error } from "@/lib/types";
 
@@ -25,14 +27,18 @@ export async function getCollabRoles(): Promise<{ success: boolean; roles?: Coll
     })
 
     if (result.success && result.response) {
-        const data: CollabRoleResponse = await result.response.json()
+        try {
+            const data: CollabRoleResponse = await result.response.json()
 
-        const roles: CollabRole[] = data.data.map((role) => ({
-            role_id: role.id,
-            level: role.attributes.level,
-        }))
+            const roles: CollabRole[] = data.data.map((role) => ({
+                role_id: role.id,
+                level: role.attributes.level,
+            }))
 
-        return { success: true, roles }
+            return { success: true, roles }
+        } catch {
+            return { success: false, error: { message: 'Failed to parse roles data' } }
+        }
     }
 
     return { success: false, error: result.error }

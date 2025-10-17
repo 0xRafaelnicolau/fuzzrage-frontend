@@ -1,5 +1,5 @@
-import { SignupCard } from "@/components/home/auth/signup/signup-card";
-import { SignupHeader } from "@/components/home/auth/signup/signup-header";
+import { SignupCard } from "@/app/(home)/(auth)/signup/signup-card";
+import { SignupHeader } from "@/app/(home)/(auth)/signup/signup-header";
 import { Footer } from "@/components/ui/footer";
 import FlickeringGrid from "@/components/ui/flickering-grid";
 

@@ -63,7 +63,7 @@ export async function acceptInvite(req: AcceptInviteRequest): Promise<{ success:
 }
 
 export type GetTeamMembersRequest = {
-    project_id: string
+    projectId: string
 }
 
 export type GetTeamMembersResponse = {
@@ -85,7 +85,7 @@ export type GetTeamMembersResponse = {
 }
 
 export async function getTeamMembers(req: GetTeamMembersRequest): Promise<{ success: boolean; members?: TeamMember[]; error?: Error }> {
-    const result = await request(`/v1/projects/${req.project_id}/collabs`, {
+    const result = await request(`/v1/projects/${req.projectId}/collabs`, {
         method: 'GET',
     })
 
@@ -111,17 +111,17 @@ export async function getTeamMembers(req: GetTeamMembersRequest): Promise<{ succ
 }
 
 export type DeleteTeamMemberRequest = {
-    project_id: string
+    projectId: string
     collaborator_id: string
 }
 
 export async function deleteTeamMember(req: DeleteTeamMemberRequest): Promise<{ success: boolean; error?: Error }> {
-    const result = await request(`/v1/projects/${req.project_id}/collabs/${req.collaborator_id}`, {
+    const result = await request(`/v1/projects/${req.projectId}/collabs/${req.collaborator_id}`, {
         method: 'DELETE',
     })
 
     if (result.success && result.response) {
-        revalidatePath(`/project/${req.project_id}/settings/team`)
+        revalidatePath(`/project/${req.projectId}/settings/team`)
         return { success: true }
     }
 

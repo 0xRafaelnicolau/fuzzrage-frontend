@@ -1,4 +1,4 @@
-import { ProjectsHeader } from '@/components/projects/projects-header';
+import { ProjectsHeader } from '@/app/(dashboard)/project/[id]/projects-header';
 import { Footer } from '@/components/ui/footer';
 import { User, getUser } from '@/lib/actions/user';
 import { notFound } from 'next/navigation';

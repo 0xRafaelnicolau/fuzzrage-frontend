@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useTransition, useCallback, useMemo } from "react";
-import { User } from "@/lib/actions/user";
-import { ProjectOwner } from "@/lib/actions/projects";
-import { TeamMember, deleteTeamMember } from "@/lib/actions/team";
+import React, { useTransition, useCallback, useMemo, useState, useEffect } from "react";
+import { getUser, User } from "@/lib/actions/user";
+import { getProjectOwner, ProjectOwner } from "@/lib/actions/projects";
+import { TeamMember, deleteTeamMember, getTeamMembers } from "@/lib/actions/team";
 import { Trash2, AlertTriangle } from "lucide-react";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -24,10 +24,7 @@ import {
 } from "@/components/ui/alert-dialog";
 
 interface TeamListProps {
-    user: User;
     projectId: string;
-    owner: ProjectOwner | undefined;
-    members: TeamMember[];
 }
 
 const ROLE_NAMES = {
@@ -52,16 +49,50 @@ const getInitials = (username: string): string =>
         .toUpperCase()
         .slice(0, 2);
 
-export function TeamList({ user, projectId, owner, members = [] }: TeamListProps) {
+export function TeamList({ projectId }: TeamListProps) {
     const [isPending, startTransition] = useTransition();
     const router = useRouter();
 
+    const [user, setUser] = useState<User>();
+    const [owner, setOwner] = useState<ProjectOwner>();
+    const [members, setMembers] = useState<TeamMember[]>();
+
+    useEffect(() => {
+        const fetchInfo = async () => {
+            const [userResponse, projectOwnerResponse, teamMembersResponse] = await Promise.all([
+                getUser(),
+                getProjectOwner({ projectId }),
+                getTeamMembers({ projectId })
+            ]);
+
+            if (userResponse.success && userResponse.user) {
+                setUser(userResponse.user);
+            } else {
+                toast.error(userResponse.error?.message || "Failed to get user");
+            }
+
+            if (projectOwnerResponse.success && projectOwnerResponse.owner) {
+                setOwner(projectOwnerResponse.owner);
+            } else {
+                toast.error(projectOwnerResponse.error?.message || "Failed to get project owner");
+            }
+
+            if (teamMembersResponse.success && teamMembersResponse.members) {
+                setMembers(teamMembersResponse.members);
+            } else {
+                toast.error(teamMembersResponse.error?.message || "Failed to get team members");
+            }
+        }
+        fetchInfo();
+    }, [projectId]);
+
+
     const handleRemoveMember = useCallback((collaboratorId: string, memberUsername: string) => {
-        const isCurrentUser = user.name === memberUsername;
+        const isCurrentUser = user?.name === memberUsername;
 
         startTransition(async () => {
             const response = await deleteTeamMember({
-                project_id: projectId,
+                projectId,
                 collaborator_id: collaboratorId
             });
 
@@ -74,13 +105,13 @@ export function TeamList({ user, projectId, owner, members = [] }: TeamListProps
                 toast.error(response.error?.message || "Failed to remove member");
             }
         });
-    }, [user.name, projectId, router]);
+    }, [user?.name, projectId, router]);
 
     const allMembers = useMemo(() => {
         const membersList = owner ? [ownerToTeamMember(owner)] : [];
 
         const sortedMembers = members
-            .filter(member => member.role_level !== 3)
+            ?.filter(member => member.role_level !== 3)
             .sort((a, b) => {
                 if (a.role_level !== b.role_level) {
                     return b.role_level - a.role_level;
@@ -88,7 +119,7 @@ export function TeamList({ user, projectId, owner, members = [] }: TeamListProps
                 return a.username.localeCompare(b.username);
             });
 
-        return [...membersList, ...sortedMembers];
+        return [...membersList, ...sortedMembers ?? []];
     }, [owner, members]);
 
     if (allMembers.length === 0) {
@@ -123,7 +154,7 @@ export function TeamList({ user, projectId, owner, members = [] }: TeamListProps
                         {allMembers.map((member, index) => {
                             const isLast = index === allMembers.length - 1;
                             const isOwner = member.user_id === 'owner' || member.role_level === 3;
-                            const isCurrentUser = user.name === member.username;
+                            const isCurrentUser = user?.name === member.username;
                             const borderClass = `border-t ${isLast ? '' : 'border-b'}`;
 
                             return (
