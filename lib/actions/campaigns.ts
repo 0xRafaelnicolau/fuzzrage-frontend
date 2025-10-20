@@ -7,16 +7,34 @@ export type Campaign = {
     id: string;
     type: string;
     attributes: {
-        branch: string;
-        config: string;
-        contract_name: string;
         created_at: string;
-        duration: number;
-        entry_point: string;
         project_id: number;
+        result: {
+            cov_percentage: number;
+            props_failed: number;
+            props_passed: number;
+            props_tested: number;
+            status: string;
+            total_duration: number;
+        },
+        settings: {
+            corpus: {
+                dst_id: string;
+                reused: boolean;
+                saved: boolean;
+                src_id: string;
+            },
+            execution: {
+                branch: string;
+                config: string;
+                contract_name: string;
+                duration: number;
+                entry_point: string;
+            }
+        },
         state: string;
         updated_at: string;
-    }
+    },
 }
 
 export type CreateCampaignRequest = {
@@ -31,13 +49,31 @@ export type CreateCampaignRequest = {
 export type CreateCampaignResponse = {
     data: {
         attributes: {
-            branch: string;
-            config: string;
-            contract_name: string;
             created_at: string;
-            duration: number;
-            entry_point: string;
             project_id: number;
+            result: {
+                cov_percentage: number;
+                props_failed: number;
+                props_passed: number;
+                props_tested: number;
+                status: string;
+                total_duration: number;
+            },
+            settings: {
+                corpus: {
+                    dst_id: string;
+                    reused: boolean;
+                    saved: boolean;
+                    src_id: string;
+                },
+                execution: {
+                    branch: string;
+                    config: string;
+                    contract_name: string;
+                    duration: number;
+                    entry_point: string;
+                }
+            },
             state: string;
             updated_at: string;
         },
@@ -67,18 +103,14 @@ export async function createCampaign(req: CreateCampaignRequest): Promise<{ succ
         try {
             const data: CreateCampaignResponse = await result.response.json()
 
-
             const campaign: Campaign = {
                 id: data.data.id,
                 type: data.data.type,
                 attributes: {
-                    branch: data.data.attributes.branch,
-                    config: data.data.attributes.config,
-                    contract_name: data.data.attributes.contract_name,
                     created_at: data.data.attributes.created_at,
-                    duration: data.data.attributes.duration,
-                    entry_point: data.data.attributes.entry_point,
                     project_id: data.data.attributes.project_id,
+                    result: data.data.attributes.result,
+                    settings: data.data.attributes.settings,
                     state: data.data.attributes.state,
                     updated_at: data.data.attributes.updated_at
                 }
@@ -98,6 +130,7 @@ export type GetCampaignsRequest = {
     page?: number;
     size?: number;
     sort?: string;
+    state_in?: string;
     created_at_gte?: string;
     created_at_lte?: string;
 }
@@ -105,13 +138,31 @@ export type GetCampaignsRequest = {
 export type GetCampaignsResponse = {
     data: Array<{
         attributes: {
-            branch: string;
-            config: string;
-            contract_name: string;
             created_at: string;
-            duration: number;
-            entry_point: string;
             project_id: number;
+            result: {
+                cov_percentage: number;
+                props_failed: number;
+                props_passed: number;
+                props_tested: number;
+                status: string;
+                total_duration: number;
+            },
+            settings: {
+                corpus: {
+                    dst_id: string;
+                    reused: boolean;
+                    saved: boolean;
+                    src_id: string;
+                },
+                execution: {
+                    branch: string;
+                    config: string;
+                    contract_name: string;
+                    duration: number;
+                    entry_point: string;
+                }
+            },
             state: string;
             updated_at: string;
         },
@@ -138,6 +189,9 @@ export async function getCampaigns(req: GetCampaignsRequest): Promise<{ success:
     if (req?.sort) {
         queryParams.append('sort', req.sort);
     }
+    if (req?.state_in) {
+        queryParams.append('state_in', req.state_in);
+    }
     if (req?.created_at_gte) {
         queryParams.append('created_at_gte', req.created_at_gte);
     }
@@ -157,13 +211,10 @@ export async function getCampaigns(req: GetCampaignsRequest): Promise<{ success:
                 id: item.id,
                 type: item.type,
                 attributes: {
-                    branch: item.attributes.branch,
-                    config: item.attributes.config,
-                    contract_name: item.attributes.contract_name,
                     created_at: item.attributes.created_at,
-                    duration: item.attributes.duration,
-                    entry_point: item.attributes.entry_point,
                     project_id: item.attributes.project_id,
+                    result: item.attributes.result,
+                    settings: item.attributes.settings,
                     state: item.attributes.state,
                     updated_at: item.attributes.updated_at
                 }

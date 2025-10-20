@@ -34,7 +34,7 @@ export default function Page() {
         { value: "SUCCEEDED", label: "Succeeded", color: "bg-green-500" },
         { value: "FAILED", label: "Failed", color: "bg-red-500" },
         { value: "RUNNING", label: "Running", color: "bg-yellow-500" },
-        { value: "QUEUED", label: "Queued", color: "bg-gray-400" },
+        { value: "QUEUED", label: "Queued", color: "bg-cyan-500" },
         { value: "CANCELED", label: "Canceled", color: "bg-gray-400" },
     ];
     const toggleStatus = (status: string) => {
@@ -65,6 +65,7 @@ export default function Page() {
             page: page + 1,
             size: 20,
             sort: "-created_at",
+            state_in: selectedStatuses.join(','),
             created_at_gte: from?.toISOString(),
             created_at_lte: to?.toISOString(),
         }
@@ -102,6 +103,7 @@ export default function Page() {
                 page: 1,
                 size: 20,
                 sort: "-created_at",
+                state_in: selectedStatuses.join(','),
                 created_at_gte: from?.toISOString(),
                 created_at_lte: to?.toISOString(),
             }
@@ -118,7 +120,7 @@ export default function Page() {
         }
 
         fetchCampaigns();
-    }, [date]);
+    }, [selectedStatuses, date]);
 
     return (
         <>
@@ -216,7 +218,7 @@ export default function Page() {
                                 {campaigns.map((campaign, index) => {
                                     const isFirst = index === 0;
                                     const isLast = index === campaigns.length - 1;
-                                    const durationInSeconds = campaign.attributes.duration;
+                                    const durationInSeconds = campaign.attributes.settings.execution.duration;
                                     const durationMinutes = Math.floor(durationInSeconds / 60);
                                     const durationSeconds = durationInSeconds % 60;
                                     const durationDisplay = durationMinutes > 0
@@ -246,7 +248,7 @@ export default function Page() {
                                             </div>
                                             <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                                 <GitBranch className="h-4 w-4" />
-                                                {campaign.attributes.branch}
+                                                {campaign.attributes.settings.execution.branch}
                                             </div>
                                             <div className="text-sm text-muted-foreground">
                                                 {durationDisplay}

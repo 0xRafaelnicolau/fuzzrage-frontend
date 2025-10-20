@@ -23,8 +23,9 @@ export function CampaignsHeader({ user, campaignId }: CampaignsHeaderProps) {
 
     const tabs: Tab[] = useMemo(() => [
         { id: 'overview', label: 'Overview', href: `/campaign/${campaignId}` },
-        { id: 'logs', label: 'Logs', href: `/campaign/${campaignId}/logs` },
+        { id: 'properties', label: 'Properties', href: `/campaign/${campaignId}/properties` },
         { id: 'coverage', label: 'Coverage', href: `/campaign/${campaignId}/coverage` },
+        { id: 'logs', label: 'Logs', href: `/campaign/${campaignId}/logs` },
     ], []);
 
     const activeTab = useMemo(() => {
