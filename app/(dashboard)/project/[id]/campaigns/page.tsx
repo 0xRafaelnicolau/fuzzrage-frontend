@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useEffect, useState, useRef } from "react";
+import { useParams, useRouter } from "next/navigation";
 import { Campaign, getCampaigns, GetCampaignsRequest } from "@/lib/actions/campaigns";
 import { toast } from "sonner";
-import { Calendar as CalendarIcon, ChevronDown, Check, GitBranch } from "lucide-react";
+import { Calendar as CalendarIcon, ChevronDown, Check, GitBranch, ExternalLink, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
@@ -17,6 +17,7 @@ import { StartCampaignModal } from "@/app/(dashboard)/project/[id]/(overview)/st
 
 export default function Page() {
     const params = useParams();
+    const router = useRouter();
     const id = params.id as string;
 
     // Campaigns
@@ -25,6 +26,8 @@ export default function Page() {
     const [loadingMore, setLoadingMore] = useState(false);
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(false);
+    const [copiedCampaignId, setCopiedCampaignId] = useState<string | null>(null);
+    const copyTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     // Campaign dates
     const [date, setDate] = useState<DateRange | undefined>(undefined);
@@ -33,8 +36,8 @@ export default function Page() {
     const options = [
         { value: "SUCCEEDED", label: "Succeeded", color: "bg-green-500" },
         { value: "FAILED", label: "Failed", color: "bg-red-500" },
-        { value: "RUNNING", label: "Running", color: "bg-yellow-500" },
-        { value: "QUEUED", label: "Queued", color: "bg-cyan-500" },
+        { value: "RUNNING", label: "Running", color: "bg-orange-500" },
+        { value: "QUEUED", label: "Queued", color: "bg-yellow-500" },
         { value: "CANCELED", label: "Canceled", color: "bg-gray-400" },
     ];
     const toggleStatus = (status: string) => {
@@ -121,6 +124,14 @@ export default function Page() {
 
         fetchCampaigns();
     }, [selectedStatuses, date]);
+
+    useEffect(() => {
+        return () => {
+            if (copyTimeoutRef.current) {
+                clearTimeout(copyTimeoutRef.current);
+            }
+        };
+    }, []);
 
     return (
         <>
@@ -232,7 +243,7 @@ export default function Page() {
                                         <div
                                             key={campaign.id}
                                             className={`
-                                                grid grid-cols-1 sm:grid-cols-[2fr_2fr_2fr_2fr_1fr] gap-3 items-center px-3 py-4 border-x border-t bg-card
+                                                grid grid-cols-1 sm:grid-cols-[2fr_2fr_2fr_2fr_1fr_auto] gap-3 items-center px-3 py-4 border-x border-t bg-card
                                                 ${isFirst ? 'rounded-t-md' : ''}
                                                 ${isLast ? 'rounded-b-md border-b' : ''}
                                             `}
@@ -255,6 +266,43 @@ export default function Page() {
                                             </div>
                                             <div className="text-sm text-muted-foreground whitespace-nowrap">
                                                 {format(new Date(campaign.attributes.created_at), "MMM d")}
+                                            </div>
+                                            <div className="flex items-center gap-3">
+                                                <button
+                                                    onClick={() => {
+                                                        // Clear any existing timeout
+                                                        if (copyTimeoutRef.current) {
+                                                            clearTimeout(copyTimeoutRef.current);
+                                                        }
+
+                                                        navigator.clipboard.writeText(`${window.location.origin}/campaign/${campaign.id}`);
+                                                        toast.success("Campaign link copied to clipboard");
+                                                        setCopiedCampaignId(campaign.id);
+
+                                                        // Set new timeout
+                                                        copyTimeoutRef.current = setTimeout(() => {
+                                                            setCopiedCampaignId(null);
+                                                            copyTimeoutRef.current = null;
+                                                        }, 2000);
+                                                    }}
+                                                    className="hover:bg-accent rounded-md transition-colors"
+                                                    title="Copy campaign link"
+                                                >
+                                                    {copiedCampaignId === campaign.id ? (
+                                                        <Check className="h-4 w-4 text-muted-foreground animate-in fade-in duration-200" />
+                                                    ) : (
+                                                        <Copy className="h-4 w-4 text-muted-foreground animate-in fade-in duration-200" />
+                                                    )}
+                                                </button>
+                                                <button
+                                                    onClick={() => {
+                                                        router.push(`/campaign/${campaign.id}`);
+                                                    }}
+                                                    className="hover:bg-accent rounded-md transition-colors"
+                                                    title="Go to campaign"
+                                                >
+                                                    <ExternalLink className="h-4 w-4 text-muted-foreground" />
+                                                </button>
                                             </div>
                                         </div>
                                     );
@@ -282,6 +330,121 @@ export default function Page() {
                         </>
                     )}
                 </ScrollArea>
+
+                {/* Mobile Cards View */}
+                <div className="lg:hidden space-y-3 pb-6">
+                    {loading ? (
+                        <div className="flex justify-center items-center py-16">
+                            <Spinner variant="default" className="text-muted-foreground" />
+                        </div>
+                    ) : campaigns.length === 0 ? (
+                        <div className="text-center py-16">
+                            <p className="text-muted-foreground">No campaigns found.</p>
+                        </div>
+                    ) : (
+                        <>
+                            {campaigns.map((campaign) => {
+                                const durationInSeconds = campaign.attributes.settings.execution.duration;
+                                const durationMinutes = Math.floor(durationInSeconds / 60);
+                                const durationSeconds = durationInSeconds % 60;
+                                const durationDisplay = durationMinutes > 0
+                                    ? `${durationMinutes}m ${durationSeconds}s`
+                                    : `${durationSeconds}s`;
+
+                                const stateOption = options.find(opt => opt.value === campaign.attributes.state);
+                                const stateColor = stateOption?.color || 'bg-gray-400';
+
+                                return (
+                                    <div
+                                        key={campaign.id}
+                                        className="bg-card border rounded-lg p-4 space-y-3"
+                                    >
+                                        {/* Header with ID and Actions */}
+                                        <div className="flex items-center justify-between">
+                                            <div className="text-sm font-medium">
+                                                {campaign.id.substring(0, 8)}
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <button
+                                                    onClick={() => {
+                                                        if (copyTimeoutRef.current) {
+                                                            clearTimeout(copyTimeoutRef.current);
+                                                        }
+
+                                                        navigator.clipboard.writeText(`${window.location.origin}/campaign/${campaign.id}`);
+                                                        toast.success("Campaign link copied to clipboard");
+                                                        setCopiedCampaignId(campaign.id);
+
+                                                        copyTimeoutRef.current = setTimeout(() => {
+                                                            setCopiedCampaignId(null);
+                                                            copyTimeoutRef.current = null;
+                                                        }, 2000);
+                                                    }}
+                                                    className="hover:bg-accent rounded-md p-1.5 transition-colors"
+                                                    title="Copy campaign link"
+                                                >
+                                                    {copiedCampaignId === campaign.id ? (
+                                                        <Check className="h-4 w-4 text-muted-foreground" />
+                                                    ) : (
+                                                        <Copy className="h-4 w-4 text-muted-foreground" />
+                                                    )}
+                                                </button>
+                                                <button
+                                                    onClick={() => {
+                                                        router.push(`/campaign/${campaign.id}`);
+                                                    }}
+                                                    className="hover:bg-accent rounded-md p-1.5 transition-colors"
+                                                    title="Go to campaign"
+                                                >
+                                                    <ExternalLink className="h-4 w-4 text-muted-foreground" />
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        {/* Status */}
+                                        <div className="flex items-center gap-2">
+                                            <div className={`w-2 h-2 rounded-full ${stateColor}`} />
+                                            <span className="text-sm text-muted-foreground">
+                                                {stateOption?.label || campaign.attributes.state}
+                                            </span>
+                                        </div>
+
+                                        {/* Branch */}
+                                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                            <GitBranch className="h-4 w-4" />
+                                            {campaign.attributes.settings.execution.branch}
+                                        </div>
+
+                                        {/* Duration and Date */}
+                                        <div className="flex items-center justify-between text-sm text-muted-foreground">
+                                            <span>{durationDisplay}</span>
+                                            <span>{format(new Date(campaign.attributes.created_at), "MMM d, yyyy")}</span>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                            {hasMore && (
+                                <div className="flex justify-center pt-2">
+                                    <Button
+                                        variant="outline"
+                                        onClick={loadMore}
+                                        disabled={loadingMore}
+                                        className="gap-2"
+                                    >
+                                        {loadingMore ? (
+                                            <>
+                                                <Spinner variant="default" className="h-4 w-4" />
+                                                Loading...
+                                            </>
+                                        ) : (
+                                            "Load More"
+                                        )}
+                                    </Button>
+                                </div>
+                            )}
+                        </>
+                    )}
+                </div>
             </div>
         </>
     )
