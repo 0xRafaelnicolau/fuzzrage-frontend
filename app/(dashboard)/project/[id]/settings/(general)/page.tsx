@@ -1,4 +1,5 @@
 import { UpdateProject } from "@/app/(dashboard)/project/[id]/settings/(general)/update-project";
+import { DeleteProject } from "@/app/(dashboard)/project/[id]/settings/(general)/delete-project";
 
 export default async function Page({ params }: { params: { id: string } }) {
     const { id } = await params;
@@ -10,6 +11,7 @@ export default async function Page({ params }: { params: { id: string } }) {
             </div>
 
             <UpdateProject projectId={id} />
+            <DeleteProject projectId={id} />
         </main>
     );
 }

@@ -341,3 +341,21 @@ export async function updateProject(req: UpdateProjectRequest): Promise<{ succes
 
     return { success: false, error: result.error }
 }
+
+export type DeleteProjectRequest = {
+    projectId: string
+}
+
+export async function deleteProject(req: DeleteProjectRequest): Promise<{ success: boolean; error?: Error }> {
+    const result = await request(`/v1/projects/${req.projectId}`, {
+        method: 'DELETE'
+    })
+
+    if (result.success && result.response) {
+        revalidatePath(`/project/${req.projectId}/settings`)
+
+        return { success: true }
+    }
+
+    return { success: false, error: result.error }
+}

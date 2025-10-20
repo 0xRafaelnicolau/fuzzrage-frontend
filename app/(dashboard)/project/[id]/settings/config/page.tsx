@@ -5,10 +5,6 @@ import { ConfigList } from "@/components/projects/settings/config/config-list";
 import { Config, getConfigs } from "@/lib/actions/configs";
 import { ConfigListSkeleton } from "@/components/projects/settings/config/config-list-skeleton";
 
-async function AddConfigContent({ id }: { id: string }) {
-    return <AddConfig projectId={id} />;
-}
-
 async function ConfigListContent({ id }: { id: string }) {
     const response = await getConfigs({ project_id: id });
 
@@ -29,9 +25,7 @@ export default async function Page({ params }: { params: { id: string } }) {
                 <h2 className="text-lg font-semibold">Configs</h2>
             </div>
 
-            <Suspense fallback={<AddConfigSkeleton />}>
-                <AddConfigContent id={id} />
-            </Suspense>
+            <AddConfig projectId={id} />
 
             <Suspense fallback={<ConfigListSkeleton />}>
                 <ConfigListContent id={id} />

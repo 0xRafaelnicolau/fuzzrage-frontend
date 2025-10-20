@@ -25,7 +25,7 @@ export function ProjectsHeader({ user, projectId }: ProjectsHeaderProps) {
         { id: 'overview', label: 'Overview', href: `/project/${projectId}` },
         { id: 'campaigns', label: 'Campaigns', href: `/project/${projectId}/campaigns` },
         { id: 'activity', label: 'Activity', href: `/project/${projectId}/activity` },
-        { id: 'statistics', label: 'Statistics', href: `/project/${projectId}/statistics` },
+        // { id: 'statistics', label: 'Statistics', href: `/project/${projectId}/statistics` },
         { id: 'corpus', label: 'Corpus', href: `/project/${projectId}/corpus` },
         { id: 'settings', label: 'Settings', href: `/project/${projectId}/settings` },
     ], []);
