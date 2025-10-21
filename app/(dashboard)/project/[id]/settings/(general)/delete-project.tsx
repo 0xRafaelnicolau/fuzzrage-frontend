@@ -51,8 +51,10 @@ export function DeleteProject({ projectId }: { projectId: string }) {
     const handleDelete = async () => {
         const response = await deleteProject({ projectId });
 
-        if (response.success)
+        if (response.success) {
+            toast.success("Project deleted successfully");
             router.push("/dashboard");
+        }
         else {
             toast.error(response.error?.message || "Failed to delete project");
         }

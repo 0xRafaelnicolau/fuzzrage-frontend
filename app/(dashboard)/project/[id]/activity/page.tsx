@@ -20,6 +20,7 @@ const TYPES = [
     { value: 'campaign', label: 'Campaigns', description: 'Campaigns that were started, stopped, or finished.' },
     { value: 'corpus', label: 'Corpus', description: 'Corpus items that were created, updated, or deleted.' },
     { value: 'config', label: 'Configs', description: 'Configuration files that were added, updated, or deleted.' },
+    { value: 'user', label: 'Team', description: 'Team members that were added or removed.' },
 ];
 
 export default function Page() {

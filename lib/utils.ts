@@ -84,6 +84,20 @@ export function getActionLabel(action: string, targetId: string) {
         targetDisplay: targetId.substring(0, 8),
         href: `/campaign/${targetId}`
       };
+    case "COLLAB_ADDED":
+      return {
+        prefix: 'added collaborator ',
+        suffix: ' to ',
+        targetDisplay: targetId,
+        href: ''
+      };
+    case "COLLAB_REMOVED":
+      return {
+        prefix: 'removed collaborator ',
+        suffix: ' from ',
+        targetDisplay: targetId,
+        href: ''
+      };
     default:
       return {
         prefix: '',
