@@ -1,4 +1,5 @@
 import { TeamInvite } from "@/app/(dashboard)/project/[id]/settings/team/team-invite";
+import { TeamList } from "@/app/(dashboard)/project/[id]/settings/team/team-list";
 
 export default async function Page({ params }: { params: { id: string } }) {
     const { id } = await params;
@@ -10,6 +11,7 @@ export default async function Page({ params }: { params: { id: string } }) {
             </div>
 
             <TeamInvite projectId={id} />
+            <TeamList projectId={id} />
         </main>
     );
 }

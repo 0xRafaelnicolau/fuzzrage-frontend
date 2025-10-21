@@ -22,6 +22,7 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger
 } from "@/components/ui/alert-dialog";
+import { Spinner } from "@/components/ui/spinner";
 
 interface TeamListProps {
     projectId: string;
@@ -56,9 +57,11 @@ export function TeamList({ projectId }: TeamListProps) {
     const [user, setUser] = useState<User>();
     const [owner, setOwner] = useState<ProjectOwner>();
     const [members, setMembers] = useState<TeamMember[]>();
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchInfo = async () => {
+            setLoading(true);
             const [userResponse, projectOwnerResponse, teamMembersResponse] = await Promise.all([
                 getUser(),
                 getProjectOwner({ projectId }),
@@ -82,6 +85,7 @@ export function TeamList({ projectId }: TeamListProps) {
             } else {
                 toast.error(teamMembersResponse.error?.message || "Failed to get team members");
             }
+            setLoading(false);
         }
         fetchInfo();
     }, [projectId]);
@@ -132,9 +136,15 @@ export function TeamList({ projectId }: TeamListProps) {
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="flex items-center justify-center py-8">
-                    <p className="text-muted-foreground text-sm">
-                        No team members found. Invite your first member above.
-                    </p>
+                    {loading ? (
+                        <div className="flex justify-center items-center">
+                            <Spinner variant="default" className="text-muted-foreground" />
+                        </div>
+                    ) : (
+                        <p className="text-muted-foreground text-sm">
+                            No team members found. Invite your first member above.
+                        </p>
+                    )}
                 </CardContent>
             </Card>
         );
