@@ -23,20 +23,19 @@ import {
 } from "@/components/ui/select"
 import { CirclePlus } from 'lucide-react'
 import { Config, getConfigs } from "@/lib/actions/configs"
-import { createCampaign } from "@/lib/actions/campaigns"
+import { createCampaign, Campaign } from "@/lib/actions/campaigns"
 import { toast } from "sonner"
-import { useRouter } from "next/navigation"
 
 interface StartCampaignModalProps {
     projectId: string
+    onCampaignCreated?: (campaign: Campaign) => void
 }
 
-export function StartCampaignModal({ projectId }: StartCampaignModalProps) {
+export function StartCampaignModal({ projectId, onCampaignCreated }: StartCampaignModalProps) {
     const [configs, setConfigs] = useState<Config[]>([])
     const [loading, setLoading] = useState(true)
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [open, setOpen] = useState(false)
-    const router = useRouter()
 
     useEffect(() => {
         async function fetchConfigs() {
@@ -84,8 +83,10 @@ export function StartCampaignModal({ projectId }: StartCampaignModalProps) {
 
         if (result.success) {
             toast.success("Campaign started successfully")
+            if (result.campaign && onCampaignCreated) {
+                onCampaignCreated(result.campaign)
+            }
             setOpen(false)
-            router.refresh()
         } else {
             toast.error(result.error?.message || "Failed to start campaign")
         }

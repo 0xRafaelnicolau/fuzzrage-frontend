@@ -20,7 +20,7 @@ export function DashboardHeader({ user }: { user: User }) {
         { id: 'overview', label: 'Overview', href: '/dashboard' },
         { id: 'projects', label: 'Projects', href: '/dashboard/projects' },
         { id: 'activity', label: 'Activity', href: '/dashboard/activity' },
-        { id: 'usage', label: 'Usage', href: '/dashboard/usage' },
+        // { id: 'usage', label: 'Usage', href: '/dashboard/usage' },
         { id: 'settings', label: 'Settings', href: '/dashboard/settings' },
     ], []);
 

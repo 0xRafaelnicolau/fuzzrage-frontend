@@ -19,7 +19,7 @@ export function getRoleName(role: CollabRole) {
   }
 }
 
-export function getActionLabel(action: string, targetId: string) {
+export function getActionLabel(action: string, projectId: string, targetId: string) {
   switch (action) {
     case "CONFIG_ADDED":
       return {
@@ -61,28 +61,28 @@ export function getActionLabel(action: string, targetId: string) {
         prefix: 'created campaign ',
         suffix: ' in ',
         targetDisplay: targetId.substring(0, 8),
-        href: `/campaign/${targetId}`
+        href: `/project/${projectId}/campaign/${targetId}`
       };
-    case "CAMPAIGN_CANCELED":
+    case "CAMPAIGN_CANCELLED":
       return {
-        prefix: 'Campaign ',
-        suffix: ' canceled executing in ',
+        prefix: 'canceled campaign ',
+        suffix: ' in ',
         targetDisplay: targetId.substring(0, 8),
-        href: `/campaign/${targetId}`
+        href: `/project/${projectId}/campaign/${targetId}`
       };
     case "CAMPAIGN_FINISHED":
       return {
         prefix: 'Campaign ',
         suffix: ' finished executing in ',
         targetDisplay: targetId.substring(0, 8),
-        href: `/campaign/${targetId}`
+        href: `/project/${projectId}/campaign/${targetId}`
       };
     case "CAMPAIGN_STARTED":
       return {
         prefix: 'Campaign ',
         suffix: ' started executing in ',
         targetDisplay: targetId.substring(0, 8),
-        href: `/campaign/${targetId}`
+        href: `/project/${projectId}/campaign/${targetId}`
       };
     case "COLLAB_ADDED":
       return {

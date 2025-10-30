@@ -1,4 +1,4 @@
-import { SettingsNavigation } from "@/app/(dashboard)/project/[id]/settings/settings-navigation";
+import { SettingsNavigation } from "@/app/(dashboard)/project/[id]/(project)/settings/settings-navigation";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default async function Layout({ children, params }: { children: React.ReactNode; params: Promise<{ id: string }> }) {

@@ -106,7 +106,6 @@ export async function getProjectActivity(req: GetProjectActivityRequest): Promis
     return { success: false, error: result.error }
 }
 
-
 export type GetActivityRequest = {
     page?: number;
     size?: number;

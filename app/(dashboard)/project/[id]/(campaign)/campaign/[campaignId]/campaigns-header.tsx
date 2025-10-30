@@ -9,6 +9,7 @@ import Link from "next/link";
 
 interface CampaignsHeaderProps {
     user: User;
+    projectId: string;
     campaignId: string;
 }
 
@@ -18,14 +19,14 @@ interface Tab {
     href: string;
 }
 
-export function CampaignsHeader({ user, campaignId }: CampaignsHeaderProps) {
+export function CampaignsHeader({ user, projectId, campaignId }: CampaignsHeaderProps) {
     const pathname = usePathname();
 
     const tabs: Tab[] = useMemo(() => [
-        { id: 'overview', label: 'Overview', href: `/campaign/${campaignId}` },
-        { id: 'properties', label: 'Properties', href: `/campaign/${campaignId}/properties` },
-        { id: 'coverage', label: 'Coverage', href: `/campaign/${campaignId}/coverage` },
-        { id: 'logs', label: 'Logs', href: `/campaign/${campaignId}/logs` },
+        { id: 'overview', label: 'Overview', href: `/project/${projectId}/campaign/${campaignId}` },
+        { id: 'properties', label: 'Properties', href: `/project/${projectId}/campaign/${campaignId}/properties` },
+        { id: 'coverage', label: 'Coverage', href: `/project/${projectId}/campaign/${campaignId}/coverage` },
+        { id: 'logs', label: 'Logs', href: `/project/${projectId}/campaign/${campaignId}/logs` },
     ], []);
 
     const activeTab = useMemo(() => {

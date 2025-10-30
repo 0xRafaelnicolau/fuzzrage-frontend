@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Campaign, getCampaigns, GetCampaignsRequest } from "@/lib/actions/campaigns";
 import { toast } from "sonner";
-import { Calendar as CalendarIcon, ChevronDown, Check, GitBranch, ExternalLink, Copy } from "lucide-react";
+import { Calendar as CalendarIcon, ChevronDown, Check, GitBranch, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
@@ -13,7 +13,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/compon
 import { format } from "date-fns";
 import { Spinner } from "@/components/ui/spinner";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { StartCampaignModal } from "@/app/(dashboard)/project/[id]/(overview)/start-campaign-modal"
+import { StartCampaignModal } from "@/app/(dashboard)/project/[id]/(project)/(overview)/start-campaign-modal"
+
 
 export default function Page() {
     const params = useParams();
@@ -29,6 +30,11 @@ export default function Page() {
     const [copiedCampaignId, setCopiedCampaignId] = useState<string | null>(null);
     const copyTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+    // Handle new campaign creation
+    const handleCampaignCreated = (newCampaign: Campaign) => {
+        setCampaigns(prevCampaigns => [newCampaign, ...prevCampaigns]);
+    };
+
     // Campaign dates
     const [date, setDate] = useState<DateRange | undefined>(undefined);
 
@@ -38,7 +44,7 @@ export default function Page() {
         { value: "FAILED", label: "Failed", color: "bg-red-500" },
         { value: "RUNNING", label: "Running", color: "bg-orange-500" },
         { value: "QUEUED", label: "Queued", color: "bg-yellow-500" },
-        { value: "CANCELED", label: "Canceled", color: "bg-gray-400" },
+        { value: "CANCELLED", label: "Canceled", color: "bg-gray-400" },
     ];
     const toggleStatus = (status: string) => {
         selectStatus(prev =>
@@ -212,7 +218,7 @@ export default function Page() {
                             ))}
                         </DropdownMenuContent>
                     </DropdownMenu>
-                    <StartCampaignModal key="start-campaign" projectId={id} />
+                    <StartCampaignModal key="start-campaign" projectId={id} onCampaignCreated={handleCampaignCreated} />
                 </div>
                 <ScrollArea className="hidden lg:block h-[calc(100vh-18rem)]">
                     {loading ? (
@@ -243,10 +249,11 @@ export default function Page() {
                                         <div
                                             key={campaign.id}
                                             className={`
-                                                grid grid-cols-1 sm:grid-cols-[2fr_2fr_2fr_2fr_1fr_auto] gap-3 items-center px-3 py-4 border-x border-t bg-card
+                                                grid grid-cols-1 sm:grid-cols-[1fr_1fr_1fr_1fr_2fr_auto] gap-3 items-center px-3 py-4 border-x border-t bg-card cursor-pointer hover:bg-accent transition-colors
                                                 ${isFirst ? 'rounded-t-md' : ''}
                                                 ${isLast ? 'rounded-b-md border-b' : ''}
                                             `}
+                                            onClick={() => router.push(`/project/${id}/campaign/${campaign.id}`)}
                                         >
                                             <div className="text-sm">
                                                 {campaign.id.substring(0, 8)}
@@ -265,17 +272,18 @@ export default function Page() {
                                                 {durationDisplay}
                                             </div>
                                             <div className="text-sm text-muted-foreground whitespace-nowrap">
-                                                {format(new Date(campaign.attributes.created_at), "MMM d")}
+                                                {format(new Date(campaign.attributes.created_at), "MMM d, yyyy")}
                                             </div>
                                             <div className="flex items-center gap-3">
                                                 <button
-                                                    onClick={() => {
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
                                                         // Clear any existing timeout
                                                         if (copyTimeoutRef.current) {
                                                             clearTimeout(copyTimeoutRef.current);
                                                         }
 
-                                                        navigator.clipboard.writeText(`${window.location.origin}/campaign/${campaign.id}`);
+                                                        navigator.clipboard.writeText(`${window.location.origin}/project/${id}/campaign/${campaign.id}`);
                                                         toast.success("Campaign link copied to clipboard");
                                                         setCopiedCampaignId(campaign.id);
 
@@ -293,15 +301,6 @@ export default function Page() {
                                                     ) : (
                                                         <Copy className="h-4 w-4 text-muted-foreground animate-in fade-in duration-200" />
                                                     )}
-                                                </button>
-                                                <button
-                                                    onClick={() => {
-                                                        router.push(`/campaign/${campaign.id}`);
-                                                    }}
-                                                    className="hover:bg-accent rounded-md transition-colors"
-                                                    title="Go to campaign"
-                                                >
-                                                    <ExternalLink className="h-4 w-4 text-muted-foreground" />
                                                 </button>
                                             </div>
                                         </div>
@@ -357,7 +356,8 @@ export default function Page() {
                                 return (
                                     <div
                                         key={campaign.id}
-                                        className="bg-card border rounded-lg p-4 space-y-3"
+                                        className="bg-card border rounded-lg p-4 space-y-3 cursor-pointer hover:bg-accent/50 transition-colors"
+                                        onClick={() => router.push(`/project/${id}/campaign/${campaign.id}`)}
                                     >
                                         {/* Header with ID and Actions */}
                                         <div className="flex items-center justify-between">
@@ -366,12 +366,13 @@ export default function Page() {
                                             </div>
                                             <div className="flex items-center gap-2">
                                                 <button
-                                                    onClick={() => {
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
                                                         if (copyTimeoutRef.current) {
                                                             clearTimeout(copyTimeoutRef.current);
                                                         }
 
-                                                        navigator.clipboard.writeText(`${window.location.origin}/campaign/${campaign.id}`);
+                                                        navigator.clipboard.writeText(`${window.location.origin}/project/${id}/campaign/${campaign.id}`);
                                                         toast.success("Campaign link copied to clipboard");
                                                         setCopiedCampaignId(campaign.id);
 
@@ -388,15 +389,6 @@ export default function Page() {
                                                     ) : (
                                                         <Copy className="h-4 w-4 text-muted-foreground" />
                                                     )}
-                                                </button>
-                                                <button
-                                                    onClick={() => {
-                                                        router.push(`/campaign/${campaign.id}`);
-                                                    }}
-                                                    className="hover:bg-accent rounded-md p-1.5 transition-colors"
-                                                    title="Go to campaign"
-                                                >
-                                                    <ExternalLink className="h-4 w-4 text-muted-foreground" />
                                                 </button>
                                             </div>
                                         </div>

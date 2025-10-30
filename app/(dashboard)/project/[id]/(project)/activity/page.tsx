@@ -374,7 +374,7 @@ export default function Page() {
                                                             <span className="font-medium truncate sm:inline">{item.user_name} </span>
                                                             <span className="text-muted-foreground">
                                                                 {(() => {
-                                                                    const actionLabel = getActionLabel(item.action, item.target_id);
+                                                                    const actionLabel = getActionLabel(item.action, item.project_id, item.target_id);
                                                                     return (
                                                                         <>
                                                                             {actionLabel.prefix}
@@ -432,4 +432,4 @@ export default function Page() {
             </div>
         </div >
     );
-}       
+}

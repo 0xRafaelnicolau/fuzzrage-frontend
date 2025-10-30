@@ -1,12 +1,11 @@
-import { CampaignsHeader } from '@/app/(dashboard)/campaign/[id]/campaigns-header';
+import { ProjectsHeader } from '@/app/(dashboard)/project/[id]/(project)/projects-header';
 import { Footer } from '@/components/ui/footer';
 import { User, getUser } from '@/lib/actions/user';
 import { notFound } from 'next/navigation';
 import FlickeringGrid from '@/components/ui/flickering-grid';
 
-export default async function Layout({ children, params }: { children: React.ReactNode, params: Promise<{ id: string }> }) {
+export default async function Layout({ children, params }: { children: React.ReactNode; params: Promise<{ id: string }> }) {
     const { id } = await params;
-
     const response = await getUser();
 
     let user: User;
@@ -18,7 +17,7 @@ export default async function Layout({ children, params }: { children: React.Rea
 
     return (
         <main className="min-h-screen flex flex-col">
-            <CampaignsHeader user={user} campaignId={id} />
+            <ProjectsHeader user={user} projectId={id} />
             <div className="flex-1 relative">
                 <div className="absolute inset-0 flex items-center justify-center -z-20">
                     <div className="w-full h-full overflow-hidden rounded-lg bg-background">

@@ -2,6 +2,8 @@
 
 import { request } from "@/lib/helpers";
 import { Error } from "@/lib/types";
+import { revalidatePath } from "next/cache";
+
 
 export type Campaign = {
     id: string;
@@ -224,6 +226,99 @@ export async function getCampaigns(req: GetCampaignsRequest): Promise<{ success:
         } catch {
             return { success: false, error: { message: 'Failed to parse get campaigns data' } }
         }
+    }
+
+    return { success: false, error: result.error }
+}
+
+export type GetCampaignRequest = {
+    project_id: string;
+    campaign_id: string;
+}
+
+export type GetCampaignResponse = {
+    data: {
+        attributes: {
+            created_at: string;
+            project_id: number;
+            result: {
+                cov_percentage: number;
+                props_failed: number;
+                props_passed: number;
+                props_tested: number;
+                status: string;
+                total_duration: number;
+            },
+            settings: {
+                corpus: {
+                    dst_id: string;
+                    reused: boolean;
+                    saved: boolean;
+                    src_id: string;
+                },
+                execution: {
+                    branch: string;
+                    config: string;
+                    contract_name: string;
+                    duration: number;
+                    entry_point: string;
+                }
+            },
+            state: string;
+            updated_at: string;
+        },
+        id: string;
+        type: string;
+    }
+}
+
+export async function getCampaign(req: GetCampaignRequest): Promise<{ success: boolean; campaign?: Campaign; error?: Error }> {
+    const result = await request(`/v1/projects/${req.project_id}/campaigns/${req.campaign_id}`, {
+        method: 'GET',
+    })
+
+    if (result.success && result.response) {
+        try {
+            const data: GetCampaignResponse = await result.response.json()
+
+            const campaign: Campaign = {
+                id: data.data.id,
+                type: data.data.type,
+                attributes: {
+                    created_at: data.data.attributes.created_at,
+                    project_id: data.data.attributes.project_id,
+                    result: data.data.attributes.result,
+                    settings: data.data.attributes.settings,
+                    state: data.data.attributes.state,
+                    updated_at: data.data.attributes.updated_at
+                }
+            }
+
+            return { success: true, campaign }
+
+        } catch {
+            return { success: false, error: { message: 'Failed to parse get campaign data' } }
+        }
+    }
+
+    return { success: false, error: result.error }
+}
+
+export type CancelCampaignRequest = {
+    project_id: string;
+    campaign_id: string;
+}
+
+export async function cancelCampaign(req: CancelCampaignRequest): Promise<{ success: boolean; error?: Error }> {
+    const result = await request(`/v1/projects/${req.project_id}/campaigns/${req.campaign_id}/cancel`, {
+        method: 'POST',
+    })
+
+    if (result.success && result.response) {
+        revalidatePath(`/project/${req.project_id}/campaigns`)
+        revalidatePath(`/project/${req.project_id}/campaign/${req.campaign_id}`)
+
+        return { success: true }
     }
 
     return { success: false, error: result.error }

@@ -6,7 +6,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Activity, getActivity, GetActivityRequest } from "@/lib/actions/activity";
-import { ChevronDown, ChevronRight, Filter, Search, Check, Calendar as CalendarIcon, PlayCircle, CheckCircle2, XCircle } from "lucide-react";
+import { ChevronDown, ChevronRight, Filter, Search, Check, Calendar as CalendarIcon } from "lucide-react";
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { formatDistanceToNow } from "date-fns";
@@ -370,7 +370,7 @@ export default function Page() {
                                                             <span className="font-medium truncate sm:inline">{item.user_name} </span>
                                                             <span className="text-muted-foreground">
                                                                 {(() => {
-                                                                    const actionLabel = getActionLabel(item.action, item.target_id);
+                                                                    const actionLabel = getActionLabel(item.action, item.project_id, item.target_id);
                                                                     return (
                                                                         <>
                                                                             {actionLabel.prefix}
