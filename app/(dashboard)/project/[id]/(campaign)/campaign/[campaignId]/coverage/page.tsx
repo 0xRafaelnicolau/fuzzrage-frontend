@@ -40,7 +40,7 @@ export default function Page() {
         };
 
         fetchTree();
-    }, []);
+    }, [projectId, campaignId]);
 
     // Coverage
     const [coverage, setCoverage] = useState<Coverage | null>(null);
@@ -73,8 +73,8 @@ export default function Page() {
         fetchCoverage();
     }, [filename]);
 
-    const renderTree = (nodes: any[]) =>
-        nodes.map((node) =>
+    const renderTree = (nodes: TreeNode[]) =>
+        nodes.map((node: TreeNode) =>
             node.children && node.children.length > 0 ? (
                 <Folder key={node.id} value={node.id} element={node.name} className="text-muted-foreground">
                     {renderTree(node.children)}

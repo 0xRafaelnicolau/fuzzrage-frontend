@@ -56,7 +56,7 @@ export default function Page() {
         }
 
         fetchCorpus();
-    }, []);
+    }, [date]);
 
     return (
         <div className="p-3">
