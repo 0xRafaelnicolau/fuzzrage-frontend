@@ -25,6 +25,7 @@ import { CirclePlus } from 'lucide-react'
 import { Config, getConfigs } from "@/lib/actions/configs"
 import { createCampaign, Campaign } from "@/lib/actions/campaigns"
 import { toast } from "sonner"
+import { Corpus, getCorpus } from "@/lib/actions/corpus"
 
 interface StartCampaignModalProps {
     projectId: string
@@ -33,13 +34,15 @@ interface StartCampaignModalProps {
 
 export function StartCampaignModal({ projectId, onCampaignCreated }: StartCampaignModalProps) {
     const [configs, setConfigs] = useState<Config[]>([])
-    const [loading, setLoading] = useState(true)
+    const [loadingConfigs, setLoadingConfigs] = useState(true)
+    const [corpus, setCorpus] = useState<Corpus[]>([])
+    const [loadingCorpus, setLoadingCorpus] = useState(true)
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [open, setOpen] = useState(false)
 
     useEffect(() => {
         async function fetchConfigs() {
-            setLoading(true)
+            setLoadingConfigs(true)
             const response = await getConfigs({ project_id: projectId })
 
             if (response.success && response.configs) {
@@ -47,11 +50,30 @@ export function StartCampaignModal({ projectId, onCampaignCreated }: StartCampai
             } else {
                 setConfigs([])
             }
-            setLoading(false)
+            setLoadingConfigs(false)
         }
 
         if (open) {
             fetchConfigs()
+        }
+    }, [projectId, open])
+
+    useEffect(() => {
+        async function fetchCorpus() {
+            setLoadingCorpus(true)
+
+            const response = await getCorpus({ project_id: projectId })
+            if (response.success && response.corpus) {
+                setCorpus(response.corpus)
+            } else {
+                setCorpus([])
+            }
+
+            setLoadingCorpus(false)
+        }
+
+        if (open) {
+            fetchCorpus()
         }
     }, [projectId, open])
 
@@ -65,6 +87,9 @@ export function StartCampaignModal({ projectId, onCampaignCreated }: StartCampai
         const configId = parseInt(formData.get("config") as string)
         const contractName = formData.get("contract") as string
         const entryPoint = formData.get("entrypoint") as string
+        const saveCorpus = formData.get("save-corpus") as string
+        const corpusId = formData.get("corpus") as string
+        const dstCorpusName = formData.get("dst-corpus-name") as string
 
         if (!branch || !duration || !configId || !contractName || !entryPoint) {
             toast.error("Please fill in all fields")
@@ -79,6 +104,10 @@ export function StartCampaignModal({ projectId, onCampaignCreated }: StartCampai
             contract_name: contractName,
             duration,
             entry_point: entryPoint,
+            corpus_reused: !!corpusId,
+            corpus_saved: saveCorpus === "yes",
+            src_corpus_id: corpusId || undefined,
+            dst_corpus_name: dstCorpusName || undefined,
         })
 
         if (result.success) {
@@ -102,7 +131,7 @@ export function StartCampaignModal({ projectId, onCampaignCreated }: StartCampai
                     <span className="hidden md:inline">Start Campaign</span>
                 </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="sm:max-w-[430px]">
                 <form onSubmit={handleSubmit}>
                     <DialogHeader>
                         <DialogTitle>Start Campaign</DialogTitle>
@@ -116,7 +145,7 @@ export function StartCampaignModal({ projectId, onCampaignCreated }: StartCampai
                                 <Label htmlFor="git-branch">Branch</Label>
                                 <Select name="git-branch" required>
                                     <SelectTrigger className="w-full">
-                                        <SelectValue placeholder="Select a branch" />
+                                        <SelectValue placeholder="Branch" />
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectItem value="main">main</SelectItem>
@@ -130,7 +159,7 @@ export function StartCampaignModal({ projectId, onCampaignCreated }: StartCampai
                                     id="duration"
                                     name="duration"
                                     type="number"
-                                    placeholder="Enter duration"
+                                    placeholder="Seconds"
                                     min="1"
                                     required
                                 />
@@ -138,9 +167,9 @@ export function StartCampaignModal({ projectId, onCampaignCreated }: StartCampai
                         </div>
                         <div className="grid gap-3">
                             <Label htmlFor="config">Config</Label>
-                            <Select name="config" required disabled={loading}>
+                            <Select name="config" required disabled={loadingConfigs}>
                                 <SelectTrigger className="w-full">
-                                    <SelectValue placeholder={loading ? "Loading configs..." : "Select a config"} />
+                                    <SelectValue placeholder={loadingConfigs ? "Loading configs..." : "Select a config"} />
                                 </SelectTrigger>
                                 <SelectContent>
                                     {configs.length > 0 ? (
@@ -175,12 +204,53 @@ export function StartCampaignModal({ projectId, onCampaignCreated }: StartCampai
                                 required
                             />
                         </div>
+                        <div className="grid gap-3">
+                            <Label htmlFor="save-corpus">Save Corpus</Label>
+                            <Select name="save-corpus" defaultValue="no">
+                                <SelectTrigger className="w-full">
+                                    <SelectValue placeholder="Select an option" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="yes">Yes</SelectItem>
+                                    <SelectItem value="no">No</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="grid gap-3">
+                            <Label htmlFor="corpus">Corpus (optional)</Label>
+                            <Select name="corpus" disabled={loadingCorpus}>
+                                <SelectTrigger className="w-full">
+                                    <SelectValue placeholder={loadingCorpus ? "Loading corpus..." : "Select a corpus"} />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {corpus.length > 0 ? (
+                                        corpus.map((corpus) => (
+                                            <SelectItem key={corpus.corpus_id} value={corpus.corpus_id}>
+                                                {corpus.name}
+                                            </SelectItem>
+                                        ))
+                                    ) : (
+                                        <SelectItem value="no-configs" disabled>
+                                            No corpus available
+                                        </SelectItem>
+                                    )}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="grid gap-3">
+                            <Label htmlFor="dst-corpus-name">Corpus Name (optional)</Label>
+                            <Input
+                                id="dst-corpus-name"
+                                name="dst-corpus-name"
+                                placeholder="Enter the corpus name..."
+                            />
+                        </div>
                     </div>
                     <DialogFooter>
                         <DialogClose asChild>
                             <Button variant="outline" type="button" disabled={isSubmitting}>Cancel</Button>
                         </DialogClose>
-                        <Button type="submit" disabled={isSubmitting || loading}>
+                        <Button type="submit" disabled={isSubmitting || loadingConfigs}>
                             {isSubmitting ? "Starting..." : "Start Campaign"}
                         </Button>
                     </DialogFooter>

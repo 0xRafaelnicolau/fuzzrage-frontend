@@ -235,7 +235,7 @@ export default function Page() {
                                 {campaigns.map((campaign, index) => {
                                     const isFirst = index === 0;
                                     const isLast = index === campaigns.length - 1;
-                                    const durationInSeconds = campaign.attributes.settings.execution.duration;
+                                    const durationInSeconds = campaign.attributes.result.total_duration;
                                     const durationMinutes = Math.floor(durationInSeconds / 60);
                                     const durationSeconds = durationInSeconds % 60;
                                     const durationDisplay = durationMinutes > 0
@@ -343,7 +343,7 @@ export default function Page() {
                     ) : (
                         <>
                             {campaigns.map((campaign) => {
-                                const durationInSeconds = campaign.attributes.settings.execution.duration;
+                                const durationInSeconds = campaign.attributes.result.total_duration;
                                 const durationMinutes = Math.floor(durationInSeconds / 60);
                                 const durationSeconds = durationInSeconds % 60;
                                 const durationDisplay = durationMinutes > 0

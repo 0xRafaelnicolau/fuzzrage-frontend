@@ -35,9 +35,15 @@ export type GetCorpusResponse = {
         id: string;
         type: string;
     }>;
+    meta: {
+        current_page: number,
+        per_page: number,
+        total: number,
+        total_pages: number
+    }
 }
 
-export async function getCorpus(req: GetCorpusRequest): Promise<{ success: boolean; corpus?: Corpus[]; error?: Error }> {
+export async function getCorpus(req: GetCorpusRequest): Promise<{ success: boolean; corpus?: Corpus[]; meta?: GetCorpusResponse['meta']; error?: Error }> {
     const queryParams = new URLSearchParams();
 
     if (req?.page !== undefined) {
@@ -79,7 +85,7 @@ export async function getCorpus(req: GetCorpusRequest): Promise<{ success: boole
                 updated_at: item.attributes.updated_at,
             }));
 
-            return { success: true, corpus };
+            return { success: true, corpus, meta: data.meta };
         } catch (error) {
             return { success: false, error: { message: 'Failed to parse corpus response' } };
         }

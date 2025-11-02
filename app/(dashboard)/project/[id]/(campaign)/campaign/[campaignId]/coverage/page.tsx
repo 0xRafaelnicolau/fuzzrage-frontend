@@ -9,6 +9,7 @@ import { TreeNode, buildTree } from "@/lib/build-tree";
 import { Folder, File, Tree } from "@/components/ui/file-tree";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Spinner } from "@/components/ui/spinner";
+import { ProgressCircle } from "@/components/ui/progress-circle";
 
 export default function Page() {
     const params = useParams();
@@ -63,7 +64,7 @@ export default function Page() {
                 if (result.success && result.coverage) {
                     setCoverage(result.coverage);
                 } else {
-                    toast.error(result.error?.message || 'Failed to fetch coverage');
+                    toast.error('Coverage report not available for this file.');
                 };
             };
 
@@ -76,14 +77,13 @@ export default function Page() {
     const renderTree = (nodes: TreeNode[]) =>
         nodes.map((node: TreeNode) =>
             node.children && node.children.length > 0 ? (
-                <Folder key={node.id} value={node.id} element={node.name} className="text-muted-foreground">
+                <Folder key={node.id} value={node.id} element={node.name}>
                     {renderTree(node.children)}
                 </Folder>
             ) : (
                 <File
                     key={node.id}
                     value={node.id}
-                    className="text-muted-foreground"
                     handleSelect={() => setFilename(node.id)}
                 >
                     <p>{node.name}</p>
@@ -100,14 +100,14 @@ export default function Page() {
                             <div className="">
                                 <h2 className="text-lg font-semibold">Tree</h2>
                             </div>
-                            <div className="mt-2">
+                            <div className="bg-background border rounded-md mt-2">
                                 <div className="lg:hidden">
                                     {loadingTree ? (
                                         <div className="flex justify-center items-center py-16">
                                             <Spinner variant="default" className="text-muted-foreground" />
                                         </div>
                                     ) : (
-                                        <Tree className="overflow-auto" elements={tree}>
+                                        <Tree className="p-2 mt-1 overflow-auto" elements={tree}>
                                             {renderTree(tree)}
                                         </Tree>
                                     )}
@@ -118,7 +118,7 @@ export default function Page() {
                                             <Spinner variant="default" className="text-muted-foreground" />
                                         </div>
                                     ) : (
-                                        <Tree className="overflow-auto" elements={tree}>
+                                        <Tree className="p-2 mt-1 overflow-auto" elements={tree}>
                                             {renderTree(tree)}
                                         </Tree>
                                     )}
@@ -128,15 +128,20 @@ export default function Page() {
                     </div>
 
                     <div className="w-full lg:w-3/4 lg:pl-4">
-                        <h2 className="text-lg font-semibold">Coverage</h2>
-                        {loadingCoverage ? (
-                            <div className="flex justify-center items-center py-16">
-                                <Spinner variant="default" className="text-muted-foreground" />
-                            </div>
-                        ) : (
-                            <div className="mt-2">
-                                <div className="lg:hidden">
-                                    <div className="bg-background flex flex-col text-xs">
+                        <div className="flex items-center justify-between">
+                            <h2 className="text-lg font-semibold">Coverage</h2>
+                            {coverage?.percentage != null && (
+                                <ProgressCircle value={(coverage?.percentage || 0) * 100} className="size-7" />
+                            )}
+                        </div>
+                        <div className="bg-background border rounded-md mt-2">
+                            <div className="lg:hidden">
+                                {loadingCoverage ? (
+                                    <div className="flex justify-center items-center py-16">
+                                        <Spinner variant="default" className="text-muted-foreground" />
+                                    </div>
+                                ) : (
+                                    <div className="bg-background flex flex-col text-xs mt-2">
                                         <style>{`
                                         code { 
                                             white-space: pre-wrap; 
@@ -156,11 +161,21 @@ export default function Page() {
                                             background-color: bg-background; 
                                         }
                                     `}</style>
-                                        <div dangerouslySetInnerHTML={{ __html: coverage?.content || '' }}></div>
+                                        {coverage?.content ? (
+                                            <div dangerouslySetInnerHTML={{ __html: coverage?.content }}></div>
+                                        ) : (
+                                            <div className="flex justify-center items-center py-16 text-muted-foreground text-sm">No file selected.</div>
+                                        )}
                                     </div>
-                                </div>
-                                <ScrollArea className="hidden lg:block lg:h-[calc(100vh-16rem)]">
-                                    <div className="bg-background flex flex-col text-xs">
+                                )}
+                            </div>
+                            <ScrollArea className="hidden lg:block lg:h-[calc(100vh-16rem)]">
+                                {loadingCoverage ? (
+                                    <div className="flex justify-center items-center py-16">
+                                        <Spinner variant="default" className="text-muted-foreground" />
+                                    </div>
+                                ) : (
+                                    <div className="bg-background flex flex-col text-xs mt-2">
                                         <style>{`
                                         code { 
                                             white-space: pre-wrap; 
@@ -180,14 +195,18 @@ export default function Page() {
                                             background-color: bg-background; 
                                         }
                                     `}</style>
-                                        <div dangerouslySetInnerHTML={{ __html: coverage?.content || '' }}></div>
+                                        {coverage?.content ? (
+                                            <div dangerouslySetInnerHTML={{ __html: coverage?.content }}></div>
+                                        ) : (
+                                            <div className="flex justify-center items-center py-16 text-muted-foreground text-sm">No file selected.</div>
+                                        )}
                                     </div>
-                                </ScrollArea>
-                            </div>
-                        )}
+                                )}
+                            </ScrollArea>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </div >
         </>
     )
 }

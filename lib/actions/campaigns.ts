@@ -46,6 +46,10 @@ export type CreateCampaignRequest = {
     contract_name: string;
     duration: number;
     entry_point: string;
+    corpus_reused?: boolean;
+    corpus_saved?: boolean;
+    src_corpus_id?: string;
+    dst_corpus_name?: string
 }
 
 export type CreateCampaignResponse = {
@@ -94,7 +98,11 @@ export async function createCampaign(req: CreateCampaignRequest): Promise<{ succ
                     config_id: req.config_id,
                     contract_name: req.contract_name,
                     duration: req.duration,
-                    entry_point: req.entry_point
+                    entry_point: req.entry_point,
+                    corpus_reused: req.corpus_reused,
+                    corpus_saved: req.corpus_saved,
+                    src_corpus_id: req.src_corpus_id,
+                    dst_corpus_name: req.dst_corpus_name
                 }
             }
         })
