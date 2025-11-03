@@ -217,6 +217,14 @@ export function StartCampaignModal({ projectId, onCampaignCreated }: StartCampai
                             </Select>
                         </div>
                         <div className="grid gap-3">
+                            <Label htmlFor="dst-corpus-name">Corpus Name</Label>
+                            <Input
+                                id="dst-corpus-name"
+                                name="dst-corpus-name"
+                                placeholder="Enter the corpus name..."
+                            />
+                        </div>
+                        <div className="grid gap-3">
                             <Label htmlFor="corpus">Corpus (optional)</Label>
                             <Select name="corpus" disabled={loadingCorpus}>
                                 <SelectTrigger className="w-full">
@@ -237,16 +245,8 @@ export function StartCampaignModal({ projectId, onCampaignCreated }: StartCampai
                                 </SelectContent>
                             </Select>
                         </div>
-                        <div className="grid gap-3">
-                            <Label htmlFor="dst-corpus-name">Corpus Name (optional)</Label>
-                            <Input
-                                id="dst-corpus-name"
-                                name="dst-corpus-name"
-                                placeholder="Enter the corpus name..."
-                            />
-                        </div>
                     </div>
-                    <DialogFooter>
+                    <DialogFooter className="mt-6">
                         <DialogClose asChild>
                             <Button variant="outline" type="button" disabled={isSubmitting}>Cancel</Button>
                         </DialogClose>

@@ -5,16 +5,16 @@ import { Corpus } from "@/lib/actions/corpus";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { DateRange } from "react-day-picker";
-import { GetCorpusRequest, getCorpus } from "@/lib/actions/corpus";
+import { DeleteCorpusRequest, deleteCorpus, GetCorpusRequest, getCorpus } from "@/lib/actions/corpus";
 import { toast } from "sonner";
 import { Spinner } from "@/components/ui/spinner";
-import { Calendar as CalendarIcon, CirclePlus, Search } from "lucide-react";
+import { Calendar as CalendarIcon, Trash2, Search, AlertTriangle } from "lucide-react";
 import { useDebounce } from "use-debounce";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import { AlertDialog, AlertDialogTitle, AlertDialogHeader, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogAction, AlertDialogCancel } from "@/components/ui/alert-dialog";
 
 export default function Page() {
     const params = useParams();
@@ -25,6 +25,11 @@ export default function Page() {
     const [debouncedSearch] = useDebounce(search, 300);
     const [date, setDate] = useState<DateRange | undefined>(undefined);
 
+    // Delete dialog
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [deleteCorpusId, setDeleteCorpusId] = useState<Corpus | null>(null);
+    const [isDeleting, setIsDeleting] = useState(false);
+
     // Corpus
     const [loading, setLoading] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
@@ -32,9 +37,13 @@ export default function Page() {
     const [hasMore, setHasMore] = useState(false);
     const [corpus, setCorpus] = useState<Corpus[]>([]);
 
-    const loadMore = async () => {
-        setLoadingMore(true);
-        setPage(page + 1);
+    const fetchCorpus = async (pageNum: number = 1, append: boolean = false) => {
+        if (append) {
+            setLoadingMore(true);
+        } else {
+            setLoading(true);
+            setPage(pageNum);
+        }
 
         let from: Date | undefined;
         let to: Date | undefined;
@@ -48,7 +57,7 @@ export default function Page() {
 
         const request: GetCorpusRequest = {
             project_id: id,
-            page: page,
+            page: pageNum,
             size: 20,
             sort: "-created_at",
             name_like: debouncedSearch,
@@ -58,53 +67,56 @@ export default function Page() {
 
         const response = await getCorpus(request);
         if (response.success && response.corpus) {
-            setCorpus(prevCorpus => [...prevCorpus, ...response.corpus!]);
+            if (append) {
+                setCorpus(prevCorpus => [...prevCorpus, ...response.corpus!]);
+            } else {
+                setCorpus(response.corpus);
+            }
             setHasMore(response.meta ? response.meta.current_page < response.meta.total_pages : false);
         } else {
-            setPage(page);
+            if (append) {
+                setPage(pageNum - 1);
+            }
             toast.error(response.error?.message || "Failed to fetch corpus");
         }
 
-        setLoadingMore(false);
+        if (append) {
+            setLoadingMore(false);
+        } else {
+            setLoading(false);
+        }
+    }
+
+    const handleLoadMore = async () => {
+        const nextPage = page + 1;
+        setPage(nextPage);
+        await fetchCorpus(nextPage, true);
+    }
+
+    const handleDelete = async (corpusId: string) => {
+        setIsDeleting(true);
+
+        const request: DeleteCorpusRequest = {
+            project_id: id,
+            corpus_id: corpusId
+        }
+
+        const response = await deleteCorpus(request);
+        if (response.success) {
+            toast.success("Corpus deleted successfully");
+            // Refetch the corpus list after successful deletion
+            await fetchCorpus(1, false);
+        } else {
+            toast.error(response.error?.message || "Failed to delete corpus");
+        }
+
+        setDeleteDialogOpen(false);
+        setDeleteCorpusId(null);
+        setIsDeleting(false);
     }
 
     useEffect(() => {
-        const fetchCorpus = async () => {
-            setLoading(true);
-            setPage(1);
-
-            let from: Date | undefined;
-            let to: Date | undefined;
-            if (date?.from && date?.to) {
-                from = new Date(date.from);
-                to = new Date(date.to);
-
-                from.setHours(0, 0, 0, 0);
-                to.setHours(23, 59, 59, 999);
-            }
-
-            const request: GetCorpusRequest = {
-                project_id: id,
-                page: page,
-                size: 20,
-                sort: "-created_at",
-                name_like: debouncedSearch,
-                created_at_gte: from?.toISOString(),
-                created_at_lte: to?.toISOString(),
-            }
-
-            const response = await getCorpus(request);
-            if (response.success && response.corpus) {
-                setCorpus(response.corpus);
-                setHasMore(response.meta ? response.meta.current_page < response.meta.total_pages : false);
-            } else {
-                toast.error(response.error?.message || "Failed to fetch corpus");
-            }
-
-            setLoading(false);
-        }
-
-        fetchCorpus();
+        fetchCorpus(1, false);
     }, [debouncedSearch, date]);
 
     return (
@@ -149,17 +161,37 @@ export default function Page() {
                         <p className="text-muted-foreground">No corpus found.</p>
                     </div>
                 ) : (
-                    <>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {corpus.map((corpus) => (
-                                <span key={corpus.corpus_id}>{corpus.name}</span>
-                            ))}
-                        </div>
+                    <div className="space-y-2">
+                        {corpus.map((corpus, index) => {
+                            return (
+                                <div key={index} className="flex items-center justify-between p-3 rounded-md border bg-card">
+                                    <div className="flex items-center gap-3 min-w-0 flex-1">
+                                        <div className="text-sm min-w-0">
+                                            <span key={corpus.corpus_id}>{corpus.name}</span>
+                                        </div>
+                                    </div>
+                                    <div className="text-xs text-muted-foreground whitespace-nowrap flex-shrink-0 px-3">
+                                        {new Date(corpus.updated_at).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
+                                    </div>
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        onClick={() => {
+                                            setDeleteDialogOpen(true);
+                                            setDeleteCorpusId(corpus);
+                                        }}
+                                        size="icon"
+                                    >
+                                        <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                </div>
+                            );
+                        })}
                         {hasMore && (
                             <div className="flex justify-center mt-4 mb-2">
                                 <Button
                                     variant="outline"
-                                    onClick={loadMore}
+                                    onClick={handleLoadMore}
                                     disabled={loadingMore}
                                     className="gap-2"
                                 >
@@ -174,9 +206,40 @@ export default function Page() {
                                 </Button>
                             </div>
                         )}
-                    </>
+                    </div>
                 )}
             </ScrollArea>
+            {deleteDialogOpen && (
+                <AlertDialog open={deleteDialogOpen} onOpenChange={(open) => setDeleteDialogOpen(open)}>
+                    <AlertDialogContent>
+                        <AlertDialogHeader>
+                            <AlertDialogTitle className="flex items-center gap-2">
+                                <AlertTriangle className="h-4 w-4" />
+                                Are you sure?
+                            </AlertDialogTitle>
+                            <AlertDialogDescription>
+                                This will permanently delete <strong>{deleteCorpusId?.name}</strong>. This action cannot be undone.
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                            <AlertDialogCancel onClick={() => setDeleteDialogOpen(false)}>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                                onClick={() => handleDelete(deleteCorpusId?.corpus_id || "")}
+                                disabled={isDeleting}
+                            >
+                                {isDeleting ? (
+                                    <>
+                                        <Spinner variant="default" className="h-4 w-4" />
+                                        Deleting...
+                                    </>
+                                ) : (
+                                    "Delete"
+                                )}
+                            </AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
+            )}
         </div>
     )
-}   
+}

@@ -2,6 +2,7 @@
 
 import { request } from "@/lib/helpers";
 import { Error } from "@/lib/types";
+import { revalidatePath } from "next/cache";
 
 export type Corpus = {
     content: string;
@@ -97,4 +98,18 @@ export async function getCorpus(req: GetCorpusRequest): Promise<{ success: boole
 export type DeleteCorpusRequest = {
     project_id: string;
     corpus_id: string;
+}
+
+export async function deleteCorpus(req: DeleteCorpusRequest): Promise<{ success: boolean; error?: Error }> {
+    const result = await request(`/v1/projects/${req.project_id}/corpus/${req.corpus_id}`, {
+        method: 'DELETE',
+    });
+
+    if (result.success && result.response) {
+        revalidatePath(`/project/${req.project_id}/corpus`);
+
+        return { success: true };
+    }
+
+    return { success: false, error: { message: 'Failed to delete corpus' } };
 }

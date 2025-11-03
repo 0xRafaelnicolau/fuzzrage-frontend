@@ -164,7 +164,7 @@ export default function Page() {
                                         {coverage?.content ? (
                                             <div dangerouslySetInnerHTML={{ __html: coverage?.content }}></div>
                                         ) : (
-                                            <div className="flex justify-center items-center py-16 text-muted-foreground text-sm">No file selected.</div>
+                                            <div className="flex justify-center items-center py-16 text-muted-foreground text-base">No file selected.</div>
                                         )}
                                     </div>
                                 )}
@@ -198,7 +198,7 @@ export default function Page() {
                                         {coverage?.content ? (
                                             <div dangerouslySetInnerHTML={{ __html: coverage?.content }}></div>
                                         ) : (
-                                            <div className="flex justify-center items-center py-16 text-muted-foreground text-sm">No file selected.</div>
+                                            <div className="flex justify-center items-center py-16 text-muted-foreground text-base">No file selected.</div>
                                         )}
                                     </div>
                                 )}
