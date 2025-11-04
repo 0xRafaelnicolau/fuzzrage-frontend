@@ -159,7 +159,7 @@ export function StartCampaignModal({ projectId, onCampaignCreated }: StartCampai
                                     id="duration"
                                     name="duration"
                                     type="number"
-                                    placeholder="Seconds"
+                                    placeholder="Minutes"
                                     min="1"
                                     required
                                 />
