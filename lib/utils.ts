@@ -46,14 +46,14 @@ export function getActionLabel(action: string, projectId: string, targetId: stri
       return {
         prefix: 'renamed corpus ',
         suffix: ' in ',
-        targetDisplay: targetId,
+        targetDisplay: targetId.substring(0, 8),
         href: ''
       };
     case "CORPUS_DELETED":
       return {
         prefix: 'deleted corpus ',
         suffix: ' from ',
-        targetDisplay: targetId,
+        targetDisplay: targetId.substring(0, 8),
         href: ''
       };
     case "CAMPAIGN_CREATED":
