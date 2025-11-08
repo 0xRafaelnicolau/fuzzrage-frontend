@@ -35,7 +35,13 @@ export default function Page() {
                 const failedProperties = result.campaign.attributes.result.props_failed.split(';');
                 const passedProperties = result.campaign.attributes.result.props_passed.split(';');
 
-                setProperties([...failedProperties, ...passedProperties].map(property => ({
+                const combinedProperties = [...failedProperties, ...passedProperties]
+                    .map((property) => (property ?? "").trim())
+                    .filter(
+                        (property) => property.length > 0 && property !== "AssertionFailed(..)"
+                    );
+
+                setProperties(combinedProperties.map(property => ({
                     name: property,
                     status: failedProperties.includes(property) ? 'Failed' : 'Passed'
                 })));
@@ -57,14 +63,7 @@ export default function Page() {
                         <Spinner variant="default" className="text-muted-foreground" />
                     </div>
                 ) : (
-                    <div>
-                        {properties.map((property) => (
-                            <div key={property.name}>
-                                <p>{property.name}</p>
-                            </div>
-                        ))}
-                    </div>
-                    //<PropertiesCards projectId={projectId} campaignId={campaignId} properties={properties} />
+                    <PropertiesCards projectId={projectId} campaignId={campaignId} properties={properties} />
                 )}
             </div>
         </main >
