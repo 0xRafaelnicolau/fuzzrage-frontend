@@ -2,7 +2,7 @@
 
 import { Section } from "@/components/ui/section";
 import { buttonVariants } from "@/components/ui/button";
-import { siteConfig } from "@/lib/config";
+import { siteConfig } from "@/components/home/config";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import Link from "next/link";

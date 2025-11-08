@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/sonner";
 import { Montserrat, Merriweather, JetBrains_Mono } from "next/font/google";
-import { siteConfig } from "@/lib/config";
+import { siteConfig } from "@/components/home/config";
 import "./globals.css";
 
 const montserrat = Montserrat({

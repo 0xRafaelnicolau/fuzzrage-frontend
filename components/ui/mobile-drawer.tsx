@@ -8,7 +8,7 @@ import {
     DrawerTitle,
     DrawerTrigger,
 } from "@/components/ui/drawer";
-import { siteConfig } from "@/lib/config";
+import { siteConfig } from "@/components/home/config";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { Menu } from "lucide-react";

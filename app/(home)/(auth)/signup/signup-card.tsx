@@ -60,7 +60,7 @@ export function SignupCard() {
                     variant="outline"
                     size="lg"
                     className="w-full"
-                    disabled={isAuthenticating}
+                    disabled={true}
                     onClick={() => handleAuthenticate("gitlab")}
                 >
                     {authenticatingProvider === "gitlab" ? (
@@ -74,7 +74,7 @@ export function SignupCard() {
                     variant="outline"
                     size="lg"
                     className="w-full"
-                    disabled={isAuthenticating}
+                    disabled={true}
                     onClick={() => handleAuthenticate("bitbucket")}
                 >
                     {authenticatingProvider === "bitbucket" ? (

@@ -13,9 +13,12 @@ export type Campaign = {
         project_id: number;
         result: {
             cov_percentage: number;
-            props_failed: number;
-            props_passed: number;
-            props_tested: number;
+            props_failed: string;
+            props_failed_count: number;
+            props_passed: string;
+            props_passed_count: number;
+            props_tested: string;
+            props_tested_count: number;
             status: string;
             total_duration: number;
         },
