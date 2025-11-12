@@ -26,7 +26,7 @@ export function CampaignsHeader({ user, projectId, campaignId }: CampaignsHeader
         { id: 'overview', label: 'Overview', href: `/project/${projectId}/campaign/${campaignId}` },
         { id: 'properties', label: 'Properties', href: `/project/${projectId}/campaign/${campaignId}/properties` },
         { id: 'coverage', label: 'Coverage', href: `/project/${projectId}/campaign/${campaignId}/coverage` },
-        { id: 'logs', label: 'Logs', href: `/project/${projectId}/campaign/${campaignId}/logs` },
+        // { id: 'logs', label: 'Logs', href: `/project/${projectId}/campaign/${campaignId}/logs` },
     ], []);
 
     const activeTab = useMemo(() => {
