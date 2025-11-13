@@ -15,6 +15,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { logout } from "@/lib/actions/auth";
 import { User } from "@/lib/actions/user";
 import { toast } from "sonner";
+import Link from "next/link";
 
 export default function UserMenu({ user }: { user: User }) {
     const [open, setOpen] = React.useState(false);
@@ -41,7 +42,9 @@ export default function UserMenu({ user }: { user: User }) {
                     <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                         <Avatar className="size-8">
                             <AvatarImage src={user.avatar_url} alt={user.name} />
-                            <AvatarFallback>TB</AvatarFallback>
+                            <AvatarFallback className="bg-gradient-to-br from-muted to-accent backdrop-blur-sm">
+                                <div className="w-full h-full bg-gradient-to-br from-accent/50 to-border/50 rounded-full blur-sm"></div>
+                            </AvatarFallback>
                         </Avatar>
                         <div className="grid flex-1 text-left text-sm leading-tight">
                             <span className="truncate font-semibold">{user.name}</span>
@@ -51,15 +54,22 @@ export default function UserMenu({ user }: { user: User }) {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
-                    <DropdownMenuItem>
-                        Account
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                        Billing
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                        Notifications
-                    </DropdownMenuItem>
+
+                    <Link href="/dashboard/settings/account">
+                        <DropdownMenuItem>
+                            Account
+                        </DropdownMenuItem>
+                    </Link>
+                    <Link href="/dashboard/settings/billing">
+                        <DropdownMenuItem>
+                            Billing
+                        </DropdownMenuItem>
+                    </Link>
+                    <Link href="/dashboard/settings/notifications">
+                        <DropdownMenuItem>
+                            Notifications
+                        </DropdownMenuItem>
+                    </Link>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem

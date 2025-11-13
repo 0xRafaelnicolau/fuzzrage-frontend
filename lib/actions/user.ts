@@ -48,3 +48,15 @@ export async function getUser(): Promise<{ success: boolean; user?: User; error?
 
     return { success: false, error: result.error }
 }
+
+export async function deleteUser(): Promise<{ success: boolean; error?: Error }> {
+    const result = await request(`/v1/user`, {
+        method: 'DELETE'
+    })
+
+    if (result.success && result.response) {
+        return { success: true }
+    }
+
+    return { success: false, error: result.error }
+}
