@@ -1,12 +1,13 @@
 "use client";
 
+import Link from "next/link";
 import { Campaign, getCampaigns, GetCampaignsRequest } from "@/lib/actions/campaigns";
 import { Project, getProjects } from "@/lib/actions/projects";
 import { Spinner } from "@/components/ui/spinner";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { ProjectCard } from "@/app/(dashboard)/dashboard/projects/project-card";
-import { formatDate, formatDistanceToNow } from "date-fns";
+import { formatDate } from "date-fns";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 const stateOptions = [
@@ -129,31 +130,38 @@ export default function Page() {
                                     .map(({ campaign, project }) => {
                                         const stateOption = getStateOption(campaign.attributes.state);
                                         const stateColor = stateOption?.color || 'bg-gray-400';
+                                        const projectId = project?.id ?? campaign.attributes.project_id;
 
                                         return (
-                                            <div key={campaign.id} className="flex flex-col gap-2 p-3 rounded-md border bg-card">
-                                                <div className="flex items-center justify-between">
-                                                    <div className="flex items-center gap-2 min-w-0 flex-1">
-                                                        <span className="text-sm font-medium truncate">
-                                                            {project?.attributes.name || 'Unknown Project'}
-                                                        </span>
+                                            <Link
+                                                key={campaign.id}
+                                                href={`/project/${projectId}/campaign/${campaign.id}`}
+                                                className="block"
+                                            >
+                                                <div className="flex flex-col gap-2 p-3 rounded-md border bg-card hover:bg-accent cursor-pointer transition-colors">
+                                                    <div className="flex items-center justify-between">
+                                                        <div className="flex items-center gap-2 min-w-0 flex-1">
+                                                            <span className="text-sm font-medium truncate">
+                                                                {project?.attributes.name || 'Unknown Project'}
+                                                            </span>
+                                                        </div>
+                                                        <div className="flex items-center gap-2 flex-shrink-0">
+                                                            <div className={`w-2 h-2 rounded-full ${stateColor}`} />
+                                                            <span className="text-xs text-muted-foreground">
+                                                                {stateOption?.label || campaign.attributes.state}
+                                                            </span>
+                                                        </div>
                                                     </div>
-                                                    <div className="flex items-center gap-2 flex-shrink-0">
-                                                        <div className={`w-2 h-2 rounded-full ${stateColor}`} />
-                                                        <span className="text-xs text-muted-foreground">
-                                                            {stateOption?.label || campaign.attributes.state}
-                                                        </span>
+                                                    <div className="flex items-center justify-between">
+                                                        <div className="text-xs text-muted-foreground">
+                                                            {campaign.id.substring(0, 8)}
+                                                        </div>
+                                                        <div className="text-xs text-muted-foreground whitespace-nowrap flex-shrink-0">
+                                                            {formatDate(campaign.attributes.created_at, 'MMM d')}
+                                                        </div>
                                                     </div>
                                                 </div>
-                                                <div className="flex items-center justify-between">
-                                                    <div className="text-xs text-muted-foreground">
-                                                        {campaign.id.substring(0, 8)}
-                                                    </div>
-                                                    <div className="text-xs text-muted-foreground whitespace-nowrap flex-shrink-0">
-                                                        {formatDate(campaign.attributes.created_at, 'MMM d')}
-                                                    </div>
-                                                </div>
-                                            </div>
+                                            </Link>
                                         );
                                     });
 

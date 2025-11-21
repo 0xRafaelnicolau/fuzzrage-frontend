@@ -51,7 +51,7 @@ export default async function Page({ params }: { params: { id: string } }) {
                 <GoBack
                     title={project?.attributes.name || "Project"}
                     description={""}
-                    href="/dashboard/projects"
+                    href="/dashboard/"
                     buttons={[
                         <Link key="repository-link" href={`https://github.com/${project?.attributes.repository_owner}/${project?.attributes.repository_name}`} target="_blank">
                             <Button variant="outline" size="icon" className="md:size-auto md:h-9 md:px-4 md:py-2 md:has-[>svg]:px-3">
