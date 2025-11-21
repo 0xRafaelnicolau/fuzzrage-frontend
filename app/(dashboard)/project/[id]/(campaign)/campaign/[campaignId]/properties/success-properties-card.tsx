@@ -7,7 +7,7 @@ import { Property } from "@/app/(dashboard)/project/[id]/(campaign)/campaign/[ca
 
 export function SuccessPropertiesCard({ properties }: { properties: Property[] }) {
     return (
-        <Card className="w-full mt-6">
+        <Card className="w-full">
             <CardHeader>
                 <div className="space-y-2">
                     <CardTitle>Successful Properties</CardTitle>

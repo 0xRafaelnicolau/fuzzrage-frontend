@@ -65,7 +65,7 @@ export function FailedPropertiesCard({ projectId, campaignId, properties }: { pr
     }, [projectId, campaignId, properties]);
 
     return (
-        <Card className="w-full">
+        <Card className="w-full mt-6">
             <CardHeader>
                 <div className="space-y-2">
                     <CardTitle>Failed Properties</CardTitle>
