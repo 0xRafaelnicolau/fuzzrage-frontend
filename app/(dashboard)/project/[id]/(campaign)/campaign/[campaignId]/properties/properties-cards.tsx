@@ -10,7 +10,11 @@ export default function PropertiesCards({ projectId, campaignId, properties }: {
         <>
             <ScrollArea className="h-[calc(100vh-14rem)]">
                 <SuccessPropertiesCard properties={properties.filter(property => property.status === 'Passed')} />
-                <FailedPropertiesCard properties={properties.filter(property => property.status === 'Failed')} />
+                <FailedPropertiesCard
+                    projectId={projectId}
+                    campaignId={campaignId}
+                    properties={properties.filter(property => property.status === 'Failed')
+                    } />
             </ScrollArea>
         </>
     )

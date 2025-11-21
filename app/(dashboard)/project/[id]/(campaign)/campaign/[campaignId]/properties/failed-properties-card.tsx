@@ -1,13 +1,17 @@
 "use client"
 
+import CodeEditor from "@uiw/react-textarea-code-editor";
 import { ChevronDown, ChevronRight } from "lucide-react";
-import { Card, CardTitle, CardHeader, CardDescription, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { Property } from "@/app/(dashboard)/project/[id]/(campaign)/campaign/[campaignId]/properties/page";
-import { useState } from "react";
+import { Fragment, useState } from "react";
+import { getStackTrace, GetStackTraceRequest } from "@/lib/actions/stacktrace";
+import { useEffect } from "react";
 
-export function FailedPropertiesCard({ properties }: { properties: Property[] }) {
+export function FailedPropertiesCard({ projectId, campaignId, properties }: { projectId: string, campaignId: string, properties: Property[] }) {
     const [expandedProperties, setExpandedProperties] = useState<Set<Property>>(new Set());
+    const [stacktracesByProperty, setStacktracesByProperty] = useState<Record<string, string>>({});
 
     const toggleExpand = (property: Property) => {
         setExpandedProperties(prev => {
@@ -23,8 +27,45 @@ export function FailedPropertiesCard({ properties }: { properties: Property[] })
         });
     };
 
+    useEffect(() => {
+        const fetchStacktraces = async () => {
+            const requests: GetStackTraceRequest[] = [];
+
+            for (const property of properties) {
+                const request: GetStackTraceRequest = {
+                    project_id: projectId,
+                    campaign_id: campaignId,
+                    property: property.name
+                };
+
+                requests.push(request);
+            }
+
+            if (requests.length === 0) {
+                setStacktracesByProperty({});
+                return;
+            }
+
+            const responses = await Promise.all(requests.map(request => getStackTrace(request)));
+
+            const mapping: Record<string, string> = {};
+
+            properties.forEach((property, index) => {
+                const result = responses[index];
+
+                if (result?.success && result.stackTrace) {
+                    mapping[property.name] = result.stackTrace.content;
+                }
+            });
+
+            setStacktracesByProperty(mapping);
+        };
+
+        fetchStacktraces();
+    }, [projectId, campaignId, properties]);
+
     return (
-        <Card className="w-full mt-6">
+        <Card className="w-full">
             <CardHeader>
                 <div className="space-y-2">
                     <CardTitle>Failed Properties</CardTitle>
@@ -38,18 +79,39 @@ export function FailedPropertiesCard({ properties }: { properties: Property[] })
                 <div className="-mb-6 -mt-6">
                     <Table>
                         <TableBody>
-                            {properties.map((property) => (
-                                <TableRow key={property.name} onClick={() => toggleExpand(property)}>
-                                    <TableCell className={`w-12 pl-5`}>
-                                        {expandedProperties.has(property) ? (
-                                            <ChevronDown className="h-4 w-4" />
-                                        ) : (
-                                            <ChevronRight className="h-4 w-4" />
+                            {properties.map((property) => {
+                                const isExpanded = expandedProperties.has(property);
+                                const stacktrace = stacktracesByProperty[property.name] ?? "";
+
+                                return (
+                                    <Fragment key={property.name}>
+                                        <TableRow onClick={() => toggleExpand(property)}>
+                                            <TableCell className={`w-12 pl-5`}>
+                                                {isExpanded ? (
+                                                    <ChevronDown className="h-4 w-4" />
+                                                ) : (
+                                                    <ChevronRight className="h-4 w-4" />
+                                                )}
+                                            </TableCell>
+                                            <TableCell>{property.name}</TableCell>
+                                        </TableRow>
+                                        {isExpanded && (
+                                            <TableRow>
+                                                <TableCell colSpan={2}>
+                                                    <CodeEditor
+                                                        value={stacktrace}
+                                                        language="txt"
+                                                        readOnly
+                                                        padding={13}
+                                                        className="rounded-md border border-input shadow-xs"
+                                                        style={{ backgroundColor: "var(--background)", fontFamily: "var(--font-mono)" }}
+                                                    />
+                                                </TableCell>
+                                            </TableRow>
                                         )}
-                                    </TableCell>
-                                    <TableCell>{property.name}</TableCell>
-                                </TableRow>
-                            ))}
+                                    </Fragment>
+                                );
+                            })}
                         </TableBody>
                     </Table>
                 </div>
