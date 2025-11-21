@@ -10,13 +10,17 @@ import { Campaign, getCampaign, GetCampaignRequest } from "@/lib/actions/campaig
 import { toast } from "sonner";
 import { useEffect, useState, useCallback } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function Page() {
     const { id, campaignId } = useParams<{ id: string, campaignId: string }>();
 
     const [campaign, setCampaign] = useState<Campaign>();
+    const [isLoading, setIsLoading] = useState(true);
 
     const fetchCampaign = useCallback(async () => {
+        setIsLoading(true);
+
         const request: GetCampaignRequest = {
             project_id: id,
             campaign_id: campaignId
@@ -28,6 +32,8 @@ export default function Page() {
         } else {
             toast.error(campaign.error?.message || "Failed to fetch campaign");
         }
+
+        setIsLoading(false);
     }, [id, campaignId]);
 
     useEffect(() => {
@@ -36,37 +42,45 @@ export default function Page() {
 
     return (
         <>
-            {campaign && (
+            {isLoading ? (
+                <div className="flex justify-center items-center py-16">
+                    <Spinner variant="default" className="text-muted-foreground" />
+                </div>
+            ) : (
                 <>
-                    <div className="p-3">
-                        {(campaign.attributes.state === "RUNNING" || campaign.attributes.state === "QUEUED") && (
-                            <GoBack
-                                title={campaignId.substring(0, 8)}
-                                description={""}
-                                href={`/project/${id}/`}
-                                buttons={[
-                                    <CampaignCancelModal key="cancel-campaign" campaignId={campaignId} projectId={id} onCampaignCancelled={fetchCampaign} />
-                                ]} />
-                        )}
-                        {(campaign.attributes.state === "SUCCEEDED" || campaign.attributes.state === "FAILED" || campaign.attributes.state === "CANCELLED") && (
-                            <GoBack
-                                title={campaignId.substring(0, 8)}
-                                description={""}
-                                href={`/project/${id}/campaigns`}
-                            />
-                        )}
-                    </div>
-                    <ScrollArea className="lg:h-[calc(100vh-16rem)]">
-                        <div className="p-3">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <CampaignDetailsCard campaign={campaign} />
-                                <CampaignStatisticsCard campaign={campaign} />
+                    {campaign && (
+                        <>
+                            <div className="p-3">
+                                {(campaign.attributes.state === "RUNNING" || campaign.attributes.state === "QUEUED") && (
+                                    <GoBack
+                                        title={campaignId.substring(0, 8)}
+                                        description={""}
+                                        href={`/project/${id}/`}
+                                        buttons={[
+                                            <CampaignCancelModal key="cancel-campaign" campaignId={campaignId} projectId={id} onCampaignCancelled={fetchCampaign} />
+                                        ]} />
+                                )}
+                                {(campaign.attributes.state === "SUCCEEDED" || campaign.attributes.state === "FAILED" || campaign.attributes.state === "CANCELLED") && (
+                                    <GoBack
+                                        title={campaignId.substring(0, 8)}
+                                        description={""}
+                                        href={`/project/${id}/campaigns`}
+                                    />
+                                )}
                             </div>
-                            <div className="mt-4">
-                                <CampaignConfigCard campaign={campaign} />
-                            </div>
-                        </div>
-                    </ScrollArea>
+                            <ScrollArea className="lg:h-[calc(100vh-16rem)]">
+                                <div className="p-3">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <CampaignDetailsCard campaign={campaign} />
+                                        <CampaignStatisticsCard campaign={campaign} />
+                                    </div>
+                                    <div className="mt-4">
+                                        <CampaignConfigCard campaign={campaign} />
+                                    </div>
+                                </div>
+                            </ScrollArea>
+                        </>
+                    )}
                 </>
             )}
         </>
