@@ -131,7 +131,7 @@ export default function Page() {
         }
 
         fetchCampaigns();
-    }, [selectedStatuses, date]);
+    }, [selectedStatuses, date, id]);
 
     useEffect(() => {
         return () => {
@@ -168,11 +168,11 @@ export default function Page() {
                             description={""}
                             href="/dashboard/"
                             buttons={[
-                                <DropdownMenu>
+                                <DropdownMenu key="status-filter">
                                     <DropdownMenuTrigger asChild>
                                         <Button variant="outline" className="flex items-center gap-2 px-3 h-9">
                                             <div className="flex items-center gap-1">
-                                                {options.map((status, index) => (
+                                                {options.map((status) => (
                                                     <div
                                                         key={status.value}
                                                         className={`w-2 h-2 rounded-full ${selectedStatuses.includes(status.value)
@@ -212,7 +212,7 @@ export default function Page() {
                                         ))}
                                     </DropdownMenuContent>
                                 </DropdownMenu>,
-                                <Popover>
+                                <Popover key="date-filter">
                                     <PopoverTrigger asChild>
                                         <Button variant="outline" className="flex items-center justify-start gap-2 px-3 h-9">
                                             <CalendarIcon className="h-4 w-4" />
