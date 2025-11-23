@@ -64,7 +64,7 @@ export default function Page() {
                                     <GoBack
                                         title={campaignId.substring(0, 8)}
                                         description={""}
-                                        href={`/project/${id}/campaigns`}
+                                        href={`/project/${id}/`}
                                     />
                                 )}
                             </div>
