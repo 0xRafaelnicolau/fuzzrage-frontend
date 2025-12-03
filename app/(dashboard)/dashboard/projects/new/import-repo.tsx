@@ -88,7 +88,7 @@ export function ImportRepo({ user, installations }: { user: User, installations:
     // Projects
     const [importing, setImporting] = useState<string | null>(null)
     const handleImport = async (repo: Repository) => {
-        if (!installation) return
+        if (!installation || importing !== null) return
 
         setImporting(repo.id)
         const response = await createProject({
@@ -99,7 +99,6 @@ export function ImportRepo({ user, installations }: { user: User, installations:
         })
 
         if (response.success && response.project) {
-            setImporting(null)
             toast.success('Project imported successfully')
             redirect(`/project/${response.project.id}`)
         } else {
@@ -189,7 +188,7 @@ export function ImportRepo({ user, installations }: { user: User, installations:
                                         variant="default"
                                         className="h-8 px-4 text-sm"
                                         onClick={() => handleImport(repo)}
-                                        disabled={importing === repo.id}
+                                        disabled={importing !== null}
                                     >
                                         {importing === repo.id ? "Importing..." : "Import"}
                                     </Button>
