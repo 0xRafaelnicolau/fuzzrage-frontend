@@ -2,6 +2,7 @@ import { CampaignsHeader } from '@/app/(dashboard)/project/[id]/(campaign)/campa
 import { Footer } from '@/components/ui/footer';
 import { User, getUser } from '@/lib/actions/user';
 import { notFound } from 'next/navigation';
+import { siteConfig } from '@/components/home/config';
 import FlickeringGrid from '@/components/ui/flickering-grid';
 
 
@@ -37,7 +38,7 @@ export default async function Layout({ children, params }: { children: React.Rea
                     {children}
                 </div>
             </div>
-            <Footer />
+            <Footer socialLinks={siteConfig.footer.socialLinks} />
         </main>
     );
 }

@@ -2,7 +2,7 @@ import { Brain, Users, Plug, Globe, Code, Database } from "lucide-react";
 import { Icons } from "../ui/icons";
 
 export const siteConfig = {
-    name: "fuzzrage",
+    name: "fuzzit",
     description: "Discover vulnerabilities in your smart contracts with AI-powered Invariant Testing",
     cta: "Get Started",
     hero: {

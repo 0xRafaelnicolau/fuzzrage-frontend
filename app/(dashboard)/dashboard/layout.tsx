@@ -3,6 +3,7 @@ import { Footer } from '@/components/ui/footer';
 import { User, getUser } from '@/lib/actions/user';
 import { notFound } from 'next/navigation';
 import FlickeringGrid from '@/components/ui/flickering-grid';
+import { siteConfig } from '@/components/home/config';
 
 export default async function Layout({ children }: { children: React.ReactNode }) {
     const response = await getUser();
@@ -34,7 +35,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
                     {children}
                 </div>
             </div>
-            <Footer />
+            <Footer socialLinks={siteConfig.footer.socialLinks} />
         </main>
     );
 }
