@@ -54,8 +54,7 @@ export default function UserMenu({ user }: { user: User }) {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
-
-                    <Link href="/dashboard/settings/account">
+                    <Link href="/dashboard/settings/">
                         <DropdownMenuItem>
                             Account
                         </DropdownMenuItem>

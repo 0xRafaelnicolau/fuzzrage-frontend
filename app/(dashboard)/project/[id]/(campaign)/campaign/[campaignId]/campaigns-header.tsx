@@ -1,6 +1,6 @@
 "use client";
 
-import { Logo } from "@/components/ui/logo";
+import { Icon } from "@/components/ui/Icon";
 import { User } from "@/lib/actions/user";
 import { useMemo, useCallback } from "react";
 import { usePathname } from "next/navigation";
@@ -59,7 +59,7 @@ export function CampaignsHeader({ user, projectId, campaignId }: CampaignsHeader
                     title="brand-logo"
                     className="relative mr-6 flex items-center space-x-2"
                 >
-                    <Logo className="w-auto" />
+                    <Icon className="w-auto" />
                 </Link>
                 <div className="px-2 hidden lg:block">
                     <UserMenu user={user} />

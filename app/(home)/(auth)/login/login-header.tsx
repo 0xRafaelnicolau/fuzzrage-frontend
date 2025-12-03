@@ -1,10 +1,10 @@
 "use client";
 
 import { MobileDrawer } from "@/components/ui/mobile-drawer";
-import { Logo } from "@/components/ui/logo";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { Icon } from "@/components/ui/Icon";
 
 export function LoginHeader() {
     return (
@@ -15,7 +15,7 @@ export function LoginHeader() {
                     title="brand-logo"
                     className="relative mr-6 flex items-center space-x-2"
                 >
-                    <Logo className="w-auto" />
+                    <Icon className="w-auto" />
                 </Link>
                 <div className="hidden lg:block">
                     <Link
