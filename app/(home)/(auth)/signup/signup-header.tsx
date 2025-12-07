@@ -32,6 +32,7 @@ export function SignupHeader() {
                     <MobileDrawer />
                 </div>
             </div>
+            <hr className="absolute w-full bottom-0" />
         </header>
     );
 }

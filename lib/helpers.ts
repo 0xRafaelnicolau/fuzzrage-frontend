@@ -62,7 +62,7 @@ export async function request(url: string, options: RequestInit = {}) {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`,
-                'X-FUZZRAGE-TOKEN': hmac,
+                'X-FUZZIT-TOKEN': hmac,
                 ...options.headers
             },
             signal: controller.signal,
