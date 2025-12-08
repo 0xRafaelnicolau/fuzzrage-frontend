@@ -19,7 +19,8 @@ export function ProjectCard({ project }: ProjectCardProps) {
     const formatDate = (dateString: string) => {
         return new Date(dateString).toLocaleDateString('en-US', {
             month: 'short',
-            day: 'numeric'
+            day: 'numeric',
+            year: 'numeric'
         });
     };
 

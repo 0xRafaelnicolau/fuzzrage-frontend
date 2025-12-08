@@ -27,7 +27,7 @@ export async function login(provider: string) {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                'X-FUZZRAGE-TOKEN': hmac
+                'X-FUZZIT-TOKEN': hmac
             }
         })
     } catch {
