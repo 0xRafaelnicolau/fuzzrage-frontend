@@ -80,33 +80,7 @@ export default function Page() {
     return (
         <div className="p-3">
             <div className="flex flex-col lg:flex-row relative">
-                <div className="w-full lg:w-2/3 lg:pr-4 mb-6 lg:mb-0">
-                    <div className="">
-                        <h2 className="text-lg font-semibold">Projects</h2>
-                    </div>
-                    {loading ? (
-                        <div className="flex justify-center items-center py-16">
-                            <Spinner variant="default" className="text-muted-foreground" />
-                        </div>
-                    ) : (
-                        <>
-                            <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 lg:hidden">
-                                {projects.map((project) => (
-                                    <ProjectCard key={project.id} project={project} />
-                                ))}
-                            </div>
-                            <ScrollArea className="hidden lg:block h-[calc(100vh-15rem)]">
-                                <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    {projects.map((project) => (
-                                        <ProjectCard key={project.id} project={project} />
-                                    ))}
-                                </div>
-                            </ScrollArea>
-                        </>
-                    )}
-                </div>
-
-                <div className="w-full lg:w-1/3 lg:pl-6 mb-6 lg:mb-0">
+                <div className="w-full lg:w-1/3 lg:pr-6 mb-6 lg:mb-0">
                     <div className="lg:sticky lg:top-0">
                         <div className="">
                             <h2 className="text-lg font-semibold">Campaigns</h2>
@@ -180,6 +154,32 @@ export default function Page() {
                             })()
                         )}
                     </div>
+                </div>
+
+                <div className="w-full lg:w-2/3 lg:pl-4 mb-6 lg:mb-0">
+                    <div className="">
+                        <h2 className="text-lg font-semibold">Projects</h2>
+                    </div>
+                    {loading ? (
+                        <div className="flex justify-center items-center py-16">
+                            <Spinner variant="default" className="text-muted-foreground" />
+                        </div>
+                    ) : (
+                        <>
+                            <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 lg:hidden">
+                                {projects.map((project) => (
+                                    <ProjectCard key={project.id} project={project} />
+                                ))}
+                            </div>
+                            <ScrollArea className="hidden lg:block h-[calc(100vh-15rem)]">
+                                <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    {projects.map((project) => (
+                                        <ProjectCard key={project.id} project={project} />
+                                    ))}
+                                </div>
+                            </ScrollArea>
+                        </>
+                    )}
                 </div>
             </div>
         </div >
