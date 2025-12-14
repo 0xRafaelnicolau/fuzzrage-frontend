@@ -4,23 +4,34 @@ import { User, getUser } from '@/lib/actions/user';
 import { notFound } from 'next/navigation';
 import { siteConfig } from '@/components/home/config';
 import FlickeringGrid from '@/components/ui/flickering-grid';
+import { Project, getProject } from '@/lib/actions/projects';
 
 
 export default async function Layout({ children, params }: { children: React.ReactNode, params: Promise<{ id: string, campaignId: string }> }) {
     const { id, campaignId } = await params;
 
-    const response = await getUser();
+    const [userResponse, projectResponse] = await Promise.all([getUser(), getProject({ projectId: id })]);
 
     let user: User;
-    if (response.user && response.success) {
-        user = response.user;
+    if (userResponse.user && userResponse.success) {
+        user = userResponse.user;
     } else {
         notFound();
     }
 
+    let project: Project;
+    if (projectResponse.project && projectResponse.success) {
+        project = projectResponse.project;
+    } else {
+        notFound();
+    }
+
+    // Extract the first part of the campaign ID (before the first hyphen)
+    const campaignName = campaignId.split('-')[0];
+
     return (
         <main className="min-h-screen flex flex-col">
-            <CampaignsHeader user={user} projectId={id} campaignId={campaignId} />
+            <CampaignsHeader user={user} projectId={id} projectName={project.attributes.name} campaignId={campaignId} campaignName={campaignName} />
             <div className="flex-1 relative">
                 <div className="absolute inset-0 flex items-center justify-center -z-20">
                     <div className="w-full h-full overflow-hidden rounded-lg bg-background">
