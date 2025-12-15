@@ -37,6 +37,7 @@ export default function Page() {
     // Editing state
     const [editingId, setEditingId] = useState<string | null>(null);
     const [editingName, setEditingName] = useState<string>("");
+    const [editingDescription, setEditingDescription] = useState<string>("");
     const [isPending, startTransition] = useTransition();
 
     // Corpus
@@ -106,6 +107,7 @@ export default function Page() {
         event.stopPropagation();
         setEditingId(corpusItem.corpus_id);
         setEditingName(corpusItem.name);
+        setEditingDescription(corpusItem.content || "");
         setOpenItems(prev => {
             const newSet = new Set(prev);
             newSet.add(corpusItem.corpus_id);
@@ -114,16 +116,13 @@ export default function Page() {
     };
 
     const handleSaveEdit = async (corpusId: string) => {
-        const corpusItem = corpus.find(c => c.corpus_id === corpusId);
-        if (!corpusItem) return;
-
         startTransition(async () => {
             const request: UpdateCorpusRequest = {
                 project_id: id,
                 corpus_id: corpusId,
                 data: {
                     attributes: {
-                        description: corpusItem.content || "",
+                        description: editingDescription || "",
                         name: editingName
                     }
                 }
@@ -133,6 +132,7 @@ export default function Page() {
             if (response.success) {
                 setEditingId(null);
                 setEditingName("");
+                setEditingDescription("");
                 toast.success("Corpus updated successfully");
                 // Refetch the corpus list after successful update
                 await fetchCorpus(page, false);
@@ -148,6 +148,7 @@ export default function Page() {
         }
         setEditingId(null);
         setEditingName("");
+        setEditingDescription("");
     };
 
     const handleDelete = async (corpusId: string) => {
@@ -338,7 +339,21 @@ export default function Page() {
                                         <CollapsibleContent>
                                             <div className="px-3 pb-3 pt-0 border-t">
                                                 <div className="pt-3">
-                                                    {corpusItem.content ? (
+                                                    {editingId === corpusItem.corpus_id ? (
+                                                        <textarea
+                                                            value={editingDescription}
+                                                            onChange={(e) => setEditingDescription(e.target.value)}
+                                                            className="w-full min-h-[100px] px-3 py-2 text-sm rounded-md border border-input bg-background text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-y"
+                                                            placeholder="Enter description..."
+                                                            onClick={(e) => e.stopPropagation()}
+                                                            onKeyDown={(e) => {
+                                                                if (e.key === 'Escape') {
+                                                                    e.preventDefault();
+                                                                    handleCancelEdit();
+                                                                }
+                                                            }}
+                                                        />
+                                                    ) : corpusItem.content ? (
                                                         <div className="text-sm text-muted-foreground whitespace-pre-wrap break-words">
                                                             {corpusItem.content}
                                                         </div>
