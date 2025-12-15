@@ -247,8 +247,8 @@ export default function Page() {
                                     }}
                                 >
                                     <div className="rounded-md border bg-card">
-                                        <div className="flex items-center justify-between p-3">
-                                            <CollapsibleTrigger className="flex items-center gap-3 min-w-0 flex-1 cursor-pointer hover:bg-muted/50 rounded-md -m-1 p-1 transition-colors">
+                                        <div className="flex items-center justify-between p-3 gap-2">
+                                            <CollapsibleTrigger className="flex items-center gap-3 min-w-0 flex-1 cursor-pointer hover:bg-muted/50 rounded-md -m-1 p-1 transition-colors mr-2">
                                                 <div className="flex-shrink-0">
                                                     {isOpen ? (
                                                         <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform duration-200" />
@@ -275,14 +275,16 @@ export default function Page() {
                                                             }}
                                                         />
                                                     ) : (
-                                                        <span className="text-sm font-medium truncate">{corpusItem.name}</span>
+                                                        <>
+                                                            <span className="text-sm font-medium truncate">{corpusItem.name}</span>
+                                                            <span className="text-xs text-muted-foreground flex-shrink-0">
+                                                                {formattedDate}
+                                                            </span>
+                                                        </>
                                                     )}
-                                                    <span className="text-xs text-muted-foreground flex-shrink-0">
-                                                        {formattedDate}
-                                                    </span>
                                                 </div>
                                             </CollapsibleTrigger>
-                                            <div className="flex items-center gap-2 flex-shrink-0">
+                                            <div className="flex items-center gap-2 flex-shrink-0 relative z-10">
                                                 {editingId === corpusItem.corpus_id ? (
                                                     <>
                                                         <Button
