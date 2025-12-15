@@ -5,10 +5,10 @@ import { Corpus } from "@/lib/actions/corpus";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { DateRange } from "react-day-picker";
-import { DeleteCorpusRequest, deleteCorpus, GetCorpusRequest, getCorpus } from "@/lib/actions/corpus";
+import { DeleteCorpusRequest, deleteCorpus, GetCorpusRequest, getCorpus, UpdateCorpusRequest, updateCorpus } from "@/lib/actions/corpus";
 import { toast } from "sonner";
 import { Spinner } from "@/components/ui/spinner";
-import { Calendar as CalendarIcon, Trash2, Search, AlertTriangle } from "lucide-react";
+import { Calendar as CalendarIcon, Trash2, Search, AlertTriangle, Edit, Check, X } from "lucide-react";
 import { useDebounce } from "use-debounce";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -29,6 +29,12 @@ export default function Page() {
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [deleteCorpusId, setDeleteCorpusId] = useState<Corpus | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
+
+    // Edit state
+    const [editingId, setEditingId] = useState<string | null>(null);
+    const [editingName, setEditingName] = useState<string>("");
+    const [editingDescription, setEditingDescription] = useState<string>("");
+    const [isUpdating, setIsUpdating] = useState(false);
 
     // Corpus
     const [loading, setLoading] = useState(true);
@@ -115,6 +121,47 @@ export default function Page() {
         setIsDeleting(false);
     }
 
+    const handleEdit = (corpus: Corpus) => {
+        setEditingId(corpus.corpus_id);
+        setEditingName(corpus.name);
+        setEditingDescription(corpus.content || "");
+    }
+
+    const handleSaveEdit = async (corpusId: string) => {
+        setIsUpdating(true);
+
+        const request: UpdateCorpusRequest = {
+            project_id: id,
+            corpus_id: corpusId,
+            data: {
+                attributes: {
+                    name: editingName,
+                    description: editingDescription
+                }
+            }
+        }
+
+        const response = await updateCorpus(request);
+        if (response.success) {
+            toast.success("Corpus updated successfully");
+            setEditingId(null);
+            setEditingName("");
+            setEditingDescription("");
+            // Refetch the corpus list after successful update
+            await fetchCorpus(1, false);
+        } else {
+            toast.error(response.error?.message || "Failed to update corpus");
+        }
+
+        setIsUpdating(false);
+    }
+
+    const handleCancelEdit = () => {
+        setEditingId(null);
+        setEditingName("");
+        setEditingDescription("");
+    }
+
     useEffect(() => {
         fetchCorpus(1, false);
     }, [debouncedSearch, date]);
@@ -162,28 +209,87 @@ export default function Page() {
                     </div>
                 ) : (
                     <div className="space-y-2">
-                        {corpus.map((corpus, index) => {
+                        {corpus.map((corpusItem, index) => {
+                            const isEditing = editingId === corpusItem.corpus_id;
                             return (
-                                <div key={index} className="flex items-center justify-between p-3 rounded-md border bg-card">
-                                    <div className="flex items-center gap-3 min-w-0 flex-1">
-                                        <div className="text-sm min-w-0">
-                                            <span key={corpus.corpus_id}>{corpus.name}</span>
+                                <div key={corpusItem.corpus_id}>
+                                    <div className="flex items-center justify-between p-3 rounded-md border bg-card">
+                                        <div className="flex items-center gap-3 min-w-0 flex-1">
+                                            <div className="text-sm min-w-0 flex-1">
+                                                {isEditing ? (
+                                                    <Input
+                                                        value={editingName}
+                                                        onChange={(e) => setEditingName(e.target.value)}
+                                                        className="w-full"
+                                                        autoFocus
+                                                    />
+                                                ) : (
+                                                    <span>{corpusItem.name}</span>
+                                                )}
+                                            </div>
+                                        </div>
+                                        {!isEditing && (
+                                            <div className="text-xs text-muted-foreground whitespace-nowrap flex-shrink-0 px-3">
+                                                {new Date(corpusItem.updated_at).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
+                                            </div>
+                                        )}
+                                        <div className="flex items-center gap-2 flex-shrink-0">
+                                            {isEditing ? (
+                                                <>
+                                                    <Button
+                                                        type="button"
+                                                        variant="outline"
+                                                        size="icon"
+                                                        onClick={() => handleSaveEdit(corpusItem.corpus_id)}
+                                                        disabled={isUpdating}
+                                                    >
+                                                        <Check className="h-4 w-4" />
+                                                    </Button>
+                                                    <Button
+                                                        type="button"
+                                                        variant="outline"
+                                                        size="icon"
+                                                        onClick={handleCancelEdit}
+                                                        disabled={isUpdating}
+                                                    >
+                                                        <X className="h-4 w-4" />
+                                                    </Button>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <Button
+                                                        type="button"
+                                                        variant="outline"
+                                                        onClick={() => handleEdit(corpusItem)}
+                                                        size="icon"
+                                                    >
+                                                        <Edit className="h-4 w-4" />
+                                                    </Button>
+                                                    <Button
+                                                        type="button"
+                                                        variant="outline"
+                                                        onClick={() => {
+                                                            setDeleteDialogOpen(true);
+                                                            setDeleteCorpusId(corpusItem);
+                                                        }}
+                                                        size="icon"
+                                                    >
+                                                        <Trash2 className="h-4 w-4" />
+                                                    </Button>
+                                                </>
+                                            )}
                                         </div>
                                     </div>
-                                    <div className="text-xs text-muted-foreground whitespace-nowrap flex-shrink-0 px-3">
-                                        {new Date(corpus.updated_at).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
-                                    </div>
-                                    <Button
-                                        type="button"
-                                        variant="outline"
-                                        onClick={() => {
-                                            setDeleteDialogOpen(true);
-                                            setDeleteCorpusId(corpus);
-                                        }}
-                                        size="icon"
-                                    >
-                                        <Trash2 className="h-4 w-4" />
-                                    </Button>
+                                    {isEditing && (
+                                        <div className="p-3 pt-0">
+                                            <textarea
+                                                value={editingDescription}
+                                                onChange={(e) => setEditingDescription(e.target.value)}
+                                                className="w-full min-h-[100px] rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
+                                                placeholder="Description"
+                                            />
+                                        </div>
+                                    )}
                                 </div>
                             );
                         })}
