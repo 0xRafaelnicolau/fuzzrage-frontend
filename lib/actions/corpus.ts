@@ -113,3 +113,29 @@ export async function deleteCorpus(req: DeleteCorpusRequest): Promise<{ success:
 
     return { success: false, error: { message: 'Failed to delete corpus' } };
 }
+
+export type UpdateCorpusRequest = {
+    project_id: string;
+    corpus_id: string;
+    data: {
+        attributes: {
+            description: string;
+            name: string;
+        }
+    }
+}
+
+export async function updateCorpus(req: UpdateCorpusRequest): Promise<{ success: boolean; error?: Error }> {
+    const result = await request(`/v1/projects/${req.project_id}/corpus/${req.corpus_id}`, {
+        method: 'PUT',
+        body: JSON.stringify(req.data),
+    });
+
+    if (result.success && result.response) {
+        revalidatePath(`/project/${req.project_id}/corpus`);
+
+        return { success: true };
+    }
+
+    return { success: false, error: { message: 'Failed to update corpus' } };
+}
