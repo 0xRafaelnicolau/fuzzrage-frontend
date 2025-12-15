@@ -3,12 +3,12 @@
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Corpus } from "@/lib/actions/corpus";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { DateRange } from "react-day-picker";
-import { DeleteCorpusRequest, deleteCorpus, GetCorpusRequest, getCorpus } from "@/lib/actions/corpus";
+import { DeleteCorpusRequest, deleteCorpus, GetCorpusRequest, getCorpus, UpdateCorpusRequest, updateCorpus } from "@/lib/actions/corpus";
 import { toast } from "sonner";
 import { Spinner } from "@/components/ui/spinner";
-import { Calendar as CalendarIcon, Trash2, Search, AlertTriangle, ChevronDown, ChevronRight } from "lucide-react";
+import { Calendar as CalendarIcon, Trash2, Search, AlertTriangle, ChevronDown, ChevronRight, Edit, Check, X } from "lucide-react";
 import { useDebounce } from "use-debounce";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -33,6 +33,11 @@ export default function Page() {
 
     // Expandable sections
     const [openItems, setOpenItems] = useState<Set<string>>(new Set());
+
+    // Editing state
+    const [editingId, setEditingId] = useState<string | null>(null);
+    const [editingName, setEditingName] = useState<string>("");
+    const [isPending, startTransition] = useTransition();
 
     // Corpus
     const [loading, setLoading] = useState(true);
@@ -96,6 +101,54 @@ export default function Page() {
         setPage(nextPage);
         await fetchCorpus(nextPage, true);
     }
+
+    const handleEdit = (corpusItem: Corpus, event: React.MouseEvent) => {
+        event.stopPropagation();
+        setEditingId(corpusItem.corpus_id);
+        setEditingName(corpusItem.name);
+        setOpenItems(prev => {
+            const newSet = new Set(prev);
+            newSet.add(corpusItem.corpus_id);
+            return newSet;
+        });
+    };
+
+    const handleSaveEdit = async (corpusId: string) => {
+        const corpusItem = corpus.find(c => c.corpus_id === corpusId);
+        if (!corpusItem) return;
+
+        startTransition(async () => {
+            const request: UpdateCorpusRequest = {
+                project_id: id,
+                corpus_id: corpusId,
+                data: {
+                    attributes: {
+                        description: corpusItem.content || "",
+                        name: editingName
+                    }
+                }
+            };
+
+            const response = await updateCorpus(request);
+            if (response.success) {
+                setEditingId(null);
+                setEditingName("");
+                toast.success("Corpus updated successfully");
+                // Refetch the corpus list after successful update
+                await fetchCorpus(page, false);
+            } else {
+                toast.error(response.error?.message || "Failed to update corpus");
+            }
+        });
+    };
+
+    const handleCancelEdit = (event?: React.MouseEvent) => {
+        if (event) {
+            event.stopPropagation();
+        }
+        setEditingId(null);
+        setEditingName("");
+    };
 
     const handleDelete = async (corpusId: string) => {
         setIsDeleting(true);
@@ -179,6 +232,9 @@ export default function Page() {
                                     key={corpusItem.corpus_id}
                                     open={isOpen}
                                     onOpenChange={(open) => {
+                                        if (editingId === corpusItem.corpus_id) {
+                                            return;
+                                        }
                                         setOpenItems(prev => {
                                             const newSet = new Set(prev);
                                             if (open) {
@@ -201,25 +257,81 @@ export default function Page() {
                                                     )}
                                                 </div>
                                                 <div className="flex items-center gap-3 min-w-0 flex-1">
-                                                    <span className="text-sm font-medium truncate">{corpusItem.name}</span>
+                                                    {editingId === corpusItem.corpus_id ? (
+                                                        <Input
+                                                            value={editingName}
+                                                            onChange={(e) => setEditingName(e.target.value)}
+                                                            className="border-0 bg-transparent p-0 h-auto text-sm font-medium focus-visible:ring-0 focus-visible:ring-offset-0 shadow-none"
+                                                            autoFocus
+                                                            onClick={(e) => e.stopPropagation()}
+                                                            onKeyDown={(e) => {
+                                                                if (e.key === 'Enter') {
+                                                                    e.preventDefault();
+                                                                    handleSaveEdit(corpusItem.corpus_id);
+                                                                } else if (e.key === 'Escape') {
+                                                                    e.preventDefault();
+                                                                    handleCancelEdit();
+                                                                }
+                                                            }}
+                                                        />
+                                                    ) : (
+                                                        <span className="text-sm font-medium truncate">{corpusItem.name}</span>
+                                                    )}
                                                     <span className="text-xs text-muted-foreground flex-shrink-0">
                                                         {formattedDate}
                                                     </span>
                                                 </div>
                                             </CollapsibleTrigger>
-                                            <Button
-                                                type="button"
-                                                variant="outline"
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    setDeleteDialogOpen(true);
-                                                    setDeleteCorpusId(corpusItem);
-                                                }}
-                                                size="icon"
-                                                className="flex-shrink-0"
-                                            >
-                                                <Trash2 className="h-4 w-4" />
-                                            </Button>
+                                            <div className="flex items-center gap-2 flex-shrink-0">
+                                                {editingId === corpusItem.corpus_id ? (
+                                                    <>
+                                                        <Button
+                                                            type="button"
+                                                            variant="outline"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                handleSaveEdit(corpusItem.corpus_id);
+                                                            }}
+                                                            size="icon"
+                                                            disabled={isPending}
+                                                        >
+                                                            <Check className="h-4 w-4" />
+                                                        </Button>
+                                                        <Button
+                                                            type="button"
+                                                            variant="outline"
+                                                            onClick={(e) => handleCancelEdit(e)}
+                                                            size="icon"
+                                                            disabled={isPending}
+                                                        >
+                                                            <X className="h-4 w-4" />
+                                                        </Button>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <Button
+                                                            type="button"
+                                                            variant="outline"
+                                                            onClick={(e) => handleEdit(corpusItem, e)}
+                                                            size="icon"
+                                                        >
+                                                            <Edit className="h-4 w-4" />
+                                                        </Button>
+                                                        <Button
+                                                            type="button"
+                                                            variant="outline"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                setDeleteDialogOpen(true);
+                                                                setDeleteCorpusId(corpusItem);
+                                                            }}
+                                                            size="icon"
+                                                        >
+                                                            <Trash2 className="h-4 w-4" />
+                                                        </Button>
+                                                    </>
+                                                )}
+                                            </div>
                                         </div>
                                         <CollapsibleContent>
                                             <div className="px-3 pb-3 pt-0 border-t">
