@@ -8,7 +8,7 @@ import { DateRange } from "react-day-picker";
 import { DeleteCorpusRequest, deleteCorpus, GetCorpusRequest, getCorpus } from "@/lib/actions/corpus";
 import { toast } from "sonner";
 import { Spinner } from "@/components/ui/spinner";
-import { Calendar as CalendarIcon, Trash2, Search, AlertTriangle } from "lucide-react";
+import { Calendar as CalendarIcon, Trash2, Search, AlertTriangle, ChevronDown, ChevronRight } from "lucide-react";
 import { useDebounce } from "use-debounce";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -29,6 +29,9 @@ export default function Page() {
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [deleteCorpusId, setDeleteCorpusId] = useState<Corpus | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
+
+    // Expandable sections
+    const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
 
     // Corpus
     const [loading, setLoading] = useState(true);
@@ -92,6 +95,21 @@ export default function Page() {
         setPage(nextPage);
         await fetchCorpus(nextPage, true);
     }
+
+    const toggleExpand = (corpusId: string, event?: React.MouseEvent) => {
+        if (event) {
+            event.stopPropagation();
+        }
+        setExpandedIds(prev => {
+            const newSet = new Set(prev);
+            if (newSet.has(corpusId)) {
+                newSet.delete(corpusId);
+            } else {
+                newSet.add(corpusId);
+            }
+            return newSet;
+        });
+    };
 
     const handleDelete = async (corpusId: string) => {
         setIsDeleting(true);
@@ -162,28 +180,66 @@ export default function Page() {
                     </div>
                 ) : (
                     <div className="space-y-2">
-                        {corpus.map((corpus, index) => {
+                        {corpus.map((corpusItem, index) => {
+                            const isExpanded = expandedIds.has(corpusItem.corpus_id);
+                            const isLast = index === corpus.length - 1;
+
                             return (
-                                <div key={index} className="flex items-center justify-between p-3 rounded-md border bg-card">
-                                    <div className="flex items-center gap-3 min-w-0 flex-1">
-                                        <div className="text-sm min-w-0">
-                                            <span key={corpus.corpus_id}>{corpus.name}</span>
-                                        </div>
-                                    </div>
-                                    <div className="text-xs text-muted-foreground whitespace-nowrap flex-shrink-0 px-3">
-                                        {new Date(corpus.updated_at).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
-                                    </div>
-                                    <Button
-                                        type="button"
-                                        variant="outline"
-                                        onClick={() => {
-                                            setDeleteDialogOpen(true);
-                                            setDeleteCorpusId(corpus);
-                                        }}
-                                        size="icon"
+                                <div key={corpusItem.corpus_id}>
+                                    <div
+                                        className={`flex items-center justify-between p-3 rounded-md border bg-card cursor-pointer hover:bg-muted/50 ${isExpanded && !isLast ? 'rounded-b-none border-b-0' : ''}`}
+                                        onClick={() => toggleExpand(corpusItem.corpus_id)}
                                     >
-                                        <Trash2 className="h-4 w-4" />
-                                    </Button>
+                                        <div className="flex items-center gap-3 min-w-0 flex-1">
+                                            <div className="flex-shrink-0">
+                                                {isExpanded ? (
+                                                    <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                                                ) : (
+                                                    <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                                                )}
+                                            </div>
+                                            <div className="flex flex-col min-w-0 flex-1">
+                                                <span className="text-sm font-medium">{corpusItem.name}</span>
+                                                {!isExpanded && (
+                                                    <span className="text-xs text-muted-foreground mt-0.5">
+                                                        {new Date(corpusItem.updated_at).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </div>
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setDeleteDialogOpen(true);
+                                                setDeleteCorpusId(corpusItem);
+                                            }}
+                                            size="icon"
+                                            className="flex-shrink-0"
+                                        >
+                                            <Trash2 className="h-4 w-4" />
+                                        </Button>
+                                    </div>
+                                    {isExpanded && (
+                                        <div className={`px-3 pb-3 pt-0 border border-t-0 rounded-b-md bg-card ${isLast ? '' : 'border-b'}`}>
+                                            <div className="pt-2 space-y-2">
+                                                <div className="text-xs text-muted-foreground">
+                                                    Updated {new Date(corpusItem.updated_at).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
+                                                </div>
+                                                {corpusItem.content && (
+                                                    <div className="text-sm text-muted-foreground whitespace-pre-wrap break-words">
+                                                        {corpusItem.content}
+                                                    </div>
+                                                )}
+                                                {!corpusItem.content && (
+                                                    <div className="text-sm text-muted-foreground italic">
+                                                        No description
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             );
                         })}
