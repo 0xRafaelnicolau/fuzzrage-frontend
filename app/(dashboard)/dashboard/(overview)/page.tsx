@@ -7,18 +7,24 @@ import { toast } from "sonner";
 import { ProjectsSection } from "@/app/(dashboard)/dashboard/(overview)/projects-section";
 import { CampaignsSection } from "@/app/(dashboard)/dashboard/(overview)/campaigns-section";
 import { UsageSection } from "@/app/(dashboard)/dashboard/(overview)/usage-section";
+import { getUser, getUsage, Usage } from "@/lib/actions/user";
+import { getPlan, Plan } from "@/lib/actions/plans";
 
 export default function Page() {
     const [loading, setLoading] = useState(false);
     const [projects, setProjects] = useState<Project[]>([]);
     const [campaigns, setCampaigns] = useState<Map<string, Campaign[]>>(new Map());
+    const [plan, setPlan] = useState<Plan | null>(null);
+    const [usage, setUsage] = useState<Usage | null>(null);
 
     const fetchProjects = async (): Promise<Project[] | null> => {
         const response = await getProjects();
+
         if (!response.success || !response.projects) {
             toast.error(response.error?.message || 'Failed to fetch projects');
             return null;
         }
+
         return response.projects;
     };
 
@@ -48,11 +54,45 @@ export default function Page() {
         return campaignsMap;
     };
 
+    const fetchUsageData = async (): Promise<void> => {
+
+        const userResponse = await getUser();
+        if (!userResponse.success || !userResponse.user) {
+            toast.error(userResponse.error?.message || 'Failed to fetch user');
+            return;
+        }
+
+        const user = userResponse.user;
+
+        // Then fetch plan and usage in parallel
+        const [planResponse, usageResponse] = await Promise.all([
+            getPlan({ plan_id: user.plan_id.toString() }),
+            getUsage()
+        ]);
+
+        if (planResponse.success && planResponse.plan) {
+            setPlan(planResponse.plan);
+        } else {
+            toast.error(planResponse.error?.message || 'Failed to fetch user plan');
+        }
+
+        if (usageResponse.success && usageResponse.usage) {
+            setUsage(usageResponse.usage);
+        } else {
+            toast.error(usageResponse.error?.message || 'Failed to fetch user usage');
+        }
+    };
+
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
 
-            const fetchedProjects = await fetchProjects();
+            // Fetch projects and usage data in parallel
+            const [fetchedProjects] = await Promise.all([
+                fetchProjects(),
+                fetchUsageData(),
+            ]);
+
             if (!fetchedProjects) {
                 setLoading(false);
                 return;
@@ -80,7 +120,7 @@ export default function Page() {
                     <div className="lg:sticky lg:top-0">
                         <div className="mb-6">
                             <h2 className="text-lg font-semibold">Usage</h2>
-                            <UsageSection loading={loading} />
+                            <UsageSection plan={plan} usage={usage} loading={loading} />
                         </div>
                         <div className="">
                             <h2 className="text-lg font-semibold">Campaigns</h2>

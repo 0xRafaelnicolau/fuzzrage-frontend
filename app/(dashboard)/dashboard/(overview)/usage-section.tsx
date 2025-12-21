@@ -4,14 +4,13 @@ import { Spinner } from "@/components/ui/spinner";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { ProgressCircle } from "@/components/ui/progress-circle";
 import { Button } from "@/components/ui/button";
-import { Usage, getUsage, getUser } from "@/lib/actions/user";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
+import { Usage } from "@/lib/actions/user";
 import Link from "next/link";
-import { ChevronDown } from "lucide-react";
-import { getPlan, Plan } from "@/lib/actions/plans";
+import { Plan } from "@/lib/actions/plans";
 
 interface UsageSectionProps {
+    plan: Plan | null;
+    usage: Usage | null;
     loading: boolean;
 }
 
@@ -43,52 +42,8 @@ function formatNumber(num: number): string {
     return num.toString();
 }
 
-export function UsageSection({ loading: parentLoading }: UsageSectionProps) {
-    const [plan, setPlan] = useState<Plan | null>(null);
-    const [usage, setUsage] = useState<Usage | null>(null);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        const fetchUsageData = async () => {
-            setLoading(true);
-
-            // First fetch user to get plan_id
-            const userResponse = await getUser();
-            if (!userResponse.success || !userResponse.user) {
-                toast.error(userResponse.error?.message || 'Failed to fetch user');
-                setLoading(false);
-                return;
-            }
-
-            const user = userResponse.user;
-
-            // Then fetch plan and usage in parallel
-            const [planResponse, usageResponse] = await Promise.all([
-                getPlan({ plan_id: user.plan_id.toString() }),
-                getUsage()
-            ]);
-
-            if (planResponse.success && planResponse.plan) {
-                setPlan(planResponse.plan);
-            } else {
-                toast.error(planResponse.error?.message || 'Failed to fetch user plan');
-            }
-
-            if (usageResponse.success && usageResponse.usage) {
-                setUsage(usageResponse.usage);
-            } else {
-                toast.error(usageResponse.error?.message || 'Failed to fetch user usage');
-            }
-
-            setLoading(false);
-        };
-
-        if (!parentLoading) {
-            fetchUsageData();
-        }
-    }, [parentLoading]);
-
-    if (parentLoading || loading || !plan || !usage) {
+export function UsageSection({ plan, usage, loading }: UsageSectionProps) {
+    if (loading || !plan || !usage) {
         return (
             <div className="flex justify-center items-center py-16">
                 <Spinner variant="default" className="text-muted-foreground" />
