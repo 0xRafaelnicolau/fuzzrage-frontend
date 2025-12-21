@@ -127,7 +127,7 @@ export function ImportRepo({ user, installations }: { user: User, installations:
                 </div>
                 <div className="flex-shrink-0 w-full sm:w-auto">
                     {installations.length === 0 ? (
-                        <Button variant="outline" className="w-full sm:w-auto" onClick={handleInstallation}>
+                        <Button variant="outline" className="w-full sm:w-auto cursor-pointer" onClick={handleInstallation}>
                             <div className="flex items-center gap-2">
                                 {getProviderIcon(user?.provider)}
                                 Install {getProviderName(user?.provider)} App
@@ -136,7 +136,7 @@ export function ImportRepo({ user, installations }: { user: User, installations:
                     ) : (
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button variant="outline" className="w-full sm:w-48">
+                                <Button variant="outline" className="w-full sm:w-48 cursor-pointer">
                                     <div className="flex items-center gap-2">
                                         {getProviderIcon(installation?.provider)}
                                         {installation?.target}
@@ -186,7 +186,7 @@ export function ImportRepo({ user, installations }: { user: User, installations:
                                     <Button
                                         size="sm"
                                         variant="default"
-                                        className="h-8 px-4 text-sm"
+                                        className="h-8 px-4 text-sm cursor-pointer"
                                         onClick={() => handleImport(repo)}
                                         disabled={importing !== null}
                                     >

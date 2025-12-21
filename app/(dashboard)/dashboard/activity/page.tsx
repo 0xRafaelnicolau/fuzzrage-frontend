@@ -145,7 +145,7 @@ export default function Page() {
                                     <Collapsible>
                                         <CollapsibleTrigger
                                             onClick={() => setIsDateExpanded(!isDateExpanded)}
-                                            className="w-full flex items-center justify-between p-2.5 text-left hover:bg-muted/50 transition-colors rounded-t-md"
+                                            className="w-full flex items-center justify-between p-2.5 text-left hover:bg-muted/50 transition-colors rounded-t-md cursor-pointer"
                                         >
                                             <div className="flex items-center gap-2">
                                                 <CalendarIcon className="h-4 w-4 text-muted-foreground" />
@@ -176,7 +176,7 @@ export default function Page() {
                                     <Collapsible>
                                         <CollapsibleTrigger
                                             onClick={() => setTypeExpanded(!isTypeExpanded)}
-                                            className="w-full flex items-center justify-between p-2.5 text-left hover:bg-muted/50 transition-colors border-t border-border"
+                                            className="w-full flex items-center justify-between p-2.5 text-left hover:bg-muted/50 transition-colors border-t border-border cursor-pointer"
                                         >
                                             <div className="flex items-center gap-2">
                                                 <Filter className="h-4 w-4 text-muted-foreground" />
@@ -241,7 +241,7 @@ export default function Page() {
                                     <Collapsible>
                                         <CollapsibleTrigger
                                             onClick={() => setIsDateExpanded(!isDateExpanded)}
-                                            className="w-full flex items-center justify-between p-2.5 text-left hover:bg-muted/50 transition-colors rounded-t-md"
+                                            className="w-full flex items-center justify-between p-2.5 text-left hover:bg-muted/50 transition-colors rounded-t-md cursor-pointer"
                                         >
                                             <div className="flex items-center gap-2">
                                                 <CalendarIcon className="h-4 w-4 text-muted-foreground" />
@@ -272,7 +272,7 @@ export default function Page() {
                                     <Collapsible>
                                         <CollapsibleTrigger
                                             onClick={() => setTypeExpanded(!isTypeExpanded)}
-                                            className="w-full flex items-center justify-between p-2.5 text-left hover:bg-muted/50 transition-colors border-t border-border"
+                                            className="w-full flex items-center justify-between p-2.5 text-left hover:bg-muted/50 transition-colors border-t border-border cursor-pointer"
                                         >
                                             <div className="flex items-center gap-2">
                                                 <Filter className="h-4 w-4 text-muted-foreground" />
@@ -407,7 +407,7 @@ export default function Page() {
                                                 variant="outline"
                                                 onClick={handleLoadMore}
                                                 disabled={loadingMore}
-                                                className="gap-2"
+                                                className="gap-2 cursor-pointer"
                                             >
                                                 {loadingMore ? (
                                                     <>

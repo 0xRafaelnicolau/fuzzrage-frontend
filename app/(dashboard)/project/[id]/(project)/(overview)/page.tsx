@@ -16,6 +16,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { StartCampaignModal } from "@/app/(dashboard)/project/[id]/(project)/(overview)/start-campaign-modal"
 import { GoBack } from "@/components/ui/go-back";
 import { getProject, Project } from "@/lib/actions/projects";
+import { CAMPAIGN_STATE_OPTIONS, getCampaignStateOption } from "@/lib/campaign-state";
 
 
 export default function Page() {
@@ -41,13 +42,7 @@ export default function Page() {
     const [date, setDate] = useState<DateRange | undefined>(undefined);
 
     // Campaign status 
-    const options = [
-        { value: "SUCCEEDED", label: "Succeeded", color: "bg-green-500" },
-        { value: "FAILED", label: "Failed", color: "bg-red-500" },
-        { value: "RUNNING", label: "Running", color: "bg-orange-500" },
-        { value: "QUEUED", label: "Queued", color: "bg-yellow-500" },
-        { value: "CANCELLED", label: "Canceled", color: "bg-gray-400" },
-    ];
+    const options = CAMPAIGN_STATE_OPTIONS;
     const toggleStatus = (status: string) => {
         selectStatus(prev =>
             prev.includes(status)
@@ -260,14 +255,16 @@ export default function Page() {
                                 {campaigns.map((campaign, index) => {
                                     const isFirst = index === 0;
                                     const isLast = index === campaigns.length - 1;
-                                    const durationInSeconds = campaign.attributes.result.total_duration;
-                                    const durationMinutes = Math.floor(durationInSeconds / 60);
-                                    const durationSeconds = durationInSeconds % 60;
-                                    const durationDisplay = durationMinutes > 0
-                                        ? `${durationMinutes}m ${durationSeconds}s`
-                                        : `${durationSeconds}s`;
+                                    const durationInMinutes = campaign.attributes.result.total_duration;
+                                    const hours = Math.floor(durationInMinutes / 60);
+                                    const minutes = Math.floor(durationInMinutes % 60);
+                                    const durationDisplay = hours > 0
+                                        ? minutes > 0
+                                            ? `${hours}h ${minutes}m`
+                                            : `${hours}h`
+                                        : `${minutes}m`;
 
-                                    const stateOption = options.find(opt => opt.value === campaign.attributes.state);
+                                    const stateOption = getCampaignStateOption(campaign.attributes.state);
                                     const stateColor = stateOption?.color || 'bg-gray-400';
 
                                     return (
@@ -368,12 +365,14 @@ export default function Page() {
                     ) : (
                         <>
                             {campaigns.map((campaign) => {
-                                const durationInSeconds = campaign.attributes.result.total_duration;
-                                const durationMinutes = Math.floor(durationInSeconds / 60);
-                                const durationSeconds = durationInSeconds % 60;
-                                const durationDisplay = durationMinutes > 0
-                                    ? `${durationMinutes}m ${durationSeconds}s`
-                                    : `${durationSeconds}s`;
+                                const durationInMinutes = campaign.attributes.result.total_duration;
+                                const hours = Math.floor(durationInMinutes / 60);
+                                const minutes = Math.floor(durationInMinutes % 60);
+                                const durationDisplay = hours > 0
+                                    ? minutes > 0
+                                        ? `${hours}h ${minutes}m`
+                                        : `${hours}h`
+                                    : `${minutes}m`;
 
                                 const stateOption = options.find(opt => opt.value === campaign.attributes.state);
                                 const stateColor = stateOption?.color || 'bg-gray-400';

@@ -11,14 +11,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Spinner } from "@/components/ui/spinner";
 import { ProgressCircle } from "@/components/ui/progress-circle";
 import { Campaign, GetCampaignRequest, getCampaign } from "@/lib/actions/campaigns";
-
-const options = [
-    { value: "SUCCEEDED", label: "Succeeded", color: "bg-green-500" },
-    { value: "FAILED", label: "Failed", color: "bg-red-500" },
-    { value: "RUNNING", label: "Running", color: "bg-orange-500" },
-    { value: "QUEUED", label: "Queued", color: "bg-yellow-500" },
-    { value: "CANCELLED", label: "Canceled", color: "bg-gray-400" },
-];
+import { getCampaignStateOption } from "@/lib/campaign-state";
 
 export default function Page() {
     const params = useParams();
@@ -262,7 +255,7 @@ export default function Page() {
                                         <div className="flex flex-col items-center justify-center py-16 text-center">
                                             <div className="flex items-center gap-2">
                                                 <h1 className="text-2xl font-bold">
-                                                    {options.find(opt => opt.value === campaign.attributes.state)?.label ??
+                                                    {getCampaignStateOption(campaign.attributes.state)?.label ??
                                                         campaign.attributes.state}
                                                 </h1>
                                             </div>

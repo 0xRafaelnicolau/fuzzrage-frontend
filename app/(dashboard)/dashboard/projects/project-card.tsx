@@ -34,7 +34,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
                     </div>
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                            <Button variant="ghost" size="sm" className="h-6 w-6 p-0 cursor-pointer">
                                 <MoreHorizontal className="h-4 w-4" />
                             </Button>
                         </DropdownMenuTrigger>
@@ -74,7 +74,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
 
             <CardFooter className="px-6 py-0">
                 <Link href={`/project/${project.id}`} className="w-full">
-                    <Button variant="default" className="w-full">
+                    <Button variant="default" className="w-full cursor-pointer">
                         View more
                     </Button>
                 </Link>

@@ -1,80 +1,76 @@
 "use client";
 
-import Link from "next/link";
 import { Campaign, getCampaigns, GetCampaignsRequest } from "@/lib/actions/campaigns";
 import { Project, getProjects } from "@/lib/actions/projects";
-import { Spinner } from "@/components/ui/spinner";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { ProjectCard } from "@/app/(dashboard)/dashboard/projects/project-card";
-import { formatDate } from "date-fns";
-import { ScrollArea } from "@/components/ui/scroll-area";
-
-const stateOptions = [
-    { value: "SUCCEEDED", label: "Succeeded", color: "bg-green-500" },
-    { value: "FAILED", label: "Failed", color: "bg-red-500" },
-    { value: "RUNNING", label: "Running", color: "bg-orange-500" },
-    { value: "QUEUED", label: "Queued", color: "bg-yellow-500" },
-    { value: "CANCELLED", label: "Canceled", color: "bg-gray-400" },
-];
-
-function getStateOption(state: string) {
-    return stateOptions.find(opt => opt.value === state);
-}
+import { ProjectsSection } from "@/app/(dashboard)/dashboard/(overview)/projects-section";
+import { CampaignsSection } from "@/app/(dashboard)/dashboard/(overview)/campaigns-section";
+import { UsageSection } from "@/app/(dashboard)/dashboard/(overview)/usage-section";
 
 export default function Page() {
-    const [projects, setProjects] = useState<Project[]>([]);
-    const [campaignsByProject, setCampaignsByProject] = useState<Map<string, Campaign[]>>(new Map());
     const [loading, setLoading] = useState(false);
+    const [projects, setProjects] = useState<Project[]>([]);
+    const [campaigns, setCampaigns] = useState<Map<string, Campaign[]>>(new Map());
+
+    const fetchProjects = async (): Promise<Project[] | null> => {
+        const response = await getProjects();
+        if (!response.success || !response.projects) {
+            toast.error(response.error?.message || 'Failed to fetch projects');
+            return null;
+        }
+        return response.projects;
+    };
+
+    const fetchCampaigns = async (projects: Project[]): Promise<Map<string, Campaign[]>> => {
+        const requests: GetCampaignsRequest[] = projects.map(project => ({
+            project_id: project.id,
+            size: 5,
+            sort: '-created_at'
+        }));
+
+        const responses = await Promise.all(
+            requests.map(request => getCampaigns(request))
+        );
+
+        const campaignsMap = new Map<string, Campaign[]>();
+        responses.forEach((campaignResponse, index) => {
+            const projectId = projects[index].id;
+
+            if (campaignResponse.success && campaignResponse.campaigns) {
+                campaignsMap.set(projectId, campaignResponse.campaigns);
+            } else {
+                toast.error(campaignResponse.error?.message || 'Failed to fetch campaigns');
+                campaignsMap.set(projectId, []);
+            }
+        });
+
+        return campaignsMap;
+    };
 
     useEffect(() => {
-        const fetchOverviewData = async () => {
+        const fetchData = async () => {
             setLoading(true);
 
-            const response = await getProjects();
-            if (response.success && response.projects) {
-                setProjects(response.projects);
-            } else {
-                toast.error(response.error?.message || 'Failed to fetch projects');
+            const fetchedProjects = await fetchProjects();
+            if (!fetchedProjects) {
                 setLoading(false);
                 return;
             }
 
-            if (response.projects.length === 0) {
+            setProjects(fetchedProjects);
+
+            if (fetchedProjects.length === 0) {
                 setLoading(false);
                 return;
             }
 
-            const requests: GetCampaignsRequest[] = [];
-            for (const project of response.projects) {
-                requests.push({
-                    project_id: project.id,
-                    size: 10,
-                    sort: '-created_at'
-                });
-            }
-
-            const responses = await Promise.all(requests.map(request => getCampaigns(request)));
-
-            const campaignsMap = new Map<string, Campaign[]>();
-            for (let i = 0; i < responses.length; i++) {
-                const campaignResponse = responses[i];
-                const projectId = response.projects[i].id;
-
-                if (campaignResponse.success && campaignResponse.campaigns) {
-                    campaignsMap.set(projectId, campaignResponse.campaigns);
-                } else {
-                    toast.error(campaignResponse.error?.message || 'Failed to fetch campaigns');
-                    // Continue with other projects even if one fails
-                    campaignsMap.set(projectId, []);
-                }
-            }
-
-            setCampaignsByProject(campaignsMap);
+            const campaignsMap = await fetchCampaigns(fetchedProjects);
+            setCampaigns(campaignsMap);
             setLoading(false);
-        }
+        };
 
-        fetchOverviewData();
+        fetchData();
     }, []);
 
     return (
@@ -82,104 +78,23 @@ export default function Page() {
             <div className="flex flex-col lg:flex-row relative">
                 <div className="w-full lg:w-1/3 lg:pr-6 mb-6 lg:mb-0">
                     <div className="lg:sticky lg:top-0">
+                        <div className="mb-6">
+                            <h2 className="text-lg font-semibold">Usage</h2>
+                            <UsageSection loading={loading} />
+                        </div>
                         <div className="">
                             <h2 className="text-lg font-semibold">Campaigns</h2>
+                            <CampaignsSection
+                                campaigns={campaigns}
+                                projects={projects}
+                                loading={loading}
+                            />
                         </div>
-                        {loading ? (
-                            <div className="flex justify-center items-center py-16">
-                                <Spinner variant="default" className="text-muted-foreground" />
-                            </div>
-                        ) : (
-                            (() => {
-                                const campaignList = Array.from(campaignsByProject.entries())
-                                    .flatMap(([projectId, campaigns]) => {
-                                        const project = projects.find(p => p.id === projectId);
-                                        return campaigns.map(campaign => ({ campaign, project }));
-                                    })
-                                    .sort((a, b) => {
-                                        const dateA = new Date(a.campaign.attributes.created_at).getTime();
-                                        const dateB = new Date(b.campaign.attributes.created_at).getTime();
-                                        return dateB - dateA; // Most recent first
-                                    })
-                                    .map(({ campaign, project }) => {
-                                        const stateOption = getStateOption(campaign.attributes.state);
-                                        const stateColor = stateOption?.color || 'bg-gray-400';
-                                        const projectId = project?.id ?? campaign.attributes.project_id;
-
-                                        return (
-                                            <Link
-                                                key={campaign.id}
-                                                href={`/project/${projectId}/campaign/${campaign.id}`}
-                                                className="block"
-                                            >
-                                                <div className="flex flex-col gap-2 p-3 rounded-md border bg-card hover:bg-accent cursor-pointer transition-colors">
-                                                    <div className="flex items-center justify-between">
-                                                        <div className="flex items-center gap-2 min-w-0 flex-1">
-                                                            <span className="text-sm font-medium truncate">
-                                                                {project?.attributes.name || 'Unknown Project'}
-                                                            </span>
-                                                        </div>
-                                                        <div className="flex items-center gap-2 flex-shrink-0">
-                                                            <div className={`w-2 h-2 rounded-full ${stateColor}`} />
-                                                            <span className="text-xs text-muted-foreground">
-                                                                {stateOption?.label || campaign.attributes.state}
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                    <div className="flex items-center justify-between">
-                                                        <div className="text-xs text-muted-foreground">
-                                                            {campaign.id.substring(0, 8)}
-                                                        </div>
-                                                        <div className="text-xs text-muted-foreground whitespace-nowrap flex-shrink-0">
-                                                            {formatDate(campaign.attributes.created_at, 'MMM d')}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </Link>
-                                        );
-                                    });
-
-                                return (
-                                    <>
-                                        <div className="mt-4 space-y-3 lg:hidden">
-                                            {campaignList}
-                                        </div>
-                                        <ScrollArea className="hidden lg:block h-[calc(100vh-15rem)]">
-                                            <div className="mt-4 space-y-3">
-                                                {campaignList}
-                                            </div>
-                                        </ScrollArea>
-                                    </>
-                                );
-                            })()
-                        )}
                     </div>
                 </div>
-
                 <div className="w-full lg:w-2/3 lg:pl-4 mb-6 lg:mb-0">
-                    <div className="">
-                        <h2 className="text-lg font-semibold">Projects</h2>
-                    </div>
-                    {loading ? (
-                        <div className="flex justify-center items-center py-16">
-                            <Spinner variant="default" className="text-muted-foreground" />
-                        </div>
-                    ) : (
-                        <>
-                            <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 lg:hidden">
-                                {projects.map((project) => (
-                                    <ProjectCard key={project.id} project={project} />
-                                ))}
-                            </div>
-                            <ScrollArea className="hidden lg:block h-[calc(100vh-15rem)]">
-                                <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    {projects.map((project) => (
-                                        <ProjectCard key={project.id} project={project} />
-                                    ))}
-                                </div>
-                            </ScrollArea>
-                        </>
-                    )}
+                    <h2 className="text-lg font-semibold">Projects</h2>
+                    <ProjectsSection projects={projects} loading={loading} />
                 </div>
             </div>
         </div >

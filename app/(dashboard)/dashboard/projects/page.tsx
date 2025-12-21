@@ -142,7 +142,7 @@ export default function Page() {
                 </div>
                 <Popover>
                     <PopoverTrigger asChild>
-                        <Button variant="outline" size="icon">
+                        <Button variant="outline" size="icon" className="cursor-pointer">
                             <CalendarIcon className="h-4 w-4" />
                         </Button>
                     </PopoverTrigger>
@@ -157,11 +157,11 @@ export default function Page() {
                     </PopoverContent>
                 </Popover>
                 <Link href="/dashboard/projects/new">
-                    <Button variant="default" className="gap-1.25 hidden md:inline-flex">
+                    <Button variant="default" className="gap-1.25 hidden md:inline-flex cursor-pointer">
                         <CirclePlus className="h-4 w-4" />
                         Add Project
                     </Button>
-                    <Button variant="default" size="icon" className="gap-1.25 md:hidden">
+                    <Button variant="default" size="icon" className="gap-1.25 md:hidden cursor-pointer">
                         <CirclePlus className="h-4 w-4" />
                     </Button>
                 </Link>
@@ -188,7 +188,7 @@ export default function Page() {
                                     variant="outline"
                                     onClick={loadMore}
                                     disabled={loadingMore}
-                                    className="gap-2"
+                                    className="gap-2 cursor-pointer"
                                 >
                                     {loadingMore ? (
                                         <>

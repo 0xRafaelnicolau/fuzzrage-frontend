@@ -17,7 +17,7 @@ export function GoBack({
         <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
                 <Link href={href}>
-                    <Button variant="outline" size="sm" className="p-2 h-8 w-8">
+                    <Button variant="outline" size="sm" className="p-2 h-8 w-8 cursor-pointer">
                         <ArrowLeft className="h-4 w-4" />
                     </Button>
                 </Link>

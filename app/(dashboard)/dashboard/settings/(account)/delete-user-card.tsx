@@ -51,6 +51,7 @@ export function DeleteUserCard({ user }: { user: User }) {
                             <Button
                                 type="button"
                                 onClick={() => setIsDialogOpen(true)}
+                                className="cursor-pointer"
                             >
                                 <Trash2 className="h-4 w-4" />
                                 <span className="hidden sm:inline">
@@ -89,10 +90,11 @@ export function DeleteUserCard({ user }: { user: User }) {
                         </div>
                     </div>
                     <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogCancel className="cursor-pointer">Cancel</AlertDialogCancel>
                         <AlertDialogAction
                             disabled={confirmationText !== user?.name}
                             onClick={handleDeleteUser}
+                            className="cursor-pointer"
                         >
                             Delete
                         </AlertDialogAction>
