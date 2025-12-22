@@ -11,7 +11,9 @@ import { getUser, getUsage, Usage } from "@/lib/actions/user";
 import { getPlan, Plan } from "@/lib/actions/plans";
 
 export default function Page() {
-    const [loading, setLoading] = useState(false);
+    const [projectsLoading, setProjectsLoading] = useState(false);
+    const [campaignsLoading, setCampaignsLoading] = useState(false);
+    const [usageLoading, setUsageLoading] = useState(false);
     const [projects, setProjects] = useState<Project[]>([]);
     const [campaigns, setCampaigns] = useState<Map<string, Campaign[]>>(new Map());
     const [plan, setPlan] = useState<Plan | null>(null);
@@ -85,7 +87,9 @@ export default function Page() {
 
     useEffect(() => {
         const fetchData = async () => {
-            setLoading(true);
+            setProjectsLoading(true);
+            setCampaignsLoading(true);
+            setUsageLoading(true);
 
             // Fetch projects and usage data in parallel
             const [fetchedProjects] = await Promise.all([
@@ -93,21 +97,27 @@ export default function Page() {
                 fetchUsageData(),
             ]);
 
+            setProjectsLoading(false);
+            setUsageLoading(false);
+
             if (!fetchedProjects) {
-                setLoading(false);
+                setProjectsLoading(false);
+                setUsageLoading(false);
                 return;
             }
 
             setProjects(fetchedProjects);
 
             if (fetchedProjects.length === 0) {
-                setLoading(false);
+                setProjectsLoading(false);
+                setUsageLoading(false);
+                setCampaignsLoading(false);
                 return;
             }
 
             const campaignsMap = await fetchCampaigns(fetchedProjects);
             setCampaigns(campaignsMap);
-            setLoading(false);
+            setCampaignsLoading(false);
         };
 
         fetchData();
@@ -120,21 +130,21 @@ export default function Page() {
                     <div className="lg:sticky lg:top-0">
                         <div className="mb-6">
                             <h2 className="text-lg font-semibold">Usage</h2>
-                            <UsageSection plan={plan} usage={usage} loading={loading} />
+                            <UsageSection plan={plan} usage={usage} loading={usageLoading} />
                         </div>
                         <div className="">
                             <h2 className="text-lg font-semibold">Campaigns</h2>
                             <CampaignsSection
                                 campaigns={campaigns}
                                 projects={projects}
-                                loading={loading}
+                                loading={campaignsLoading}
                             />
                         </div>
                     </div>
                 </div>
                 <div className="w-full lg:w-2/3 lg:pl-4 mb-6 lg:mb-0">
                     <h2 className="text-lg font-semibold">Projects</h2>
-                    <ProjectsSection projects={projects} loading={loading} />
+                    <ProjectsSection projects={projects} loading={projectsLoading} />
                 </div>
             </div>
         </div >
