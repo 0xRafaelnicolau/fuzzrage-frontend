@@ -16,12 +16,15 @@ export function CampaignStatisticsCard({ campaign }: CampaignStatisticsCardProps
         return statusColors[state] || "bg-gray-400";
     };
 
-    const formatDuration = (seconds: number) => {
-        const durationMinutes = Math.floor(seconds / 60);
-        const durationSeconds = seconds % 60;
-        return durationMinutes > 0
-            ? `${durationMinutes}m ${durationSeconds}s`
-            : `${durationSeconds}s`;
+    const formatDuration = (minutes: number) => {
+        const hours = Math.floor(minutes / 60);
+        const remainingMinutes = minutes % 60;
+        if (hours > 0) {
+            return remainingMinutes > 0
+                ? `${hours}h ${remainingMinutes}m`
+                : `${hours}h`;
+        }
+        return `${remainingMinutes}m`;
     };
 
     const result = campaign.attributes.result;
