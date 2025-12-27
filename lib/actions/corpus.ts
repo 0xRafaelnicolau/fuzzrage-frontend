@@ -117,18 +117,21 @@ export async function deleteCorpus(req: DeleteCorpusRequest): Promise<{ success:
 export type UpdateCorpusRequest = {
     project_id: string;
     corpus_id: string;
-    data: {
-        attributes: {
-            description: string;
-            name: string;
-        }
-    }
+    description: string;
+    name: string;
 }
 
 export async function updateCorpus(req: UpdateCorpusRequest): Promise<{ success: boolean; error?: Error }> {
     const result = await request(`/v1/projects/${req.project_id}/corpus/${req.corpus_id}`, {
         method: 'PUT',
-        body: JSON.stringify(req.data),
+        body: JSON.stringify({
+            data: {
+                attributes: {
+                    description: req.description,
+                    name: req.name
+                }
+            }
+        })
     });
 
     if (result.success && result.response) {
