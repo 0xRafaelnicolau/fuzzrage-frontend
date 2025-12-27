@@ -248,6 +248,112 @@ export async function getCampaigns(req: GetCampaignsRequest): Promise<{ success:
     return { success: false, error: result.error }
 }
 
+export type GetUserCampaignsRequest = {
+    page?: number;
+    size?: number;
+    sort?: string;
+    state_in?: string;
+    created_at_gte?: string;
+    created_at_lte?: string;
+}
+
+export type GetUserCampaignsResponse = {
+    data: Array<{
+        attributes: {
+            created_at: string;
+            project_id: number;
+            result: {
+                cov_percentage: number;
+                props_failed: string;
+                props_failed_count: number;
+                props_passed: string;
+                props_passed_count: number;
+                props_tested: string;
+                props_tested_count: number;
+                status: string;
+                total_duration: number;
+            },
+            settings: {
+                corpus: {
+                    dst_id: string;
+                    reused: boolean;
+                    saved: boolean;
+                    src_id: string;
+                },
+                execution: {
+                    branch: string;
+                    config: string;
+                    contract_name: string;
+                    duration: number;
+                    entry_point: string;
+                }
+            },
+            state: string;
+            updated_at: string;
+        },
+        id: string;
+        type: string;
+    }>
+    meta: {
+        current_page: number;
+        per_page: number;
+        total: number;
+        total_pages: number;
+    }
+}
+
+export async function getUserCampaigns(req: GetUserCampaignsRequest): Promise<{ success: boolean; campaigns?: Campaign[]; meta?: GetUserCampaignsResponse['meta']; error?: Error }> {
+    const queryParams = new URLSearchParams();
+
+    if (req?.page !== undefined) {
+        queryParams.append('page', req.page.toString());
+    }
+    if (req?.size !== undefined) {
+        queryParams.append('size', req.size.toString());
+    }
+    if (req?.sort) {
+        queryParams.append('sort', req.sort);
+    }
+    if (req?.state_in) {
+        queryParams.append('state_in', req.state_in);
+    }
+    if (req?.created_at_gte) {
+        queryParams.append('created_at_gte', req.created_at_gte);
+    }
+    if (req?.created_at_lte) {
+        queryParams.append('created_at_lte', req.created_at_lte);
+    }
+
+    const result = await request(`/v1/user/campaigns${queryParams.toString() ? `?${queryParams.toString()}` : ''}`, {
+        method: 'GET',
+    })
+
+    if (result.success && result.response) {
+        try {
+            const data: GetUserCampaignsResponse = await result.response.json()
+
+            const campaigns: Campaign[] = data.data.map(item => ({
+                id: item.id,
+                type: item.type,
+                attributes: {
+                    created_at: item.attributes.created_at,
+                    project_id: item.attributes.project_id,
+                    result: item.attributes.result,
+                    settings: item.attributes.settings,
+                    state: item.attributes.state,
+                    updated_at: item.attributes.updated_at
+                }
+            }))
+
+            return { success: true, campaigns, meta: data.meta }
+        } catch {
+            return { success: false, error: { message: 'Failed to parse get user campaigns data' } }
+        }
+    }
+
+    return { success: false, error: result.error }
+}
+
 export type GetCampaignRequest = {
     project_id: string;
     campaign_id: string;

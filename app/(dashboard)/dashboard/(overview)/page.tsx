@@ -1,6 +1,6 @@
 "use client";
 
-import { Campaign, getCampaigns, GetCampaignsRequest } from "@/lib/actions/campaigns";
+import { Campaign, getUserCampaigns, GetUserCampaignsRequest } from "@/lib/actions/campaigns";
 import { Project, getProjects } from "@/lib/actions/projects";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
@@ -30,28 +30,26 @@ export default function Page() {
         return response.projects;
     };
 
-    const fetchCampaigns = async (projects: Project[]): Promise<Map<string, Campaign[]>> => {
-        const requests: GetCampaignsRequest[] = projects.map(project => ({
-            project_id: project.id,
-            size: 5,
+    const fetchCampaigns = async (): Promise<Map<string, Campaign[]>> => {
+        const request: GetUserCampaignsRequest = {
+            size: 10,
             sort: '-created_at'
-        }));
+        };
 
-        const responses = await Promise.all(
-            requests.map(request => getCampaigns(request))
-        );
+        const response = await getUserCampaigns(request);
 
         const campaignsMap = new Map<string, Campaign[]>();
-        responses.forEach((campaignResponse, index) => {
-            const projectId = projects[index].id;
 
-            if (campaignResponse.success && campaignResponse.campaigns) {
-                campaignsMap.set(projectId, campaignResponse.campaigns);
-            } else {
-                toast.error(campaignResponse.error?.message || 'Failed to fetch campaigns');
-                campaignsMap.set(projectId, []);
-            }
-        });
+        if (response.success && response.campaigns) {
+            // Group campaigns by project_id
+            response.campaigns.forEach(campaign => {
+                const projectId = campaign.attributes.project_id.toString();
+                const existing = campaignsMap.get(projectId) || [];
+                campaignsMap.set(projectId, [...existing, campaign]);
+            });
+        } else {
+            toast.error(response.error?.message || 'Failed to fetch campaigns');
+        }
 
         return campaignsMap;
     };
@@ -108,14 +106,8 @@ export default function Page() {
 
             setProjects(fetchedProjects);
 
-            if (fetchedProjects.length === 0) {
-                setProjectsLoading(false);
-                setUsageLoading(false);
-                setCampaignsLoading(false);
-                return;
-            }
-
-            const campaignsMap = await fetchCampaigns(fetchedProjects);
+            // Fetch campaigns independently (no longer depends on projects)
+            const campaignsMap = await fetchCampaigns();
             setCampaigns(campaignsMap);
             setCampaignsLoading(false);
         };
